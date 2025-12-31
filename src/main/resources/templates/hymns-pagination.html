@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="ja-JP">
-<#include "include-header.ftlh">
+<html lang="ja-JP" xmlns:th="https://www.thymeleaf.org">
+<div th:replace="~{commons::header}"></div>
 
 <body>
 	<style>
@@ -8,8 +8,8 @@
 			font-family: "Noto Serif JP", serif;
 		}
 	</style>
-	<#include "include-navbar.ftlh">
-	<#include "include-sidebar.ftlh">
+	<div th:replace="~{commons::navibar}"></div>
+	<div th:insert="~{commons::sidebar}"></div>
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 main">
@@ -36,11 +36,7 @@
 								</button>
 							</div>
 						</div>
-						<#if pageNum?exists>
-							<input type="hidden" value="${pageNum}" id="pageNumContainer">
-						<#else>
-							<input type="hidden" value="''" id="pageNumContainer">
-						</#if>
+						<input type="hidden" th:value="${pageNum eq null ? '' : pageNum}" id="pageNumContainer">
 						<table class="table table-sm table-hover">
 							<caption style="font-size: 10px;">賛美歌情報一覧</caption>
 							<thead>
@@ -63,7 +59,7 @@
 			</div>
 		</div>
 	</div>
-	<script type="text/javascript" src="/static/customizes/hymns-pagination.js" nonce="${nonce}"></script>
+	<script type="text/javascript" th:src="@{/static/customizes/hymns-pagination.js}"></script>
 </body>
 
 </html>
