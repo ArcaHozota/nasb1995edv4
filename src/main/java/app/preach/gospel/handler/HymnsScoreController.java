@@ -47,13 +47,13 @@ public final class HymnsScoreController {
 	/**
 	 * 賛美歌楽譜をダウンロードする
 	 *
-	 * @param scoreId 賛美歌ID
+	 * @param id 賛美歌ID
 	 * @return ResponseEntity<byte[]>
 	 */
 	@GetMapping(ProjectURLConstants.URL_SCORE_DOWNLOAD)
 	@ResponseBody
-	public @NotNull ResponseEntity<byte[]> scoreDownload(@RequestParam final Long scoreId) {
-		final CoResult<HymnDto, DataAccessException> hymnInfoById = this.iHymnService.getHymnInfoById(scoreId);
+	public @NotNull ResponseEntity<byte[]> scoreDownload(@RequestParam final Long id) {
+		final CoResult<HymnDto, DataAccessException> hymnInfoById = this.iHymnService.getHymnInfoById(id);
 		if (!hymnInfoById.isOk()) {
 			throw hymnInfoById.getErr();
 		}
