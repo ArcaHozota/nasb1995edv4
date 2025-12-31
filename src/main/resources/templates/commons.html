@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!-- commons.html -->
+<html lang="ja-JP" xmlns:th="https://www.thymeleaf.org">
+
+<head th:fragment="header">
+	<title>NASB1995</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="_csrf_header" content="${_csrf.headerName}">
+	<meta name="_csrf_token" content="${_csrf.token}">
+	<link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/customize.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+	<link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Corinthia:wght@700&family=Noto+Sans+JP:wght@100..900&family=Noto+Serif+JP:wght@200..900&display=swap">
+	<script type="text/javascript" th:src="@{/static/bootstrap/js/bootstrap.bundle.min.js}"></script>
+	<script type="text/javascript" th:src="@{/static/layer/neo-layer.js}"></script>
+	<script type="text/javascript" th:src="@{/static/customizes/constants.js}"></script>
+	<script type="text/javascript" th:src="@{/static/customizes/commons.js}"></script>
+	<script type="text/javascript" th:src="'https://cdn.jsdelivr.net/npm/sweetalert2@11'"></script>
+</head>
+
+<body>
+	<div th:fragment="navibar">
+		<nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top" data-bs-theme="dark">
+			<div class="container-fluid">
+				<div class="collapse navbar-collapse" id="navbarSupportedContents">
+					<div class="input-group d-flex justify-content-end">
+						<input type="text" class="form-control" id="searchInput" placeholder="検索"
+							style="max-width: 180px;">
+						<button class="input-group-text bg-transparent p-0 px-2" id="searchBtn">
+							<i class="fa-solid fa-magnifying-glass"></i>
+						</button>
+					</div>
+					<form id="logoutForm" method="post" th:action="@{/category/do-logout}" style="display: none;">
+					</form>
+					<div class="d-flex">
+						<button id="logoutBtn" type="button" class="btn btn-danger me-2">
+							<i class="fa-solid fa-right-from-bracket"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</nav>
+	</div>
+
+	<div th:fragment="sidebar" th:remove="tag">
+		<div class="col-md-2 position-fixed top-0 start-0 text-bg-dark" style="height: 100vh; z-index: 1040;"
+			th:with="securityPerson=${#authentication.principal}">
+			<div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 100%;height: 100%;">
+				<div class="d-flex justify-content-start">
+					<img th:src="@{/static/image/cross.svg}" alt="img01" width="45" height="54">
+					<a class="navbar-brand effect-shine" style="font-size: 33px;" href="#" id="toMainmenu">
+						NASB1995
+					</a>
+				</div>
+				<hr>
+				<ul class="nav nav-pills flex-column mb-auto">
+					<li class="nav-item">
+						<a href="#" class="nav-link text-white" id="toBookSearch">
+							<svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+								<use xlink:href="#"></use>
+							</svg>
+							<i class="fa-solid fa-anchor"></i> 聖書章節選択
+						</a>
+					</li>
+					<li>
+						<a href="#" class="nav-link text-white" id="toTemporary">
+							<svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+								<use xlink:href="#"></use>
+							</svg>
+							<i class="fa-solid fa-box-archive"></i> 聖書章節入力
+						</a>
+					</li>
+					<li>
+						<a href="#" class="nav-link text-white" id="toCollection">
+							<svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+								<use xlink:href="#"></use>
+							</svg>
+							<i class="fa-solid fa-rss"></i> 賛美歌集め
+						</a>
+					</li>
+					<li>
+						<a href="#" class="nav-link text-white" id="toRandomFive">
+							<svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+								<use xlink:href="#"></use>
+							</svg>
+							<i class="fa-solid fa-copyright"></i> ランダム五つ
+						</a>
+					</li>
+				</ul>
+				<hr>
+				<div class="dropdown"> <a href="#"
+						class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+						data-bs-toggle="dropdown" aria-expanded="false"> <img src="https://github.com/mdo.png" alt=""
+							width="32" height="32" class="rounded-circle me-2">
+						<strong th:text="${securityPerson.originalAdmin.username}"></strong> </a>
+					<ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+						<li>
+							<a class="dropdown-item" href="#" id="toPersonal">
+								<i class="fa-solid fa-user-gear"></i> 個人スペース
+								<input type="hidden" th:value="${securityPerson.originalAdmin.id}">
+							</a>
+						</li>
+						<li>
+							<a class="dropdown-item" href="#" id="toMessage">
+								<i class="fa-solid fa-comments"></i> メッセージ
+							</a>
+						</li>
+						<li>
+							<hr class="dropdown-divider">
+						</li>
+						<li>
+							<a class="dropdown-item" href="#" id="logoutBtn2">
+								<i class="fa-solid fa-right-from-bracket"></i> ログアウト
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
