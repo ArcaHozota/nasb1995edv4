@@ -13,7 +13,7 @@ server:
       accept-count: 1000
 spring:
    application:
-      name: nasb1995edv3
+      name: nasb1995edv4
    servlet:
       multipart:
          max-file-size: 3MB

@@ -12,7 +12,6 @@ const passwordIpt1 = document.getElementById("passwordIpt1");
 const passwordIpt2 = document.getElementById("passwordIpt2");
 const accountIpt = document.getElementById("accountIpt");
 
-
 document.addEventListener("DOMContentLoaded", () => {
     torokuBox.querySelector(".toroku-title").addEventListener("click", () => {
         if (torokuBox.classList.contains("slide-up")) {
@@ -47,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-emailIpt.addEventListener("change", function () {
+emailIpt.addEventListener("change", function() {
     const inputEmail = this.value;
     const regularEmail = /^[a-zA-Z\d._%+-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
     if (inputEmail.includes("@") && !regularEmail.test(inputEmail)) {
@@ -58,7 +57,6 @@ emailIpt.addEventListener("change", function () {
 loginBtn.addEventListener("click", () => {
     const account = accountIpt.value.trim();
     const password = passwordIpt.value.trim();
-
     if (account === emptyString && password === emptyString) {
         layer.msg('アカウントとパスワードを入力してください。');
     } else if (account === emptyString) {

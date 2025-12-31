@@ -69,7 +69,7 @@ public class SpringWebMvcConfiguration extends WebMvcConfigurationSupport {
 		log.info(ProjectConstants.MESSAGE_SPRING_MVCCONVERTOR);
 		final MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
 		messageConverter.setObjectMapper(new JacksonObjectMapper());
-		converters.add(0, messageConverter);
+		converters.add(1, messageConverter);
 	}
 
 	// @Configuration

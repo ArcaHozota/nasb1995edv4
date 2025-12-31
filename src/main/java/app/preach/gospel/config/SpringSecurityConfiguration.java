@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVersion;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import app.preach.gospel.common.ProjectConstants;
 import app.preach.gospel.common.ProjectURLConstants;
@@ -38,7 +37,7 @@ public class SpringSecurityConfiguration {
 	/**
 	 * 除外するパス
 	 */
-	private static final String[] IGNORANCE_PATHS = { "/index.action", "/home/**", "/static/**",
+	private static final String[] IGNORANCE_PATHS = { "/index.action", "/home/**", "/static/**", "/category/login",
 			"/category/login-with-error", "/category/to-system-error", "/students/pre-login", "/hymns/pagination",
 			"/hymns/get-info-id", "/hymns/get-records", "/hymns/kanumi-retrieve", "/hymns/random-retrieve",
 			"/hymns/score-download" };
@@ -76,25 +75,23 @@ public class SpringSecurityConfiguration {
 	@Bean
 	@Order(2)
 	protected SecurityFilterChain filterChain(final @NonNull HttpSecurity httpSecurity) throws Exception {
-		httpSecurity
-				.authorizeHttpRequests(
-						authorize -> authorize.requestMatchers(IGNORANCE_PATHS).permitAll()
-								.requestMatchers(ProjectURLConstants.URL_HYMNS_NAMESPACE
-										.concat("/").concat(ProjectURLConstants.URL_TO_EDITION))
-								.hasAuthority("hymns%edition")
-								.requestMatchers(ProjectURLConstants.URL_HYMNS_NAMESPACE
-										.concat("/").concat(ProjectURLConstants.URL_CHECK_DELETE))
-								.hasAuthority("hymns%deletion")
-								.requestMatchers(ProjectURLConstants.URL_STUDENTS_NAMESPACE.concat(CoStringUtils.SLASH)
-										.concat(ProjectURLConstants.URL_TO_EDITION))
-								.hasAuthority("students%retrievEdition").anyRequest().authenticated())
-				.csrf(csrf -> csrf
-						.ignoringRequestMatchers(ProjectURLConstants.URL_STATIC_RESOURCE,
-								ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(CoStringUtils.SLASH)
-										.concat(ProjectURLConstants.URL_LOGIN),
-								ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(CoStringUtils.SLASH)
-										.concat(ProjectURLConstants.URL_LOGOUT))
-						.csrfTokenRepository(new CookieCsrfTokenRepository()))
+		httpSecurity.authorizeHttpRequests(authorize -> authorize.requestMatchers(IGNORANCE_PATHS).permitAll()
+				.requestMatchers(
+						ProjectURLConstants.URL_HYMNS_NAMESPACE.concat("/").concat(ProjectURLConstants.URL_TO_EDITION))
+				.hasAuthority("hymns%edition")
+				.requestMatchers(ProjectURLConstants.URL_HYMNS_NAMESPACE.concat("/")
+						.concat(ProjectURLConstants.URL_CHECK_DELETE))
+				.hasAuthority("hymns%deletion")
+				.requestMatchers(ProjectURLConstants.URL_STUDENTS_NAMESPACE.concat(CoStringUtils.SLASH)
+						.concat(ProjectURLConstants.URL_TO_EDITION))
+				.hasAuthority("students%retrievEdition").anyRequest().authenticated())
+//				.csrf(csrf -> csrf
+//						.ignoringRequestMatchers(ProjectURLConstants.URL_STATIC_RESOURCE,
+//								ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(CoStringUtils.SLASH)
+//										.concat(ProjectURLConstants.URL_LOGIN),
+//								ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(CoStringUtils.SLASH)
+//										.concat(ProjectURLConstants.URL_LOGOUT))
+//						.csrfTokenRepository(new CookieCsrfTokenRepository()))
 				.exceptionHandling(handling -> {
 					handling.authenticationEntryPoint(this.projectAuthenticationEntryPoint);
 					handling.accessDeniedHandler((request, response, accessDeniedException) -> {
