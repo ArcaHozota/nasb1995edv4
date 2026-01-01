@@ -36,7 +36,7 @@ public final class HomepageController {
 	 *
 	 * @return ModelAndView
 	 */
-	@GetMapping("/category/login-with-error")
+	@GetMapping("/home/login-with-error")
 	public @NotNull ModelAndView loginWithError() {
 		final CoResult<Long, DataAccessException> totalCounts = this.iHymnService.getTotalCounts();
 		if (!totalCounts.isOk()) {
@@ -69,7 +69,7 @@ public final class HomepageController {
 	 *
 	 * @return ModelAndView
 	 */
-	@GetMapping("/category/to-mainmenu-with-login")
+	@GetMapping("/home/to-mainmenu-with-login")
 	public @NotNull ModelAndView toMainmenuWithLogin() {
 		final ModelAndView modelAndView = new ModelAndView("mainmenu");
 		modelAndView.addObject("loginMsg", ProjectConstants.MESSAGE_STRING_LOGIN_SUCCESS);

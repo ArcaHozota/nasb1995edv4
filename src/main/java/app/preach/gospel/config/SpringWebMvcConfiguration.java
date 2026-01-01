@@ -49,10 +49,10 @@ public class SpringWebMvcConfiguration extends WebMvcConfigurationSupport {
 	 */
 	@Override
 	protected void addViewControllers(final @NonNull ViewControllerRegistry registry) {
-		registry.addViewController(ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(ProjectURLConstants.URL_TO_LOGIN))
+		registry.addViewController(ProjectURLConstants.URL_HOME_NAMESPACE.concat(ProjectURLConstants.URL_TO_LOGIN))
 				.setViewName("login-toroku");
 		registry.addViewController(
-				ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(ProjectURLConstants.URL_TO_MAINMENU))
+				ProjectURLConstants.URL_HOME_NAMESPACE.concat(ProjectURLConstants.URL_TO_MAINMENU))
 				.setViewName("mainmenu");
 		registry.addViewController(
 				ProjectURLConstants.URL_HYMNS_NAMESPACE.concat(ProjectURLConstants.URL_TO_RANDOM_FIVE))

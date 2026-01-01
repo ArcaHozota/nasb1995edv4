@@ -14,7 +14,7 @@ public final class ProjectURLConstants {
 
 	public static final String URL_BOOKS_NAMESPACE = "/books";
 
-	public static final String URL_CATEGORY_NAMESPACE = "/category";
+	public static final String URL_HOME_NAMESPACE = "/home";
 
 	public static final String URL_CHECK_DELETE = "deletion-check";
 

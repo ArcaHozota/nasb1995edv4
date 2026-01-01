@@ -43,7 +43,7 @@ public class ProjectLogoutSuccessHandler implements LogoutSuccessHandler {
 	public void onLogoutSuccess(final HttpServletRequest request, final HttpServletResponse response,
 			final Authentication authentication) throws IOException {
 		this.nlpCache.invalidateAll();
-		response.sendRedirect(ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(CoStringUtils.SLASH)
+		response.sendRedirect(ProjectURLConstants.URL_HOME_NAMESPACE.concat(CoStringUtils.SLASH)
 				.concat(ProjectURLConstants.URL_TO_LOGIN));
 		log.info("Caffeine stats: {}", this.nlpCache.stats());
 	}
