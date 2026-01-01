@@ -6,7 +6,7 @@ package app.preach.gospel.dto;
  * @author ArkamaHozota
  * @since 1.00beta
  */
-public record PhraseDto(
+public record VerseDto(
 
 		/*
 		 * ID

@@ -18,7 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import app.preach.gospel.common.ProjectURLConstants;
 import app.preach.gospel.dto.BookDto;
 import app.preach.gospel.dto.ChapterDto;
-import app.preach.gospel.dto.PhraseDto;
+import app.preach.gospel.dto.VerseDto;
 import app.preach.gospel.service.IBookService;
 import app.preach.gospel.utils.CoResult;
 import jakarta.annotation.Resource;
@@ -63,13 +63,13 @@ public final class BooksController {
 	/**
 	 * 聖書節別情報を保存する
 	 *
-	 * @param phraseDto 情報転送クラス
+	 * @param verseDto 情報転送クラス
 	 * @return ResponseEntity<String>
 	 */
 	@PostMapping(ProjectURLConstants.URL_INFO_STORAGE)
 	@ResponseBody
-	public @NotNull ResponseEntity<String> infoStorage(@RequestBody final PhraseDto phraseDto) {
-		final CoResult<String, DataAccessException> infoStorage = this.iBookService.infoStorage(phraseDto);
+	public @NotNull ResponseEntity<String> infoStorage(@RequestBody final VerseDto verseDto) {
+		final CoResult<String, DataAccessException> infoStorage = this.iBookService.infoStorage(verseDto);
 		if (!infoStorage.isOk()) {
 			throw infoStorage.getErr();
 		}
