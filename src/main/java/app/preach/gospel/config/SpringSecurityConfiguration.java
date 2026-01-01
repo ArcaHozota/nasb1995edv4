@@ -37,7 +37,7 @@ public class SpringSecurityConfiguration {
 	/**
 	 * 除外するパス
 	 */
-	private static final String[] IGNORANCE_PATHS = { "/index.action", "/home/**", "/static/**", "/category/login",
+	private static final String[] IGNORANCE_PATHS = { "/index.action", "/home/**", "/static/**",
 			"/category/login-with-error", "/category/to-system-error", "/students/pre-login", "/hymns/pagination",
 			"/hymns/get-info-id", "/hymns/get-records", "/hymns/kanumi-retrieve", "/hymns/random-retrieve",
 			"/hymns/score-download" };
@@ -75,23 +75,18 @@ public class SpringSecurityConfiguration {
 	@Bean
 	@Order(2)
 	protected SecurityFilterChain filterChain(final @NonNull HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.authorizeHttpRequests(authorize -> authorize.requestMatchers(IGNORANCE_PATHS).permitAll()
-				.requestMatchers(
-						ProjectURLConstants.URL_HYMNS_NAMESPACE.concat("/").concat(ProjectURLConstants.URL_TO_EDITION))
-				.hasAuthority("hymns%edition")
-				.requestMatchers(ProjectURLConstants.URL_HYMNS_NAMESPACE.concat("/")
-						.concat(ProjectURLConstants.URL_CHECK_DELETE))
-				.hasAuthority("hymns%deletion")
-				.requestMatchers(ProjectURLConstants.URL_STUDENTS_NAMESPACE.concat(CoStringUtils.SLASH)
-						.concat(ProjectURLConstants.URL_TO_EDITION))
-				.hasAuthority("students%retrievEdition").anyRequest().authenticated())
-//				.csrf(csrf -> csrf
-//						.ignoringRequestMatchers(ProjectURLConstants.URL_STATIC_RESOURCE,
-//								ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(CoStringUtils.SLASH)
-//										.concat(ProjectURLConstants.URL_LOGIN),
-//								ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(CoStringUtils.SLASH)
-//										.concat(ProjectURLConstants.URL_LOGOUT))
-//						.csrfTokenRepository(new CookieCsrfTokenRepository()))
+		httpSecurity
+				.authorizeHttpRequests(
+						authorize -> authorize.requestMatchers(IGNORANCE_PATHS).permitAll()
+								.requestMatchers(ProjectURLConstants.URL_HYMNS_NAMESPACE
+										.concat("/").concat(ProjectURLConstants.URL_TO_EDITION))
+								.hasAuthority("hymns%edition")
+								.requestMatchers(ProjectURLConstants.URL_HYMNS_NAMESPACE
+										.concat("/").concat(ProjectURLConstants.URL_CHECK_DELETE))
+								.hasAuthority("hymns%deletion")
+								.requestMatchers(ProjectURLConstants.URL_STUDENTS_NAMESPACE.concat(CoStringUtils.SLASH)
+										.concat(ProjectURLConstants.URL_TO_EDITION))
+								.hasAuthority("students%retrievEdition").anyRequest().authenticated())
 				.exceptionHandling(handling -> {
 					handling.authenticationEntryPoint(this.projectAuthenticationEntryPoint);
 					handling.accessDeniedHandler((request, response, accessDeniedException) -> {
@@ -106,7 +101,7 @@ public class SpringSecurityConfiguration {
 						.loginProcessingUrl(ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(CoStringUtils.SLASH)
 								.concat(ProjectURLConstants.URL_LOGIN))
 						.defaultSuccessUrl(ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(CoStringUtils.SLASH)
-								.concat(ProjectURLConstants.URL_TO_MAINMENU_WITH_LOGIN))
+								.concat(ProjectURLConstants.URL_TO_MAINMENU_WITH_LOGIN), true)
 						.permitAll().usernameParameter("loginAcct").passwordParameter("userPswd"))
 				.logout(logout -> logout
 						.logoutUrl(ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(CoStringUtils.SLASH)

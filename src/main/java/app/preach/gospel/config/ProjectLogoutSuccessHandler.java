@@ -42,13 +42,10 @@ public class ProjectLogoutSuccessHandler implements LogoutSuccessHandler {
 	@Override
 	public void onLogoutSuccess(final HttpServletRequest request, final HttpServletResponse response,
 			final Authentication authentication) throws IOException {
-		// 🔥 清空缓存
 		this.nlpCache.invalidateAll();
-		// 如有需要可打印统计信息
-		log.info("Caffeine stats: {}", this.nlpCache.stats());
-		// 重定向到登录页
 		response.sendRedirect(ProjectURLConstants.URL_CATEGORY_NAMESPACE.concat(CoStringUtils.SLASH)
 				.concat(ProjectURLConstants.URL_TO_LOGIN));
+		log.info("Caffeine stats: {}", this.nlpCache.stats());
 	}
 
 }
