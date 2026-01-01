@@ -70,17 +70,14 @@ loginBtn.addEventListener("click", () => {
 
 torokuBtn.addEventListener("click", () => {
     const inputElements = [emailIpt, passwordIpt1, passwordIpt2];
-
     for (const el of inputElements) {
         if (el.value.trim() === emptyString) {
             layer.msg('入力しなかった情報があります。');
             return;
         }
     }
-
     const password01 = passwordIpt1.value;
     const password02 = passwordIpt2.value;
-
     if (password01 !== password02) {
         layer.msg('入力したパスワードが不一致です。');
     } else {
