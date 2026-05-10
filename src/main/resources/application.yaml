@@ -14,19 +14,17 @@ spring:
       name: nasb1995edv4
    servlet:
       multipart:
-         max-file-size: 3MB
-         max-request-size: 3MB
+         max-file-size: 10MB
+         max-request-size: 10MB
    datasource:
-      driver-class-name: org.postgresql.Driver
-      url: jdbc:postgresql://database-1.cdd6uaafebcj.ap-northeast-1.rds.amazonaws.com:5432/nasb1995?reWriteBatchedInserts=true
-      username: postgres
-      password: postgres
       hikari:
          maximum-pool-size: 40
          minimum-idle: 10
          connection-timeout: 30000
          max-lifetime: 1200000
          leak-detection-threshold: 20000
+   mvc:
+      static-path-pattern: /static/**
    thymeleaf:
       cache: false
       mode: HTML
