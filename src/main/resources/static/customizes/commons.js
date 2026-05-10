@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     [toMainmenu, toMainmenu2].forEach(el => el?.addEventListener("click", (e) => {
         e.preventDefault();
-        window.location.replace('/category/to-mainmenu');
+        window.location.replace('/home/to-mainmenu');
     }));
 
     toPersonal?.addEventListener("click", (e) => {
@@ -167,7 +167,7 @@ function normalDeleteSuccessFunction(result) {
 }
 
 function normalDeleteBtnFunction(url, msg, deleteId) {
-    fetch(url + 'deletion-check')
+    fetch(url + 'delete-check')
         .then(async res => {
             if (!res.ok) {
                 const jsonText = await res.json();
@@ -184,8 +184,7 @@ function normalDeleteBtnFunction(url, msg, deleteId) {
                 confirmButtonColor: '#7f0020'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    layer.msg('すみませんが、当機能はまだ実装されていません');
-                    // projectAjaxModify(url + 'info-delete?id=' + deleteId, 'DELETE', null, normalDeleteSuccessFunction);
+                    projectAjaxModify(url + 'info-delete?id=' + deleteId, 'DELETE', null, normalDeleteSuccessFunction);
                 }
             });
         }).catch(err => {
