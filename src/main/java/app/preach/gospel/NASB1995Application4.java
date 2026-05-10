@@ -16,9 +16,9 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @SpringBootApplication
 @ServletComponentScan
-public class NASB1995Application {
+public class NASB1995Application4 {
 	public static void main(final String[] args) {
-		SpringApplication.run(NASB1995Application.class, args);
+		SpringApplication.run(NASB1995Application4.class, args);
 		log.info(ProjectConstants.MESSAGE_SPRING_APPLICATION);
 	}
 }
