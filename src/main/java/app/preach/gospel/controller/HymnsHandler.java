@@ -1,4 +1,4 @@
-package app.preach.gospel.handler;
+package app.preach.gospel.controller;
 
 import java.io.Serial;
 import java.util.List;

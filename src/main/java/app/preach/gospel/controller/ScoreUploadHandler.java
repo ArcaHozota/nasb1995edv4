@@ -1,4 +1,4 @@
-package app.preach.gospel.handler;
+package app.preach.gospel.controller;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
