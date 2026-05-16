@@ -37,15 +37,15 @@ public class ReceiptsRecord extends UpdatableRecordImpl<ReceiptsRecord> {
     /**
      * Setter for <code>public.receipts.tennpyoh_banngoh</code>.
      */
-    public void setTennpyohBanngoh(Long value) {
+    public void setTennpyohBanngoh(String value) {
         set(1, value);
     }
 
     /**
      * Getter for <code>public.receipts.tennpyoh_banngoh</code>.
      */
-    public Long getTennpyohBanngoh() {
-        return (Long) get(1);
+    public String getTennpyohBanngoh() {
+        return (String) get(1);
     }
 
     /**
@@ -155,7 +155,7 @@ public class ReceiptsRecord extends UpdatableRecordImpl<ReceiptsRecord> {
     /**
      * Create a detached, initialised ReceiptsRecord
      */
-    public ReceiptsRecord(String id, Long tennpyohBanngoh, String mise, Float kinngaku, LocalDateTime jikann, String district, String biko, String category) {
+    public ReceiptsRecord(String id, String tennpyohBanngoh, String mise, Float kinngaku, LocalDateTime jikann, String district, String biko, String category) {
         super(Receipts.RECEIPTS);
 
         setId(id);

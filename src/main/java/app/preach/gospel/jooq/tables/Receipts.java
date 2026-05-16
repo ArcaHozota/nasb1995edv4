@@ -58,12 +58,12 @@ public class Receipts extends TableImpl<ReceiptsRecord> {
     /**
      * The column <code>public.receipts.tennpyoh_banngoh</code>.
      */
-    public final TableField<ReceiptsRecord, Long> TENNPYOH_BANNGOH = createField(DSL.name("tennpyoh_banngoh"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<ReceiptsRecord, String> TENNPYOH_BANNGOH = createField(DSL.name("tennpyoh_banngoh"), SQLDataType.VARCHAR(90).nullable(false), this, "");
 
     /**
      * The column <code>public.receipts.mise</code>.
      */
-    public final TableField<ReceiptsRecord, String> MISE = createField(DSL.name("mise"), SQLDataType.VARCHAR.nullable(false), this, "");
+    public final TableField<ReceiptsRecord, String> MISE = createField(DSL.name("mise"), SQLDataType.VARCHAR(50).nullable(false), this, "");
 
     /**
      * The column <code>public.receipts.kinngaku</code>.
