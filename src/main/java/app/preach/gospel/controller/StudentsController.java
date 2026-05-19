@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.common.ProjectURLConstants;
 import app.preach.gospel.dto.StudentDto;
 import app.preach.gospel.service.IStudentService;
 import app.preach.gospel.utils.CoResult;
@@ -29,7 +28,7 @@ import jakarta.annotation.Resource;
  * @author ArkamaHozota
  * @since 1.00beta
  */
-@RequestMapping(ProjectURLConstants.URL_STUDENTS_NAMESPACE)
+@RequestMapping("/students")
 @Controller
 public final class StudentsController {
 
@@ -49,7 +48,7 @@ public final class StudentsController {
 	 * @param loginAccount アカウント
 	 * @return ResultDto<String>
 	 */
-	@GetMapping(ProjectURLConstants.URL_CHECK_NAME)
+	@GetMapping("/check-duplicated")
 	@ResponseBody
 	public @NotNull ResponseEntity<String> checkDuplicated(@RequestParam final String id,
 			@RequestParam final String loginAccount) {
@@ -58,7 +57,7 @@ public final class StudentsController {
 		if (!checkDuplicated.isOk()) {
 			throw checkDuplicated.getErr();
 		}
-		final Integer checkDuplicatedOk = checkDuplicated.getData();
+		final var checkDuplicatedOk = checkDuplicated.getData();
 		if (checkDuplicatedOk >= 1) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ProjectConstants.MESSAGE_STUDENT_NAME_DUPLICATED);
 		}
@@ -71,7 +70,7 @@ public final class StudentsController {
 	 * @param studentDto 情報転送クラス
 	 * @return ResultDto<String>
 	 */
-	@PutMapping(ProjectURLConstants.URL_INFO_UPDATE)
+	@PutMapping("/info-update")
 	@ResponseBody
 	public @NotNull ResponseEntity<String> infoUpdate(@RequestBody final StudentDto studentDto) {
 		final CoResult<String, DataAccessException> infoUpdation = this.iStudentService.infoUpdation(studentDto);
@@ -88,7 +87,7 @@ public final class StudentsController {
 	 * @param password     パスワード
 	 * @return ResultDto<String>
 	 */
-	@GetMapping(ProjectURLConstants.URL_PRE_LOGIN)
+	@GetMapping("/pre-login")
 	@ResponseBody
 	public @NotNull ResponseEntity<String> preLogin(@RequestParam final String loginAccount,
 			@RequestParam final String password) {
@@ -106,7 +105,7 @@ public final class StudentsController {
 	 * @param editId 編集ID
 	 * @return ModelAndView
 	 */
-	@GetMapping(ProjectURLConstants.URL_TO_EDITION)
+	@GetMapping("/to-edition")
 	public @NotNull ModelAndView toEdition(@RequestParam final Long editId) {
 		final ModelAndView modelAndView = new ModelAndView("students-edition");
 		final CoResult<StudentDto, DataAccessException> studentInfoById = this.iStudentService
@@ -114,8 +113,7 @@ public final class StudentsController {
 		if (!studentInfoById.isOk()) {
 			throw studentInfoById.getErr();
 		}
-		final StudentDto studentDto = studentInfoById.getData();
-		modelAndView.addObject(ProjectConstants.ATTRNAME_EDITED_INFO, studentDto);
+		modelAndView.addObject(ProjectConstants.ATTRNAME_EDITED_INFO, studentInfoById.getData());
 		return modelAndView;
 	}
 

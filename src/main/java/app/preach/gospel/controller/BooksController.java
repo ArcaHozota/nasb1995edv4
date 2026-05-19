@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import app.preach.gospel.common.ProjectURLConstants;
 import app.preach.gospel.dto.BookDto;
 import app.preach.gospel.dto.ChapterDto;
 import app.preach.gospel.dto.VerseDto;
@@ -29,7 +28,7 @@ import jakarta.annotation.Resource;
  * @author ArkamaHozota
  * @since 1.00beta
  */
-@RequestMapping(ProjectURLConstants.URL_BOOKS_NAMESPACE)
+@RequestMapping("/books")
 @Controller
 public final class BooksController {
 
@@ -48,7 +47,7 @@ public final class BooksController {
 	 * @param bookId 聖書書別ID
 	 * @return ResponseEntity<List<ChapterDto>>
 	 */
-	@GetMapping(ProjectURLConstants.URL_GET_CHAPTERS)
+	@GetMapping("/get-chapters")
 	@ResponseBody
 	public @NotNull ResponseEntity<List<ChapterDto>> getChapters(@RequestParam final Short bookId) {
 		final CoResult<List<ChapterDto>, DataAccessException> chaptersByBookId = this.iBookService
@@ -56,8 +55,7 @@ public final class BooksController {
 		if (!chaptersByBookId.isOk()) {
 			throw chaptersByBookId.getErr();
 		}
-		final List<ChapterDto> chapterDtos = chaptersByBookId.getData();
-		return ResponseEntity.ok(chapterDtos);
+		return ResponseEntity.ok(chaptersByBookId.getData());
 	}
 
 	/**
@@ -66,7 +64,7 @@ public final class BooksController {
 	 * @param verseDto 情報転送クラス
 	 * @return ResponseEntity<String>
 	 */
-	@PostMapping(ProjectURLConstants.URL_INFO_STORAGE)
+	@PostMapping("/info-storage")
 	@ResponseBody
 	public @NotNull ResponseEntity<String> infoStorage(@RequestBody final VerseDto verseDto) {
 		final CoResult<String, DataAccessException> infoStorage = this.iBookService.infoStorage(verseDto);
@@ -81,7 +79,7 @@ public final class BooksController {
 	 *
 	 * @return ModelAndView
 	 */
-	@GetMapping(ProjectURLConstants.URL_TO_ADDITION)
+	@GetMapping("/to-addition")
 	public @NotNull ModelAndView toAddition() {
 		final CoResult<List<BookDto>, DataAccessException> books = this.iBookService.getBooks();
 		final CoResult<List<ChapterDto>, DataAccessException> chaptersByBookId = this.iBookService

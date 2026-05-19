@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
@@ -19,6 +20,7 @@ import jakarta.annotation.Resource;
  * @author ArkamaHozota
  * @since 1.00beta
  */
+@RequestMapping("/home")
 @Controller
 public final class HomepageController {
 
@@ -36,7 +38,7 @@ public final class HomepageController {
 	 *
 	 * @return ModelAndView
 	 */
-	@GetMapping("/home/login-with-error")
+	@GetMapping("/login-with-error")
 	public @NotNull ModelAndView loginWithError() {
 		final CoResult<Long, DataAccessException> totalCounts = this.iHymnService.getTotalCounts();
 		if (!totalCounts.isOk()) {
@@ -53,7 +55,7 @@ public final class HomepageController {
 	 *
 	 * @return ModelAndView
 	 */
-	@GetMapping(value = { "/home/index", "/home/page", "/home/to-home-page", "/", "index.action" })
+	@GetMapping(value = { "/index", "/page", "/to-home-page" })
 	public @NotNull ModelAndView toHomePage() {
 		final ModelAndView modelAndView = new ModelAndView("index");
 		final CoResult<Long, DataAccessException> totalCounts = this.iHymnService.getTotalCounts();
@@ -69,7 +71,7 @@ public final class HomepageController {
 	 *
 	 * @return ModelAndView
 	 */
-	@GetMapping("/home/to-mainmenu-with-login")
+	@GetMapping("/to-mainmenu-with-login")
 	public @NotNull ModelAndView toMainmenuWithLogin() {
 		final ModelAndView modelAndView = new ModelAndView("mainmenu");
 		modelAndView.addObject("loginMsg", ProjectConstants.MESSAGE_STRING_LOGIN_SUCCESS);
