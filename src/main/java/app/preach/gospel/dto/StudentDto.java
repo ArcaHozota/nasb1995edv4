@@ -1,11 +1,14 @@
 package app.preach.gospel.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * 奉仕者情報転送クラス
  *
  * @author ArkamaHozota
  * @since 1.00beta
  */
+@Schema(description = "奉仕者情報転送クラス")
 public record StudentDto(
 
 		/*
