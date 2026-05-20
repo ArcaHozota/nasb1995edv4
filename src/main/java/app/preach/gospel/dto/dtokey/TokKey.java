@@ -1,4 +1,4 @@
-package app.preach.gospel.dto;
+package app.preach.gospel.dto.dtokey;
 
 import java.io.Serializable;
 
