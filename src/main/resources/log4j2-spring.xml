@@ -6,6 +6,7 @@
 		<Property name="LOG_DIR">${env:HOME}/prod/logs</Property>
 		<!-- If you insist on USER instead: <Property name="LOG_DIR">/home/${env:USER}/prod/logs</Property> -->
 	</Properties>
+
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout
@@ -32,6 +33,7 @@
 			</DefaultRolloverStrategy>
 		</RollingFile>
 	</Appenders>
+
 	<Loggers>
 		<Root level="INFO">
 			<AppenderRef ref="Console" />
