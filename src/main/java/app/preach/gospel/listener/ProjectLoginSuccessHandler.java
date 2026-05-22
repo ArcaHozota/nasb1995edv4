@@ -39,7 +39,7 @@ public class ProjectLoginSuccessHandler implements AuthenticationSuccessHandler 
 		if (!preLoginUpdate.isOk()) {
 			throw preLoginUpdate.getErr();
 		}
-		System.out.println("Login success: " + loginAcct);
+		log.info("ログイン成功: " + loginAcct);
 		response.sendRedirect("/home/to-mainmenu-with-login/" + preLoginUpdate.getData());
 	}
 
