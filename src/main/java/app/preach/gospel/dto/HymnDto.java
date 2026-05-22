@@ -1,6 +1,7 @@
 package app.preach.gospel.dto;
 
 import app.preach.gospel.utils.LineNumber;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 賛美情報転送クラス
@@ -8,6 +9,7 @@ import app.preach.gospel.utils.LineNumber;
  * @author ArkamaHozota
  * @since 1.00beta
  */
+@Schema(description = "賛美情報転送クラス")
 public record HymnDto(
 
 		/*
