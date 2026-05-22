@@ -17,6 +17,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import app.preach.gospel.common.ProjectConstants;
 import app.preach.gospel.common.ProjectURLConstants;
+import app.preach.gospel.listener.ProjectLoginSuccessHandler;
 import app.preach.gospel.listener.ProjectLogoutSuccessHandler;
 import app.preach.gospel.listener.ProjectUserDetailsService;
 import app.preach.gospel.utils.CoStringUtils;
@@ -49,12 +50,17 @@ public class SpringSecurityConfiguration {
 	private final ProjectAuthenticationEntryPoint projectAuthenticationEntryPoint;
 
 	/**
+	 * ログインサービス
+	 */
+	private final ProjectLoginSuccessHandler projectLoginSuccessHandler;
+
+	/**
 	 * ログアウトサービス
 	 */
 	private final ProjectLogoutSuccessHandler projectLogoutSuccessHandler;
 
 	/**
-	 * ログインサービス
+	 * ログインDTOサービス
 	 */
 	private final ProjectUserDetailsService projectUserDetailsService;
 
@@ -114,8 +120,8 @@ public class SpringSecurityConfiguration {
 					});
 				})
 				.formLogin(formLogin -> formLogin.loginPage("/home/to-login").loginProcessingUrl("/home/do-login")
-						.defaultSuccessUrl("/home/to-mainmenu-with-login", true).permitAll().successHandler(null)
-						.usernameParameter("loginAcct").passwordParameter("userPswd"))
+						.permitAll().successHandler(this.projectLoginSuccessHandler).usernameParameter("loginAcct")
+						.passwordParameter("userPswd"))
 				.logout(logout -> logout.logoutUrl("/home/do-logout")
 						.logoutSuccessHandler(this.projectLogoutSuccessHandler));
 		log.info(ProjectConstants.MESSAGE_SPRING_SECURITY);

@@ -25,6 +25,7 @@ import app.preach.gospel.service.IHymnService;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.CoStringUtils;
 import app.preach.gospel.utils.Pagination;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 
 /**
@@ -33,8 +34,9 @@ import jakarta.annotation.Resource;
  * @author ArkamaHozota
  * @since 1.00beta
  */
-@RequestMapping(ProjectURLConstants.URL_HYMNS_NAMESPACE)
+@RequestMapping("/hymns")
 @Controller
+@Tag(name = "賛美歌管理ハンドラ", description = "賛美歌管理に関わる操作を扱うエンドポイント")
 public final class HymnsController {
 
 	@Serial
