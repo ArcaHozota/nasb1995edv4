@@ -20,6 +20,8 @@ import app.preach.gospel.dto.ChapterDto;
 import app.preach.gospel.dto.VerseDto;
 import app.preach.gospel.service.IBookService;
 import app.preach.gospel.utils.CoResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 
 /**
@@ -30,6 +32,7 @@ import jakarta.annotation.Resource;
  */
 @RequestMapping("/books")
 @Controller
+@Tag(name = "聖書章節入力ハンドラ", description = "聖書章節入力に関わる操作を扱うエンドポイント")
 public final class BooksController {
 
 	@Serial
@@ -49,6 +52,7 @@ public final class BooksController {
 	 */
 	@GetMapping("/get-chapters")
 	@ResponseBody
+	@Operation(summary = "情報検索", description = "書目IDを指定した章節情報を取得する")
 	public @NotNull ResponseEntity<List<ChapterDto>> getChapters(@RequestParam final Short bookId) {
 		final CoResult<List<ChapterDto>, DataAccessException> chaptersByBookId = this.iBookService
 				.getChaptersByBookId(bookId);
@@ -66,6 +70,7 @@ public final class BooksController {
 	 */
 	@PostMapping("/info-storage")
 	@ResponseBody
+	@Operation(summary = "情報保存", description = "聖書節別情報を保存する")
 	public @NotNull ResponseEntity<String> infoStorage(@RequestBody final VerseDto verseDto) {
 		final CoResult<String, DataAccessException> infoStorage = this.iBookService.infoStorage(verseDto);
 		if (!infoStorage.isOk()) {
@@ -80,6 +85,7 @@ public final class BooksController {
 	 * @return ModelAndView
 	 */
 	@GetMapping("/to-addition")
+	@Operation(summary = "画面遷移", description = "情報追加画面へ移動する")
 	public @NotNull ModelAndView toAddition() {
 		final CoResult<List<BookDto>, DataAccessException> books = this.iBookService.getBooks();
 		final CoResult<List<ChapterDto>, DataAccessException> chaptersByBookId = this.iBookService

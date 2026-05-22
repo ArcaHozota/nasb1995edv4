@@ -20,6 +20,8 @@ import app.preach.gospel.dto.StudentDto;
 import app.preach.gospel.service.IStudentService;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.CoStringUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 
 /**
@@ -30,6 +32,7 @@ import jakarta.annotation.Resource;
  */
 @RequestMapping("/students")
 @Controller
+@Tag(name = "奉仕者管理ハンドラ", description = "奉仕者管理に関わる操作を扱うエンドポイント")
 public final class StudentsController {
 
 	@Serial
@@ -50,6 +53,7 @@ public final class StudentsController {
 	 */
 	@GetMapping("/check-duplicated")
 	@ResponseBody
+	@Operation(summary = "情報検索", description = "アカウント重複チェック")
 	public @NotNull ResponseEntity<String> checkDuplicated(@RequestParam final String id,
 			@RequestParam final String loginAccount) {
 		final CoResult<Integer, DataAccessException> checkDuplicated = this.iStudentService.checkDuplicated(id,
@@ -72,6 +76,7 @@ public final class StudentsController {
 	 */
 	@PutMapping("/info-update")
 	@ResponseBody
+	@Operation(summary = "情報更新", description = "奉仕者情報を更新する")
 	public @NotNull ResponseEntity<String> infoUpdate(@RequestBody final StudentDto studentDto) {
 		final CoResult<String, DataAccessException> infoUpdation = this.iStudentService.infoUpdation(studentDto);
 		if (!infoUpdation.isOk()) {
@@ -80,24 +85,25 @@ public final class StudentsController {
 		return ResponseEntity.ok(infoUpdation.getData());
 	}
 
-	/**
-	 * ログイン時間記録
-	 *
-	 * @param loginAccount アカウント
-	 * @param password     パスワード
-	 * @return ResultDto<String>
-	 */
-	@GetMapping("/pre-login")
-	@ResponseBody
-	public @NotNull ResponseEntity<String> preLogin(@RequestParam final String loginAccount,
-			@RequestParam final String password) {
-		final CoResult<String, DataAccessException> preLoginUpdation = this.iStudentService.preLoginUpdate(loginAccount,
-				password);
-		if (!preLoginUpdation.isOk()) {
-			throw preLoginUpdation.getErr();
-		}
-		return ResponseEntity.ok(preLoginUpdation.getData());
-	}
+//	/**
+//	 * ログイン時間記録
+//	 *
+//	 * @param loginAccount アカウント
+//	 * @param password     パスワード
+//	 * @return ResultDto<String>
+//	 */
+//	@GetMapping("/pre-login")
+//	@ResponseBody
+//	@Operation(summary = "情報更新", description = "ログイン時間記録")
+//	public @NotNull ResponseEntity<String> preLogin(@RequestParam final String loginAccount,
+//			@RequestParam final String password) {
+//		final CoResult<String, DataAccessException> preLoginUpdation = this.iStudentService.preLoginUpdate(loginAccount,
+//				password);
+//		if (!preLoginUpdation.isOk()) {
+//			throw preLoginUpdation.getErr();
+//		}
+//		return ResponseEntity.ok(preLoginUpdation.getData());
+//	}
 
 	/**
 	 * 情報更新画面へ移動する

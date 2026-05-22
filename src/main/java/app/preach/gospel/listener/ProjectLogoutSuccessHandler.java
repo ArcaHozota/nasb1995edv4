@@ -1,4 +1,4 @@
-package app.preach.gospel.config;
+package app.preach.gospel.listener;
 
 import java.io.IOException;
 
@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 
 import com.github.benmanes.caffeine.cache.Cache;
 
-import app.preach.gospel.common.ProjectURLConstants;
-import app.preach.gospel.utils.CoStringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
@@ -47,8 +45,7 @@ public class ProjectLogoutSuccessHandler implements LogoutSuccessHandler {
 		// 如有需要可打印统计信息
 		log.info("Caffeine stats: {}", this.nlpCache.stats());
 		// 重定向到登录页
-		response.sendRedirect(ProjectURLConstants.URL_HOME_NAMESPACE.concat(CoStringUtils.SLASH)
-				.concat(ProjectURLConstants.URL_TO_LOGIN));
+		response.sendRedirect("/home/index");
 	}
 
 }

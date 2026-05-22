@@ -135,16 +135,12 @@ public class StudentServiceImpl implements IStudentService {
 	}
 
 	@Override
-	public CoResult<String, DataAccessException> preLoginUpdate(final String loginAccount, final String password) {
+	public CoResult<String, DataAccessException> preLoginUpdate(final String loginAccount) {
 		try {
 			final var studentsRecord = this.dslContext.selectFrom(STUDENTS).where(COMMON_CONDITION)
-					.and(STUDENTS.LOGIN_ACCOUNT.eq(loginAccount).or(STUDENTS.EMAIL.eq(loginAccount))).fetchOne();
+					.and(STUDENTS.LOGIN_ACCOUNT.eq(loginAccount)).fetchOne();
 			if (studentsRecord == null) {
 				return CoResult.err(new ConfigurationException(ProjectConstants.MESSAGE_SPRINGSECURITY_LOGINERROR1));
-			}
-			final boolean passwordMatches = ENCODER.matches(password, studentsRecord.getPassword());
-			if (!passwordMatches) {
-				return CoResult.err(new ConfigurationException(ProjectConstants.MESSAGE_SPRINGSECURITY_LOGINERROR4));
 			}
 			studentsRecord.setUpdatedTime(OffsetDateTime.now());
 			studentsRecord.update();

@@ -79,7 +79,7 @@ public final class HymnsScoreController {
 	 */
 	@PostMapping("/score-upload")
 	@ResponseBody
-	@Operation(summary = "アップロード", description = "IDを指定した賛美歌の楽譜の情報を保存する")
+	@Operation(summary = "情報保存", description = "IDを指定した賛美歌の楽譜の情報を保存する")
 	public @NotNull ResponseEntity<String> scoreUpload(@RequestBody final HymnDto hymnDto) {
 		final CoResult<String, DataAccessException> scoreStorage = this.iHymnService.scoreStorage(hymnDto.score(),
 				hymnDto.id());

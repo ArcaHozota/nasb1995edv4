@@ -17,6 +17,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import app.preach.gospel.common.ProjectConstants;
 import app.preach.gospel.common.ProjectURLConstants;
+import app.preach.gospel.listener.ProjectLogoutSuccessHandler;
 import app.preach.gospel.listener.ProjectUserDetailsService;
 import app.preach.gospel.utils.CoStringUtils;
 import lombok.AccessLevel;
@@ -112,17 +113,10 @@ public class SpringSecurityConfiguration {
 						log.warn(ProjectConstants.MESSAGE_SPRINGSECURITY_REQUIRED_AUTH, ex);
 					});
 				})
-				.formLogin(formLogin -> formLogin
-						.loginPage(ProjectURLConstants.URL_HOME_NAMESPACE.concat(CoStringUtils.SLASH)
-								.concat(ProjectURLConstants.URL_TO_LOGIN))
-						.loginProcessingUrl(ProjectURLConstants.URL_HOME_NAMESPACE.concat(CoStringUtils.SLASH)
-								.concat(ProjectURLConstants.URL_LOGIN))
-						.defaultSuccessUrl(ProjectURLConstants.URL_HOME_NAMESPACE.concat(CoStringUtils.SLASH)
-								.concat(ProjectURLConstants.URL_TO_MAINMENU_WITH_LOGIN), true)
-						.permitAll().usernameParameter("loginAcct").passwordParameter("userPswd"))
-				.logout(logout -> logout
-						.logoutUrl(ProjectURLConstants.URL_HOME_NAMESPACE.concat(CoStringUtils.SLASH)
-								.concat(ProjectURLConstants.URL_LOGOUT))
+				.formLogin(formLogin -> formLogin.loginPage("/home/to-login").loginProcessingUrl("/home/do-login")
+						.defaultSuccessUrl("/home/to-mainmenu-with-login", true).permitAll().successHandler(null)
+						.usernameParameter("loginAcct").passwordParameter("userPswd"))
+				.logout(logout -> logout.logoutUrl("/home/do-logout")
 						.logoutSuccessHandler(this.projectLogoutSuccessHandler));
 		log.info(ProjectConstants.MESSAGE_SPRING_SECURITY);
 		return httpSecurity.build();

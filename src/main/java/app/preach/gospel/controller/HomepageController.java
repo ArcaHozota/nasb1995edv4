@@ -6,12 +6,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
 import app.preach.gospel.service.IHymnService;
 import app.preach.gospel.utils.CoResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 
 /**
@@ -22,6 +25,7 @@ import jakarta.annotation.Resource;
  */
 @RequestMapping("/home")
 @Controller
+@Tag(name = "ホームページハンドラ", description = "共通とSVGイメージに関わる操作を扱うエンドポイント")
 public final class HomepageController {
 
 	@Serial
@@ -39,6 +43,7 @@ public final class HomepageController {
 	 * @return ModelAndView
 	 */
 	@GetMapping("/login-with-error")
+	@Operation(summary = "画面遷移", description = "ログインページへ移動する")
 	public @NotNull ModelAndView loginWithError() {
 		final CoResult<Long, DataAccessException> totalCounts = this.iHymnService.getTotalCounts();
 		if (!totalCounts.isOk()) {
@@ -56,6 +61,7 @@ public final class HomepageController {
 	 * @return ModelAndView
 	 */
 	@GetMapping(value = { "/index", "/page", "/to-home-page" })
+	@Operation(summary = "画面遷移", description = "ホームページへ移動する")
 	public @NotNull ModelAndView toHomePage() {
 		final ModelAndView modelAndView = new ModelAndView("index");
 		final CoResult<Long, DataAccessException> totalCounts = this.iHymnService.getTotalCounts();
@@ -71,10 +77,11 @@ public final class HomepageController {
 	 *
 	 * @return ModelAndView
 	 */
-	@GetMapping("/to-mainmenu-with-login")
-	public @NotNull ModelAndView toMainmenuWithLogin() {
+	@GetMapping("/to-mainmenu-with-login/{message}")
+	@Operation(summary = "画面遷移", description = "メインメニュへ移動する")
+	public @NotNull ModelAndView toMainmenuWithLogin(@PathVariable final String message) {
 		final ModelAndView modelAndView = new ModelAndView("mainmenu");
-		modelAndView.addObject("loginMsg", ProjectConstants.MESSAGE_STRING_LOGIN_SUCCESS);
+		modelAndView.addObject("loginMsg", message);
 		return modelAndView;
 	}
 
