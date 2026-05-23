@@ -674,8 +674,8 @@ public class HymnServiceImpl implements IHymnService {
 							.sorted(Comparator.comparingInt(item -> item.lineNumber().getLineNo())).toList());
 				}
 				final var withRandomFiveIds = withRandomFive.stream().map(HymnDto::id).toList();
-				final var otherHymns = this.dslContext.selectFrom(HYMNS).where(COMMON_CONDITION2).orderBy(HYMNS.ID.asc())
-						.fetch(rd -> {
+				final var otherHymns = this.dslContext.selectFrom(HYMNS).where(COMMON_CONDITION2)
+						.orderBy(HYMNS.ID.asc()).fetch(rd -> {
 							final Long hymnId = rd.get(HYMNS.ID);
 							if (withNameLikeIds.contains(hymnId) || withRandomFiveIds.contains(hymnId)) {
 								return null;
@@ -944,7 +944,7 @@ public class HymnServiceImpl implements IHymnService {
 			hymnsRecord2.setUpdatedTime(null);
 			hymnsRecord2.setUpdatedUser(null);
 			if (CoStringUtils.isEqual(hymnsRecord, hymnsRecord2)) {
-				return CoResult.err(new ConfigurationException(ProjectConstants.MESSAGE_STRING_NO_CHANGE));
+				return CoResult.ok(ProjectConstants.MESSAGE_STRING_NO_CHANGE);
 			}
 			CoBeanUtils.copyNullableProperties(hymnsRecord, hymnsRecord2);
 			final var trimedSerif = trimSerif(hymnsRecord.getLyric());

@@ -116,8 +116,8 @@ function showValidationMsg(element, status, msg) {
 }
 
 function projectAjaxModify(url, type, data, successFunction) {
-    const header = document.querySelector("meta[name=_csrf_header]")?.content;
-    const token = document.querySelector("meta[name=_csrf_token]")?.content;
+    const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+    const token = document.querySelector('meta[name="_csrf_token"]')?.content;
     fetch(url, {
         method: type,
         headers: {
@@ -130,7 +130,7 @@ function projectAjaxModify(url, type, data, successFunction) {
             const text = await res.text();
             throw new Error(text);
         }
-        return res.json();
+        return res;
     }).then(successFunction)
         .catch(err => {
             layer.msg(trimQuote(err.message));

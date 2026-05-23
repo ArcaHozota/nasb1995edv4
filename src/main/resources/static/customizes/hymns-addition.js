@@ -105,7 +105,7 @@ function hymnsPostSuccessFunction(response) {
 }
 
 function hymnsPutSuccessFunction(response) {
-    localStorage.setItem('redirectMessage', trimQuote(response));
+    localStorage.setItem('redirectMessage', trimQuote(response.text()));
     window.location.replace('/hymns/to-pages?pageNum=' + pageNum + '&keyword=' + keyword);
 }
 

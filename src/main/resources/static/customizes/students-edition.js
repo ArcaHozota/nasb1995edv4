@@ -57,7 +57,7 @@ restoreBtn.addEventListener("click", () => {
 });
 
 function studentsPutSuccessFunction(response) {
-    const message = trimQuote(response);
+    const message = trimQuote(response.text());
     localStorage.setItem('redirectMessage', message);
     window.location.replace('/category/to-mainmenu');
 }
