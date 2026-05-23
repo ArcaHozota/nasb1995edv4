@@ -38,9 +38,9 @@ public class SpringSecurityConfiguration {
 	/**
 	 * 除外するパス
 	 */
-	private static final String[] IGNORANCE_PATHS = { "/home/**", "/static/**", "/swagger-ui.html", "/hymns/pagination",
-			"/hymns/get-info-id", "/hymns/get-records", "/hymns/kanumi-retrieve", "/hymns/random-retrieve",
-			"/hymns/score-download" };
+	private static final String[] IGNORANCE_PATHS = { "/home/index", "/home/page", "/home/to-home-page",
+			"/home/to-login-with-error", "/static/**", "/swagger-ui.html", "/hymns/pagination", "/hymns/get-info-id",
+			"/hymns/get-records", "/hymns/kanumi-retrieve", "/hymns/random-retrieve", "/hymns/score-download" };
 
 	/**
 	 * ログインエラー処理
@@ -107,7 +107,7 @@ public class SpringSecurityConfiguration {
 					});
 				})
 				.formLogin(formLogin -> formLogin.loginPage("/home/to-login").loginProcessingUrl("/home/do-login")
-						.permitAll().successHandler(this.projectLoginSuccessHandler).usernameParameter("loginAcct")
+						.successHandler(this.projectLoginSuccessHandler).permitAll().usernameParameter("loginAcct")
 						.passwordParameter("userPswd"))
 				.logout(logout -> logout.logoutUrl("/home/do-logout")
 						.logoutSuccessHandler(this.projectLogoutSuccessHandler));

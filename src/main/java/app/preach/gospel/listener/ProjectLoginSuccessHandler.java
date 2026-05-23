@@ -40,7 +40,7 @@ public class ProjectLoginSuccessHandler implements AuthenticationSuccessHandler 
 			throw preLoginUpdate.getErr();
 		}
 		log.info("ログイン成功: " + loginAcct);
-		response.sendRedirect("/home/to-mainmenu-with-login/" + preLoginUpdate.getData());
+		response.sendRedirect("/home/to-mainmenu-with-login?message=" + preLoginUpdate.getData());
 	}
 
 }

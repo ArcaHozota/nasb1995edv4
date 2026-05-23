@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
@@ -77,9 +77,17 @@ public final class HomepageController {
 	 *
 	 * @return ModelAndView
 	 */
-	@GetMapping("/to-mainmenu-with-login/{message}")
+//	@GetMapping("/to-mainmenu-with-login/{message}")
+//	@Operation(summary = "画面遷移", description = "メインメニュへ移動する")
+//	public @NotNull ModelAndView toMainmenuWithLogin(@PathVariable final String message) {
+//		final ModelAndView modelAndView = new ModelAndView("mainmenu");
+//		modelAndView.addObject("loginMsg", message);
+//		return modelAndView;
+//	}
+
+	@GetMapping("/to-mainmenu-with-login")
 	@Operation(summary = "画面遷移", description = "メインメニュへ移動する")
-	public @NotNull ModelAndView toMainmenuWithLogin(@PathVariable final String message) {
+	public @NotNull ModelAndView toMainmenuWithLogin(@RequestParam final String message) {
 		final ModelAndView modelAndView = new ModelAndView("mainmenu");
 		modelAndView.addObject("loginMsg", message);
 		return modelAndView;
