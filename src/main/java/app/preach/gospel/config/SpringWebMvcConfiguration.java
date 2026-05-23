@@ -61,7 +61,7 @@ public class SpringWebMvcConfiguration extends WebMvcConfigurationSupport {
 	@Override
 	protected void extendMessageConverters(final @NonNull List<HttpMessageConverter<?>> converters) {
 		log.info(ProjectConstants.MESSAGE_SPRING_MVCCONVERTOR);
-		final MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
+		final var messageConverter = new MappingJackson2HttpMessageConverter();
 		messageConverter.setObjectMapper(new JacksonObjectMapper());
 		converters.add(1, messageConverter);
 	}

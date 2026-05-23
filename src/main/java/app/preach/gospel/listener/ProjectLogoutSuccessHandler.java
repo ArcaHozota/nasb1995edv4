@@ -44,7 +44,7 @@ public class ProjectLogoutSuccessHandler implements LogoutSuccessHandler {
 		this.nlpCache.invalidateAll();
 		// 如有需要可打印统计信息
 		log.info("Caffeine stats: {}", this.nlpCache.stats());
-		// 重定向到登录页
+		// ホームページへの遷移
 		response.sendRedirect("/home/index");
 	}
 
