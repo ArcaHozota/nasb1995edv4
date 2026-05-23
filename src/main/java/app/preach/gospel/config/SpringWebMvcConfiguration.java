@@ -1,14 +1,11 @@
 package app.preach.gospel.config;
 
 import java.time.Duration;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -16,7 +13,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
-import app.preach.gospel.common.ProjectConstants;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -52,18 +48,18 @@ public class SpringWebMvcConfiguration implements WebMvcConfigurer {
 		registry.addViewController("/hymns/to-random-five").setViewName("hymns-random-five");
 	}
 
-	/**
-	 * SpringMVCフレームワークを拡張するメッセージ・コンバーター
-	 *
-	 * @param converters コンバーター
-	 */
-	@Override
-	public void extendMessageConverters(final @NonNull List<HttpMessageConverter<?>> converters) {
-		log.info(ProjectConstants.MESSAGE_SPRING_MVCCONVERTOR);
-		final var messageConverter = new MappingJackson2HttpMessageConverter();
-		messageConverter.setObjectMapper(new JacksonObjectMapper());
-		converters.add(1, messageConverter);
-	}
+//	/**
+//	 * SpringMVCフレームワークを拡張するメッセージ・コンバーター
+//	 *
+//	 * @param converters コンバーター
+//	 */
+//	@Override
+//	public void extendMessageConverters(final @NonNull List<HttpMessageConverter<?>> converters) {
+//		log.info(ProjectConstants.MESSAGE_SPRING_MVCCONVERTOR);
+//		final var messageConverter = new MappingJackson2HttpMessageConverter();
+//		messageConverter.setObjectMapper(new JacksonObjectMapper());
+//		converters.add(1, messageConverter);
+//	}
 
 	// @Configuration
 	@Order(15)

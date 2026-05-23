@@ -14,6 +14,12 @@ import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueResponse;
 
+/**
+ * AWS DBコンフィグ
+ *
+ * @author ArkamaHozota
+ * @since 6.11
+ */
 @Configuration
 public class DataSourceConfiguration {
 
