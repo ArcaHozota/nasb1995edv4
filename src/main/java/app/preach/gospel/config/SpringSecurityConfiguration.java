@@ -38,9 +38,9 @@ public class SpringSecurityConfiguration {
 	/**
 	 * 除外するパス
 	 */
-	private static final String[] IGNORANCE_PATHS = { "/home/**", "/static/**", "/students/pre-login",
-			"/hymns/pagination", "/hymns/get-info-id", "/hymns/get-records", "/hymns/kanumi-retrieve",
-			"/hymns/random-retrieve", "/hymns/score-download" };
+	private static final String[] IGNORANCE_PATHS = { "/home/**", "/static/**", "/swagger-ui.html", "/hymns/pagination",
+			"/hymns/get-info-id", "/hymns/get-records", "/hymns/kanumi-retrieve", "/hymns/random-retrieve",
+			"/hymns/score-download" };
 
 	/**
 	 * ログインエラー処理

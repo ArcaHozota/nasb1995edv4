@@ -42,7 +42,7 @@ public final class HomepageController {
 	 *
 	 * @return ModelAndView
 	 */
-	@GetMapping("/login-with-error")
+	@GetMapping("/to-login-with-error")
 	@Operation(summary = "画面遷移", description = "ログインページへ移動する")
 	public @NotNull ModelAndView loginWithError() {
 		final CoResult<Long, DataAccessException> totalCounts = this.iHymnService.getTotalCounts();

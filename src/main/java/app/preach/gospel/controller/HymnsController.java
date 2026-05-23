@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.common.ProjectURLConstants;
 import app.preach.gospel.dto.HymnDto;
 import app.preach.gospel.service.IHymnService;
 import app.preach.gospel.utils.CoResult;
@@ -55,7 +54,7 @@ public final class HymnsController {
 	 * @param nameJp 日本語名称
 	 * @return ResponseEntity<String>
 	 */
-	@GetMapping(ProjectURLConstants.URL_CHECK_NAME)
+	@GetMapping("/check-duplicated")
 	@ResponseBody
 	public @NotNull ResponseEntity<String> checkDuplicated(@RequestParam final String id,
 			@RequestParam final String nameJp) {
@@ -63,7 +62,7 @@ public final class HymnsController {
 		if (!checkDuplicated.isOk()) {
 			throw checkDuplicated.getErr();
 		}
-		final Integer checkDuplicatedOk = checkDuplicated.getData();
+		final var checkDuplicatedOk = checkDuplicated.getData();
 		if (checkDuplicatedOk >= 1) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ProjectConstants.MESSAGE_HYMN_NAME_DUPLICATED);
 		}
@@ -77,7 +76,7 @@ public final class HymnsController {
 	 * @param nameKr 韓国語名称
 	 * @return ResponseEntity<String>
 	 */
-	@GetMapping(ProjectURLConstants.URL_CHECK_NAME2)
+	@GetMapping("/check-duplicated2")
 	@ResponseBody
 	public @NotNull ResponseEntity<String> checkDuplicated2(@RequestParam final String id,
 			@RequestParam final String nameKr) {
@@ -85,7 +84,7 @@ public final class HymnsController {
 		if (!checkDuplicated.isOk()) {
 			throw checkDuplicated.getErr();
 		}
-		final Integer checkDuplicatedOk = checkDuplicated.getData();
+		final var checkDuplicatedOk = checkDuplicated.getData();
 		if (checkDuplicatedOk >= 1) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ProjectConstants.MESSAGE_HYMN_NAME_DUPLICATED);
 		}
@@ -97,7 +96,7 @@ public final class HymnsController {
 	 *
 	 * @return ResponseEntity<String>
 	 */
-	@GetMapping(ProjectURLConstants.URL_CHECK_DELETE)
+	@GetMapping("/deletion-check")
 	@ResponseBody
 	public @NotNull ResponseEntity<String> deletionCheck() {
 		return ResponseEntity.ok(CoStringUtils.EMPTY_STRING);
@@ -109,7 +108,7 @@ public final class HymnsController {
 	 * @param hymnId ID
 	 * @return ResponseEntity<HymnDto>
 	 */
-	@GetMapping(ProjectURLConstants.URL_GET_INFO_ID)
+	@GetMapping("/get-info-id")
 	@ResponseBody
 	public ResponseEntity<HymnDto> getInfoById(@RequestParam final Long hymnId) {
 		final CoResult<HymnDto, DataAccessException> hymnInfoById = this.iHymnService.getHymnInfoById(hymnId);
@@ -125,7 +124,7 @@ public final class HymnsController {
 	 * @param deleteId 編集ID
 	 * @return ResponseEntity<String>
 	 */
-	@DeleteMapping(ProjectURLConstants.URL_INFO_DELETION)
+	@DeleteMapping("/info-deletion")
 	@ResponseBody
 	public @NotNull ResponseEntity<String> infoDeletion(@RequestParam final Long deleteId) {
 		final CoResult<String, DataAccessException> infoDeletion = this.iHymnService.infoDeletion(deleteId);
@@ -141,7 +140,7 @@ public final class HymnsController {
 	 * @param hymnDto 情報転送クラス
 	 * @return ResponseEntity<Integer>
 	 */
-	@PostMapping(ProjectURLConstants.URL_INFO_STORAGE)
+	@PostMapping("/info-storage")
 	@ResponseBody
 	public @NotNull ResponseEntity<Integer> infoStorage(@RequestBody final HymnDto hymnDto) {
 		final CoResult<Integer, DataAccessException> infoStorage = this.iHymnService.infoStorage(hymnDto);
@@ -157,7 +156,7 @@ public final class HymnsController {
 	 * @param hymnDto 情報転送クラス
 	 * @return ResponseEntity<String>
 	 */
-	@PutMapping(ProjectURLConstants.URL_INFO_UPDATE)
+	@PutMapping("/info-update")
 	@ResponseBody
 	public @NotNull ResponseEntity<String> infoUpdate(@RequestBody final HymnDto hymnDto) {
 		final CoResult<String, DataAccessException> infoUpdation = this.iHymnService.infoUpdate(hymnDto);
@@ -174,7 +173,7 @@ public final class HymnsController {
 	 * @param keyword キーワード
 	 * @return ResponseEntity<Pagination<HymnDto>>
 	 */
-	@GetMapping(ProjectURLConstants.URL_PAGINATION)
+	@GetMapping("/pagination")
 	@ResponseBody
 	public @NotNull ResponseEntity<Pagination<HymnDto>> pagination(@RequestParam final Integer pageNum,
 			@RequestParam(required = false, defaultValue = CoStringUtils.EMPTY_STRING) final String keyword) {
@@ -193,7 +192,7 @@ public final class HymnsController {
 	 * @param keyword キーワード
 	 * @return ResponseEntity<List<HymnDto>>
 	 */
-	@GetMapping(ProjectURLConstants.URL_RANDOM_RETRIEVE)
+	@GetMapping("/random-retrieve")
 	@ResponseBody
 	public @NotNull ResponseEntity<List<HymnDto>> randomRetrieve(@RequestParam final String keyword) {
 		final CoResult<List<HymnDto>, DataAccessException> hymnsRandomFive = this.iHymnService
@@ -211,7 +210,7 @@ public final class HymnsController {
 	 * @param pageNum ページナンバー
 	 * @return ModelAndView
 	 */
-	@GetMapping(ProjectURLConstants.URL_TO_ADDITION)
+	@GetMapping("/to-addition")
 	public @NotNull ModelAndView toAddition(@RequestParam final String pageNum) {
 		final ModelAndView modelAndView = new ModelAndView("hymns-addition");
 		modelAndView.addObject(ProjectConstants.ATTRNAME_PAGE_NUMBER, pageNum);
@@ -226,7 +225,7 @@ public final class HymnsController {
 	 * @param pageNum ページナンバー
 	 * @return ModelAndView
 	 */
-	@GetMapping(ProjectURLConstants.URL_TO_EDITION)
+	@GetMapping("/to-edition")
 	public @NotNull ModelAndView toEdition(@RequestParam final Long editId, @RequestParam final Integer pageNum) {
 		final ModelAndView modelAndView = new ModelAndView("hymns-edition");
 		final CoResult<HymnDto, DataAccessException> hymnInfoById = this.iHymnService.getHymnInfoById(editId);
@@ -245,7 +244,7 @@ public final class HymnsController {
 	 * @param pageNum ページナンバー
 	 * @return ModelAndView
 	 */
-	@GetMapping(ProjectURLConstants.URL_TO_PAGES)
+	@GetMapping("/to-pages")
 	public @NotNull ModelAndView toPages(@RequestParam final String pageNum) {
 		final ModelAndView modelAndView = new ModelAndView("hymns-pagination");
 		if (CoStringUtils.isDigital(pageNum)) {
