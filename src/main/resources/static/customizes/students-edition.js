@@ -56,10 +56,10 @@ restoreBtn.addEventListener("click", () => {
     initialStudent();
 });
 
-function studentsPutSuccessFunction(response) {
-    const message = trimQuote(response.text());
-    localStorage.setItem('redirectMessage', message);
-    window.location.replace('/category/to-mainmenu');
+async function studentsPutSuccessFunction(response) {
+    const text = await response.text();
+    localStorage.setItem('redirectMessage', trimQuote(text));
+    window.location.replace('/home/to-mainmenu');
 }
 
 function checkStudentName(studentNameInput, idVal) {

@@ -104,9 +104,18 @@ function hymnsPostSuccessFunction(response) {
     window.location.replace('/hymns/to-pages?pageNum=' + response);
 }
 
-function hymnsPutSuccessFunction(response) {
-    localStorage.setItem('redirectMessage', trimQuote(response.text()));
-    window.location.replace('/hymns/to-pages?pageNum=' + pageNum + '&keyword=' + keyword);
+async function hymnsPutSuccessFunction(response) {
+    const text = await response.text();
+    localStorage.setItem(
+        'redirectMessage',
+        trimQuote(text)
+    );
+    window.location.replace(
+        '/hymns/to-pages?pageNum='
+        + encodeURIComponent(pageNum)
+        + '&keyword='
+        + encodeURIComponent(keyword)
+    );
 }
 
 function checkHymnName(hymnNameInput, idVal) {

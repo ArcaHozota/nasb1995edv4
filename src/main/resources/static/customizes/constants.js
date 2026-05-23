@@ -10,7 +10,10 @@ const GET = 'GET';
 const POST = 'POST';
 const PUT = 'PUT';
 const DELETE = 'DELETE';
-const trimQuote = (str) => str.replace(/^"|"$/g, emptyString);
+const trimQuote = (str) =>
+    typeof str === 'string'
+        ? str.replace(/^"|"$/g, emptyString)
+        : emptyString;
 
 function buildPageInfos(response) {
     const pageInfos = document.getElementById("pageInfos");
