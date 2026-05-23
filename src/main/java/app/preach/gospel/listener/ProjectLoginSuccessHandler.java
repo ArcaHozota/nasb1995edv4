@@ -1,6 +1,7 @@
 package app.preach.gospel.listener;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import org.jooq.exception.DataAccessException;
 import org.springframework.security.core.Authentication;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import app.preach.gospel.service.IStudentService;
 import app.preach.gospel.utils.CoResult;
+import app.preach.gospel.utils.CoStringUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,8 +42,8 @@ public class ProjectLoginSuccessHandler implements AuthenticationSuccessHandler 
 			throw preLoginUpdate.getErr();
 		}
 		log.info("ログイン成功: " + loginAcct);
-		request.getSession().setAttribute("message", preLoginUpdate.getData());
-		response.sendRedirect("/home/to-mainmenu-with-login");
+		final var message = URLEncoder.encode(preLoginUpdate.getData(), CoStringUtils.CHARSET_UTF8);
+		response.sendRedirect("/home/to-mainmenu-with-login?loginMessage=" + message);
 	}
 
 }

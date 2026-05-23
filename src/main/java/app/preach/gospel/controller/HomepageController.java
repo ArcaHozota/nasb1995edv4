@@ -49,7 +49,7 @@ public final class HomepageController {
 		if (!totalCounts.isOk()) {
 			throw totalCounts.getErr();
 		}
-		final ModelAndView modelAndView = new ModelAndView("login-toroku");
+		final var modelAndView = new ModelAndView("login-toroku");
 		modelAndView.addObject(ProjectConstants.ATTRNAME_RECORDS, totalCounts.getData());
 		modelAndView.addObject(ProjectConstants.ATTRNAME_TOROKU_MSG, ProjectConstants.MESSAGE_STRING_NOT_LOGIN);
 		return modelAndView;
@@ -63,7 +63,7 @@ public final class HomepageController {
 	@GetMapping(value = { "/index", "/page", "/to-home-page" })
 	@Operation(summary = "画面遷移", description = "ホームページへ移動する")
 	public @NotNull ModelAndView toHomePage() {
-		final ModelAndView modelAndView = new ModelAndView("index");
+		final var modelAndView = new ModelAndView("index");
 		final CoResult<Long, DataAccessException> totalCounts = this.iHymnService.getTotalCounts();
 		if (!totalCounts.isOk()) {
 			throw totalCounts.getErr();
@@ -87,9 +87,9 @@ public final class HomepageController {
 
 	@GetMapping("/to-mainmenu-with-login")
 	@Operation(summary = "画面遷移", description = "メインメニュへ移動する")
-	public @NotNull ModelAndView toMainmenuWithLogin(@RequestParam final String message) {
-		final ModelAndView modelAndView = new ModelAndView("mainmenu");
-		modelAndView.addObject("loginMsg", message);
+	public @NotNull ModelAndView toMainmenuWithLogin(@RequestParam final String loginMessage) {
+		final var modelAndView = new ModelAndView("mainmenu");
+		modelAndView.addObject("loginMsg", loginMessage);
 		return modelAndView;
 	}
 
