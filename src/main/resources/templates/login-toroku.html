@@ -6,8 +6,8 @@
 	<meta charset="UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="_csrf_header" content="${_csrf.headerName}">
-	<meta name="_csrf_token" content="${_csrf.token}">
+	<meta name="_csrf_header" th:content="${_csrf.headerName}">
+	<meta name="_csrf_token" th:content="${_csrf.token}">
 	<link rel="stylesheet" type="text/css" href="/static/css/login.css">
 	<link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,7 +49,8 @@
 				<span>すでにアカウント持ち？</span>ログイン
 			</h2>
 			<form class="input-box" th:action="@{/home/do-login}" method="post" id="loginForm">
-				<input type="text" th:value="${registeredEmail eq null ? '' : registeredEmail}" name="loginAcct" id="accountIpt" placeholder="アカウント">
+				<input type="text" th:value="${registeredEmail eq null ? '' : registeredEmail}" name="loginAcct"
+					id="accountIpt" placeholder="アカウント">
 				<ion-icon name="eye-outline" id="eyeIcons"></ion-icon>
 				<input type="password" name="userPswd" id="passwordIpt" placeholder="パスワード">
 			</form>
