@@ -13,8 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 @Schema(description = "賛美情報転送クラス")
 public record HymnDto(
 		@Schema(description = "ID", example = "0123456789876543210", requiredMode = RequiredMode.REQUIRED) Long id,
-		@Schema(description = "日本語名称", example = "主を讃えよ", requiredMode = RequiredMode.REQUIRED) String nameJp,
-		@Schema(description = "ID", example = "비 준비하시니", requiredMode = RequiredMode.REQUIRED) String nameKr,
+		@Schema(description = "日本語名称", example = "主を讃えよ") String nameJp,
+		@Schema(description = "ID", example = "비 준비하시니") String nameKr,
 		@Schema(description = "歌詞", example = "0123456789876543210") String lyric,
 		@Schema(description = "ビデオリンク", example = "https://youtu.be/123456") String link,
 		@Schema(description = "楽譜") byte[] score, @Schema(description = "備考") String biko,

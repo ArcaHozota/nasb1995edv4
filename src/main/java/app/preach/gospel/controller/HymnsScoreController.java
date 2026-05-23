@@ -103,7 +103,7 @@ public final class HymnsScoreController {
 		if (!hymnInfoById.isOk()) {
 			throw hymnInfoById.getErr();
 		}
-		final HymnDto hymnDto = hymnInfoById.getData();
+		final var hymnDto = hymnInfoById.getData();
 		modelAndView.addObject(ProjectConstants.ATTRNAME_EDITED_INFO, hymnDto);
 		modelAndView.addObject(ProjectConstants.ATTRNAME_PAGE_NUMBER, pageNum);
 		return modelAndView;
