@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import app.preach.gospel.common.ProjectConstants;
 import app.preach.gospel.service.IHymnService;
 import app.preach.gospel.utils.CoResult;
+import app.preach.gospel.utils.CoStringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -85,11 +86,15 @@ public final class HomepageController {
 //		return modelAndView;
 //	}
 
-	@GetMapping("/to-mainmenu-with-login")
+	@GetMapping("/to-mainmenu")
 	@Operation(summary = "画面遷移", description = "メインメニュへ移動する")
 	public @NotNull ModelAndView toMainmenuWithLogin(final HttpSession session) {
 		final var modelAndView = new ModelAndView("mainmenu");
 		final var message = (String) session.getAttribute("loginMessage");
+		if (CoStringUtils.isEmpty(message)) {
+			modelAndView.addObject("loginMsg", CoStringUtils.EMPTY_STRING);
+			return modelAndView;
+		}
 		session.removeAttribute("loginMessage");
 		modelAndView.addObject("loginMsg", message);
 		return modelAndView;
