@@ -19,7 +19,7 @@ import lombok.Getter;
  */
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public final class SecurityAdmin extends User {
+public final class ProjectSecurityAdmin extends User {
 
 	@Serial
 	private static final long serialVersionUID = 3827955098466369880L;
@@ -35,7 +35,7 @@ public final class SecurityAdmin extends User {
 	 * @param admin       社員管理DTO
 	 * @param authorities 権限リスト
 	 */
-	SecurityAdmin(final @NotNull StudentDto admin, final Collection<SimpleGrantedAuthority> authorities) {
+	ProjectSecurityAdmin(final @NotNull StudentDto admin, final Collection<SimpleGrantedAuthority> authorities) {
 		super(admin.loginAccount(), admin.password(), true, true, true, true, authorities);
 		this.originalAdmin = admin;
 	}

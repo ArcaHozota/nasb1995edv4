@@ -59,7 +59,7 @@ public class ProjectUserDetailsService implements UserDetailsService {
 				studentsRecord.getRoleId().toString());
 		final List<SimpleGrantedAuthority> authorities = authoritiesRecords.stream()
 				.map(item -> new SimpleGrantedAuthority(item.getName())).toList();
-		return new SecurityAdmin(studentDto, authorities);
+		return new ProjectSecurityAdmin(studentDto, authorities);
 	}
 
 }

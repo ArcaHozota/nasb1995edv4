@@ -16,11 +16,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.common.ProjectURLConstants;
 import app.preach.gospel.listener.ProjectLoginSuccessHandler;
 import app.preach.gospel.listener.ProjectLogoutSuccessHandler;
 import app.preach.gospel.listener.ProjectUserDetailsService;
-import app.preach.gospel.utils.CoStringUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -83,23 +81,12 @@ public class SpringSecurityConfiguration {
 	@Order(2)
 	protected SecurityFilterChain filterChain(final @NonNull HttpSecurity httpSecurity) throws Exception {
 		httpSecurity
-				.authorizeHttpRequests(
-						authorize -> authorize.requestMatchers(IGNORANCE_PATHS).permitAll()
-								.requestMatchers(ProjectURLConstants.URL_HYMNS_NAMESPACE
-										.concat("/").concat(ProjectURLConstants.URL_TO_EDITION))
-								.hasAuthority("hymns%edition")
-								.requestMatchers(ProjectURLConstants.URL_HYMNS_NAMESPACE
-										.concat("/").concat(ProjectURLConstants.URL_CHECK_DELETE))
-								.hasAuthority("hymns%deletion")
-								.requestMatchers(ProjectURLConstants.URL_STUDENTS_NAMESPACE.concat(CoStringUtils.SLASH)
-										.concat(ProjectURLConstants.URL_TO_EDITION))
-								.hasAuthority("students%retrievEdition").anyRequest().authenticated())
-				.csrf(csrf -> csrf
-						.ignoringRequestMatchers(ProjectURLConstants.URL_STATIC_RESOURCE,
-								ProjectURLConstants.URL_HOME_NAMESPACE.concat(CoStringUtils.SLASH)
-										.concat(ProjectURLConstants.URL_LOGIN),
-								ProjectURLConstants.URL_HOME_NAMESPACE.concat(CoStringUtils.SLASH)
-										.concat(ProjectURLConstants.URL_LOGOUT))
+				.authorizeHttpRequests(authorize -> authorize.requestMatchers(IGNORANCE_PATHS).permitAll()
+						.requestMatchers("/hymns/to-edition").hasAuthority("hymns%edition")
+						.requestMatchers("/hymns/deletion-check").hasAuthority("hymns%deletion")
+						.requestMatchers("/students/to-edition").hasAuthority("students%retrievEdition").anyRequest()
+						.authenticated())
+				.csrf(csrf -> csrf.ignoringRequestMatchers("/static/**")
 						.csrfTokenRepository(new CookieCsrfTokenRepository()))
 				.exceptionHandling(handling -> {
 					handling.authenticationEntryPoint(this.projectAuthenticationEntryPoint);
