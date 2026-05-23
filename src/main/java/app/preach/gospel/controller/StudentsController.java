@@ -112,10 +112,10 @@ public final class StudentsController {
 	 * @return ModelAndView
 	 */
 	@GetMapping("/to-edition")
-	public @NotNull ModelAndView toEdition(@RequestParam final Long editId) {
+	public @NotNull ModelAndView toEdition(@RequestParam final Long userId) {
 		final ModelAndView modelAndView = new ModelAndView("students-edition");
 		final CoResult<StudentDto, DataAccessException> studentInfoById = this.iStudentService
-				.getStudentInfoById(editId);
+				.getStudentInfoById(userId);
 		if (!studentInfoById.isOk()) {
 			throw studentInfoById.getErr();
 		}
