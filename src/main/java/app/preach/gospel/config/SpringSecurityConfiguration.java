@@ -83,7 +83,7 @@ public class SpringSecurityConfiguration {
 		httpSecurity
 				.authorizeHttpRequests(authorize -> authorize.requestMatchers(IGNORANCE_PATHS).permitAll()
 						.requestMatchers("/hymns/to-edition").hasAuthority("hymns%edition")
-						.requestMatchers("/hymns/deletion-check").hasAuthority("hymns%deletion")
+						.requestMatchers("/hymns/delete-check").hasAuthority("hymns%deletion")
 						.requestMatchers("/students/to-edition").hasAuthority("students%retrievEdition").anyRequest()
 						.authenticated())
 				.csrf(csrf -> csrf.ignoringRequestMatchers("/static/**")

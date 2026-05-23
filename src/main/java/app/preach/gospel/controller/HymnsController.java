@@ -24,6 +24,7 @@ import app.preach.gospel.service.IHymnService;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.CoStringUtils;
 import app.preach.gospel.utils.Pagination;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 
@@ -56,6 +57,7 @@ public final class HymnsController {
 	 */
 	@GetMapping("/check-duplicated")
 	@ResponseBody
+	@Operation(summary = "情報検索", description = "歌の名称の重複性をチェックする")
 	public @NotNull ResponseEntity<String> checkDuplicated(@RequestParam final String id,
 			@RequestParam final String nameJp) {
 		final CoResult<Integer, DataAccessException> checkDuplicated = this.iHymnService.checkDuplicated(id, nameJp);
@@ -78,6 +80,7 @@ public final class HymnsController {
 	 */
 	@GetMapping("/check-duplicated2")
 	@ResponseBody
+	@Operation(summary = "情報検索", description = "歌の名称の重複性をチェックする2")
 	public @NotNull ResponseEntity<String> checkDuplicated2(@RequestParam final String id,
 			@RequestParam final String nameKr) {
 		final CoResult<Integer, DataAccessException> checkDuplicated = this.iHymnService.checkDuplicated2(id, nameKr);
@@ -96,8 +99,9 @@ public final class HymnsController {
 	 *
 	 * @return ResponseEntity<String>
 	 */
-	@GetMapping("/deletion-check")
+	@GetMapping("/delete-check")
 	@ResponseBody
+	@Operation(summary = "情報検索", description = "削除権限チェック")
 	public @NotNull ResponseEntity<String> deletionCheck() {
 		return ResponseEntity.ok(CoStringUtils.EMPTY_STRING);
 	}
@@ -110,6 +114,7 @@ public final class HymnsController {
 	 */
 	@GetMapping("/get-info-id")
 	@ResponseBody
+	@Operation(summary = "情報検索", description = "IDによって賛美歌情報を検索する")
 	public ResponseEntity<HymnDto> getInfoById(@RequestParam final Long hymnId) {
 		final CoResult<HymnDto, DataAccessException> hymnInfoById = this.iHymnService.getHymnInfoById(hymnId);
 		if (!hymnInfoById.isOk()) {
@@ -124,8 +129,9 @@ public final class HymnsController {
 	 * @param deleteId 編集ID
 	 * @return ResponseEntity<String>
 	 */
-	@DeleteMapping("/info-deletion")
+	@DeleteMapping("/info-delete")
 	@ResponseBody
+	@Operation(summary = "情報削除", description = "IDによって賛美歌情報を削除する")
 	public @NotNull ResponseEntity<String> infoDeletion(@RequestParam final Long deleteId) {
 		final CoResult<String, DataAccessException> infoDeletion = this.iHymnService.infoDeletion(deleteId);
 		if (!infoDeletion.isOk()) {
@@ -142,6 +148,7 @@ public final class HymnsController {
 	 */
 	@PostMapping("/info-storage")
 	@ResponseBody
+	@Operation(summary = "情報保存", description = "賛美歌情報を保存する")
 	public @NotNull ResponseEntity<Integer> infoStorage(@RequestBody final HymnDto hymnDto) {
 		final CoResult<Integer, DataAccessException> infoStorage = this.iHymnService.infoStorage(hymnDto);
 		if (!infoStorage.isOk()) {
@@ -158,6 +165,7 @@ public final class HymnsController {
 	 */
 	@PutMapping("/info-update")
 	@ResponseBody
+	@Operation(summary = "情報更新", description = "IDによって賛美歌情報を更新する")
 	public @NotNull ResponseEntity<String> infoUpdate(@RequestBody final HymnDto hymnDto) {
 		final CoResult<String, DataAccessException> infoUpdation = this.iHymnService.infoUpdate(hymnDto);
 		if (!infoUpdation.isOk()) {
@@ -175,6 +183,7 @@ public final class HymnsController {
 	 */
 	@GetMapping("/pagination")
 	@ResponseBody
+	@Operation(summary = "情報検索", description = "情報一覧画面初期表示する")
 	public @NotNull ResponseEntity<Pagination<HymnDto>> pagination(@RequestParam final Integer pageNum,
 			@RequestParam(required = false, defaultValue = CoStringUtils.EMPTY_STRING) final String keyword) {
 		final CoResult<Pagination<HymnDto>, DataAccessException> hymnsByKeyword = this.iHymnService
@@ -182,7 +191,7 @@ public final class HymnsController {
 		if (!hymnsByKeyword.isOk()) {
 			throw hymnsByKeyword.getErr();
 		}
-		final Pagination<HymnDto> pagination = hymnsByKeyword.getData();
+		final var pagination = hymnsByKeyword.getData();
 		return ResponseEntity.ok(pagination);
 	}
 
@@ -194,13 +203,14 @@ public final class HymnsController {
 	 */
 	@GetMapping("/random-retrieve")
 	@ResponseBody
+	@Operation(summary = "情報検索", description = "ランダム五つを検索する")
 	public @NotNull ResponseEntity<List<HymnDto>> randomRetrieve(@RequestParam final String keyword) {
 		final CoResult<List<HymnDto>, DataAccessException> hymnsRandomFive = this.iHymnService
 				.getHymnsInfoByRandom(keyword);
 		if (!hymnsRandomFive.isOk()) {
 			throw hymnsRandomFive.getErr();
 		}
-		final List<HymnDto> hymnDtos = hymnsRandomFive.getData();
+		final var hymnDtos = hymnsRandomFive.getData();
 		return ResponseEntity.ok(hymnDtos);
 	}
 
@@ -211,29 +221,29 @@ public final class HymnsController {
 	 * @return ModelAndView
 	 */
 	@GetMapping("/to-addition")
+	@Operation(summary = "画面遷移", description = "情報追加画面へ移動する")
 	public @NotNull ModelAndView toAddition(@RequestParam final String pageNum) {
-		final ModelAndView modelAndView = new ModelAndView("hymns-addition");
+		final var modelAndView = new ModelAndView("hymns-addition");
 		modelAndView.addObject(ProjectConstants.ATTRNAME_PAGE_NUMBER, pageNum);
 		return modelAndView;
 	}
 
 	/**
-	 *
-	 * /** 情報更新画面へ移動する
+	 * 情報更新画面へ移動する
 	 *
 	 * @param editId  編集ID
 	 * @param pageNum ページナンバー
 	 * @return ModelAndView
 	 */
 	@GetMapping("/to-edition")
+	@Operation(summary = "画面遷移", description = "情報更新画面へ移動する")
 	public @NotNull ModelAndView toEdition(@RequestParam final Long editId, @RequestParam final Integer pageNum) {
-		final ModelAndView modelAndView = new ModelAndView("hymns-edition");
+		final var modelAndView = new ModelAndView("hymns-edition");
 		final CoResult<HymnDto, DataAccessException> hymnInfoById = this.iHymnService.getHymnInfoById(editId);
 		if (!hymnInfoById.isOk()) {
 			throw hymnInfoById.getErr();
 		}
-		final HymnDto hymnDto = hymnInfoById.getData();
-		modelAndView.addObject(ProjectConstants.ATTRNAME_EDITED_INFO, hymnDto);
+		modelAndView.addObject(ProjectConstants.ATTRNAME_EDITED_INFO, hymnInfoById.getData());
 		modelAndView.addObject(ProjectConstants.ATTRNAME_PAGE_NUMBER, pageNum);
 		return modelAndView;
 	}
@@ -245,8 +255,9 @@ public final class HymnsController {
 	 * @return ModelAndView
 	 */
 	@GetMapping("/to-pages")
+	@Operation(summary = "画面遷移", description = "情報一覧画面へ移動する")
 	public @NotNull ModelAndView toPages(@RequestParam final String pageNum) {
-		final ModelAndView modelAndView = new ModelAndView("hymns-pagination");
+		final var modelAndView = new ModelAndView("hymns-pagination");
 		if (CoStringUtils.isDigital(pageNum)) {
 			modelAndView.addObject(ProjectConstants.ATTRNAME_PAGE_NUMBER, pageNum);
 			return modelAndView;
