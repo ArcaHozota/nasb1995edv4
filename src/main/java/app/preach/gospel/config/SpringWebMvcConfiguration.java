@@ -18,7 +18,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.common.ProjectURLConstants;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -39,7 +38,7 @@ public class SpringWebMvcConfiguration extends WebMvcConfigurationSupport {
 	@Override
 	protected void addResourceHandlers(final @NonNull ResourceHandlerRegistry registry) {
 		log.info(ProjectConstants.MESSAGE_SPRING_MAPPER);
-		registry.addResourceHandler(ProjectURLConstants.URL_STATIC_RESOURCE).addResourceLocations("classpath:/static/");
+		registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
 	}
 
 	/**
@@ -49,14 +48,9 @@ public class SpringWebMvcConfiguration extends WebMvcConfigurationSupport {
 	 */
 	@Override
 	protected void addViewControllers(final @NonNull ViewControllerRegistry registry) {
-		registry.addViewController(ProjectURLConstants.URL_HOME_NAMESPACE.concat(ProjectURLConstants.URL_TO_LOGIN))
-				.setViewName("login-toroku");
-		registry.addViewController(
-				ProjectURLConstants.URL_HOME_NAMESPACE.concat(ProjectURLConstants.URL_TO_MAINMENU))
-				.setViewName("mainmenu");
-		registry.addViewController(
-				ProjectURLConstants.URL_HYMNS_NAMESPACE.concat(ProjectURLConstants.URL_TO_RANDOM_FIVE))
-				.setViewName("hymns-random-five");
+		registry.addViewController("/home/to-login").setViewName("login-toroku");
+		registry.addViewController("/home/to-mainmenu").setViewName("mainmenu");
+		registry.addViewController("/hymns/to-random-five").setViewName("hymns-random-five");
 	}
 
 	/**

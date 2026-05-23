@@ -35,8 +35,8 @@
 			font-size: 1.2em;
 		}
 	</style>
-	<script type="text/javascript" src="/static/layer/neo-layer.js"></script>
-	<script type="text/javascript" src="/static/customizes/constants.js"></script>
+	<script type="text/javascript" th:src="@{/static/layer/neo-layer.js}"></script>
+	<script type="text/javascript" th:src="@{/static/customizes/constants.js}"></script>
 </head>
 
 <body>
@@ -48,7 +48,7 @@
 			<h2 class="login-title">
 				<span>すでにアカウント持ち？</span>ログイン
 			</h2>
-			<form class="input-box" th:action="@{/category/do-login}" method="post" id="loginForm">
+			<form class="input-box" th:action="@{/home/do-login}" method="post" id="loginForm">
 				<input type="text" th:value="${registeredEmail eq null ? '' : registeredEmail}" name="loginAcct" id="accountIpt" placeholder="アカウント">
 				<ion-icon name="eye-outline" id="eyeIcons"></ion-icon>
 				<input type="password" name="userPswd" id="passwordIpt" placeholder="パスワード">
@@ -60,7 +60,7 @@
 				<h2 class="toroku-title">
 					<span>アカウント無し？</span>登録
 				</h2>
-				<form class="input-box" th:action="@{/category/toroku}" method="post" id="torokuForm">
+				<form class="input-box" th:action="@{/home/toroku}" method="post" id="torokuForm">
 					<input type="email" name="email" id="emailIpt" placeholder="メール">
 					<input type="password" name="password" id="passwordIpt1" placeholder="パスワード">
 					<input type="password" id="passwordIpt2" placeholder="パス再入力">
@@ -68,10 +68,10 @@
 				<button type="button" id="torokuBtn">登録</button>
 			</div>
 		</div>
-		<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-		<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+		<script type="module" th:src="'https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js'"></script>
+		<script nomodule th:src="'https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js'"></script>
 	</div>
-	<script type="text/javascript" src="/static/customizes/login-toroku.js"></script>
+	<script type="text/javascript" th:src="@{/static/customizes/login-toroku.js}"></script>
 </body>
 
 </html>
