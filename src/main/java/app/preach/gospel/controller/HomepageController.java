@@ -7,7 +7,6 @@ import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
@@ -16,6 +15,7 @@ import app.preach.gospel.utils.CoResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * 共通とSVGイメージハンドラ
@@ -87,9 +87,11 @@ public final class HomepageController {
 
 	@GetMapping("/to-mainmenu-with-login")
 	@Operation(summary = "画面遷移", description = "メインメニュへ移動する")
-	public @NotNull ModelAndView toMainmenuWithLogin(@RequestParam final String loginMessage) {
+	public @NotNull ModelAndView toMainmenuWithLogin(final HttpSession session) {
 		final var modelAndView = new ModelAndView("mainmenu");
-		modelAndView.addObject("loginMsg", loginMessage);
+		final var message = (String) session.getAttribute("loginMessage");
+		session.removeAttribute("loginMessage");
+		modelAndView.addObject("loginMsg", message);
 		return modelAndView;
 	}
 
