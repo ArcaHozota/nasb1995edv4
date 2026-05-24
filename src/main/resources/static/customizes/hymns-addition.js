@@ -99,9 +99,10 @@ document.getElementById("restoreBtn")?.addEventListener("click", () => {
     formReset("editForm");
 });
 
-function hymnsPostSuccessFunction(response) {
+async function hymnsPostSuccessFunction(response) {
     localStorage.setItem('redirectMessage', inputString);
-    window.location.replace('/hymns/to-pages?pageNum=' + response);
+	const pn = await response.json();
+    window.location.replace('/hymns/to-pages?pageNum=' + pn);
 }
 
 async function hymnsPutSuccessFunction(response) {
