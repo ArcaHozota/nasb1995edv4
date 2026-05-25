@@ -35,13 +35,13 @@ public class ProjectExceptionHandler {
 		return ResponseEntity.status(HttpStatus.CONFLICT).contentType(MediaType.APPLICATION_JSON).body(errorMessage);
 	}
 
-	@ExceptionHandler(Exception.class)
-	public Object handleException(final Exception exception) {
-		final var errorMessage = exception.getMessage() != null ? exception.getMessage()
-				: ProjectConstants.MESSAGE_STRING_FATAL_ERROR;
-		log.error("処理中にエラーが発生しました：", exception);
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON)
-				.body(errorMessage);
-	}
+//	@ExceptionHandler(Exception.class)
+//	public Object handleException(final Exception exception) {
+//		final var errorMessage = exception.getMessage() != null ? exception.getMessage()
+//				: ProjectConstants.MESSAGE_STRING_FATAL_ERROR;
+//		log.error("処理中にエラーが発生しました：", exception);
+//		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON)
+//				.body(errorMessage);
+//	}
 
 }
