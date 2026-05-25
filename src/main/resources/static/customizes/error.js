@@ -1,3 +1,3 @@
 document.getElementById("backBtn").addEventListener("click", () => {
-    document.getElementById("logoutForm").submit();
+    window.location.replace("/home/to-mainmenu");
 });

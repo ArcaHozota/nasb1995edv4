@@ -29,7 +29,7 @@ public class ProjectAuthenticationEntryPoint implements AuthenticationEntryPoint
 			final AuthenticationException authException) throws IOException {
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());
 		response.setContentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-		response.sendRedirect("/home/to-login-with-error");
+		response.sendRedirect("/home/index");
 		log.warn(ProjectConstants.MESSAGE_STRING_NOT_LOGIN);
 	}
 
