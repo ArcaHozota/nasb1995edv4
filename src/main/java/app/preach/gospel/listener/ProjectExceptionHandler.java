@@ -7,9 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import app.preach.gospel.common.ProjectConstants;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -30,7 +30,7 @@ public class ProjectExceptionHandler {
 //	}
 
 	@ExceptionHandler(DataAccessException.class)
-	@RequestBody
+	@ResponseBody
 	public Object handleDataAccessException(final DataAccessException exception) {
 		final var errorMessage = exception.getMessage() != null ? exception.getMessage()
 				: ProjectConstants.MESSAGE_STRING_FATAL_ERROR;
