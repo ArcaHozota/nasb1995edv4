@@ -3,7 +3,6 @@
 //import lombok.AccessLevel;
 //import lombok.NoArgsConstructor;
 //
-///**
 // * プロジェクトURLコンスタント
 // *
 // * @author ArkamaHozota
