@@ -39,7 +39,7 @@ public class SpringSecurityConfiguration {
 	 * 除外するパス
 	 */
 	private static final String[] IGNORANCE_PATHS = { "/home/index", "/home/page", "/home/to-home-page",
-			"/home/to-login-with-error", "/error-page", "/static/**", "/swagger-ui/**", "/v3/api-docs/**",
+			"/home/to-login-with-error", "/error-page2", "/static/**", "/swagger-ui/**", "/v3/api-docs/**",
 			"/hymns/pagination", "/hymns/get-info-id", "/hymns/get-records", "/hymns/kanumi-retrieve",
 			"/hymns/random-retrieve", "/hymns/score-download" };
 

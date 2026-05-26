@@ -41,9 +41,27 @@ tableBody.addEventListener("click", (e) => {
     } else if (e.target.classList.contains("score-download-btn")) {
         e.preventDefault();
         const scoreId = e.target.getAttribute("data-score-id");
-        window.location.href = `/hymns/score-download?id=${scoreId}`;
+        downloadScores(scoreId);
     }
 });
+
+async function downloadScores(scoreId) {
+    const res = await fetch(`/hymns/score-download?id=${encodeURIComponent(scoreId)}`);
+    if (!res.ok) {
+        const message = await res.text();
+        window.location.href = "/error-page2?errMsg=" + encodeURIComponent(message);
+        return;
+    }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${scoreId}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+}
 
 function randomRetrieve(keyword) {
     fetch('/hymns/random-retrieve?keyword=' + encodeURIComponent(keyword))

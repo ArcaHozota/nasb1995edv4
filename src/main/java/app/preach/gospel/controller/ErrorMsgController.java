@@ -8,6 +8,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
 import app.preach.gospel.utils.CoStringUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -20,9 +21,34 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "エラー処理ハンドラ", description = "エラー処理に関わる操作を扱うエンドポイント")
 public final class ErrorMsgController {
 
+	/**
+	 * エラーページへ移動する
+	 *
+	 * @return ModelAndView
+	 */
 	@GetMapping("/error-page")
+	@Operation(summary = "画面遷移", description = "エラーページへ移動する")
 	public ModelAndView errorHandle(@RequestParam final String errMsg) {
 		final var mav = new ModelAndView("error");
+		if (CoStringUtils.isEqual(errMsg, ProjectConstants.MESSAGE_STRING_FATAL_ERROR)) {
+			mav.addObject("status", HttpStatus.INTERNAL_SERVER_ERROR.toString());
+			mav.addObject("message", errMsg);
+			return mav;
+		}
+		mav.addObject("status", HttpStatus.CONFLICT.toString());
+		mav.addObject("message", errMsg);
+		return mav;
+	}
+
+	/**
+	 * エラーページへ移動する2
+	 *
+	 * @return ModelAndView
+	 */
+	@GetMapping("/error-page2")
+	@Operation(summary = "画面遷移", description = "エラーページへ移動する2")
+	public ModelAndView errorHandle2(@RequestParam final String errMsg) {
+		final var mav = new ModelAndView("error2");
 		if (CoStringUtils.isEqual(errMsg, ProjectConstants.MESSAGE_STRING_FATAL_ERROR)) {
 			mav.addObject("status", HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			mav.addObject("message", errMsg);
