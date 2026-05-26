@@ -46,7 +46,7 @@ public class ProjectExceptionHandler {
 			mav.addObject("status", HttpStatus.CONFLICT.toString());
 			mav.addObject("message", exception.getMessage());
 			mav.addObject(ProjectConstants.ATTRNAME_EXCEPTION, exception);
-			return "error";
+			return mav;
 		}
 		mav.addObject("status", HttpStatus.INTERNAL_SERVER_ERROR.toString());
 		mav.addObject("message", ProjectConstants.MESSAGE_STRING_FATAL_ERROR);
