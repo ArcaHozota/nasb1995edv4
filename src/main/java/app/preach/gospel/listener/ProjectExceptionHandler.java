@@ -4,10 +4,10 @@ import org.jooq.exception.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
 import lombok.extern.log4j.Log4j2;
@@ -39,18 +39,19 @@ public class ProjectExceptionHandler {
 	}
 
 	@ExceptionHandler(Exception.class)
-	public String handleException(final Exception exception, final Model model) {
+	public Object handleException(final Exception exception) {
 		log.error("処理中にエラーが発生しました：", exception);
+		final var mav = new ModelAndView("error");
 		if (exception.getMessage() != null) {
-			model.addAttribute("status", HttpStatus.INTERNAL_SERVER_ERROR.toString());
-			model.addAttribute("message", exception.getMessage());
-			model.addAttribute(ProjectConstants.ATTRNAME_EXCEPTION, exception);
+			mav.addObject("status", HttpStatus.CONFLICT.toString());
+			mav.addObject("message", exception.getMessage());
+			mav.addObject(ProjectConstants.ATTRNAME_EXCEPTION, exception);
 			return "error";
 		}
-		model.addAttribute("status", HttpStatus.CONFLICT.toString());
-		model.addAttribute("message", ProjectConstants.MESSAGE_STRING_FATAL_ERROR);
-		model.addAttribute(ProjectConstants.ATTRNAME_EXCEPTION, exception);
-		return "error";
+		mav.addObject("status", HttpStatus.INTERNAL_SERVER_ERROR.toString());
+		mav.addObject("message", ProjectConstants.MESSAGE_STRING_FATAL_ERROR);
+		mav.addObject(ProjectConstants.ATTRNAME_EXCEPTION, exception);
+		return mav;
 	}
 
 }
