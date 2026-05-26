@@ -63,12 +63,18 @@ public final class HomepageController {
 	 */
 	@GetMapping(value = { "/index", "/page", "/to-home-page" })
 	@Operation(summary = "画面遷移", description = "ホームページへ移動する")
-	public @NotNull ModelAndView toHomePage() {
+	public @NotNull ModelAndView toHomePage(final HttpSession session) {
 		final var modelAndView = new ModelAndView("index");
 		final CoResult<Long, DataAccessException> totalCounts = this.iHymnService.getTotalCounts();
 		if (!totalCounts.isOk()) {
 			throw totalCounts.getErr();
 		}
+		final var message = (String) session.getAttribute("notLoginMsg");
+		if (CoStringUtils.isEmpty(message)) {
+			modelAndView.addObject(ProjectConstants.ATTRNAME_RECORDS, totalCounts.getData());
+			return modelAndView;
+		}
+		modelAndView.addObject(ProjectConstants.ATTRNAME_TOROKU_MSG, message);
 		modelAndView.addObject(ProjectConstants.ATTRNAME_RECORDS, totalCounts.getData());
 		return modelAndView;
 	}
@@ -78,14 +84,6 @@ public final class HomepageController {
 	 *
 	 * @return ModelAndView
 	 */
-//	@GetMapping("/to-mainmenu-with-login/{message}")
-//	@Operation(summary = "画面遷移", description = "メインメニュへ移動する")
-//	public @NotNull ModelAndView toMainmenuWithLogin(@PathVariable final String message) {
-//		final ModelAndView modelAndView = new ModelAndView("mainmenu");
-//		modelAndView.addObject("loginMsg", message);
-//		return modelAndView;
-//	}
-
 	@GetMapping("/to-mainmenu")
 	@Operation(summary = "画面遷移", description = "メインメニュへ移動する")
 	public @NotNull ModelAndView toMainmenuWithLogin(final HttpSession session) {

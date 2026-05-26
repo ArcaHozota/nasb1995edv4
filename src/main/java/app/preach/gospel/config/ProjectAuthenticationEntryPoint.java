@@ -27,6 +27,7 @@ public class ProjectAuthenticationEntryPoint implements AuthenticationEntryPoint
 	@Override
 	public void commence(final HttpServletRequest request, final @NotNull HttpServletResponse response,
 			final AuthenticationException authException) throws IOException {
+		request.getSession().setAttribute("notLoginMsg", ProjectConstants.MESSAGE_STRING_NOT_LOGIN);
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());
 		response.setContentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 		response.sendRedirect("/home/index");
