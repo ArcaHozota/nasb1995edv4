@@ -47,7 +47,7 @@ tableBody?.addEventListener("click", (e) => {
     } else if (target.classList.contains("score-download-btn")) {
         e.preventDefault();
         const scoreId = target.getAttribute("data-score-id");
-        window.location.href = `/hymns/score-download?id=${scoreId}`;
+        downloadScores(scoreId);
     }
 });
 
@@ -56,6 +56,24 @@ document.getElementById("infoAdditionBtn")?.addEventListener("click", (e) => {
     const url = `/hymns/to-addition?pageNum=${pageNum}`;
     checkPermissionAndTransfer(url);
 });
+
+async function downloadScores(scoreId) {
+    const res = await fetch(`/hymns/score-download?id=${encodeURIComponent(scoreId)}`);
+    if (!res.ok) {
+        const message = await res.text();
+        window.location.href = "/error-page?errMsg=" + message;
+        return;
+    }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${scoreId}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+}
 
 function toSelectedPg(pageNum, keyword) {
     fetch(`/hymns/pagination?pageNum=${encodeURIComponent(pageNum)}&keyword=${encodeURIComponent(keyword)}`)

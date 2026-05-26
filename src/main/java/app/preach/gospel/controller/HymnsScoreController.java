@@ -21,7 +21,6 @@ import app.preach.gospel.common.ProjectConstants;
 import app.preach.gospel.dto.HymnDto;
 import app.preach.gospel.service.IHymnService;
 import app.preach.gospel.utils.CoResult;
-import app.preach.gospel.utils.CoStringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -61,11 +60,10 @@ public final class HymnsScoreController {
 			throw hymnInfoById.getErr();
 		}
 		final var hymnDto = hymnInfoById.getData();
-		final String biko = hymnDto.biko();
-		if (CoStringUtils.isEmpty(biko)) {
-			throw new NoDataFoundException(ProjectConstants.MESSAGE_STRING_FATAL_ERROR);
+		if (hymnDto.score() == null || hymnDto.score().length == 0) {
+			throw new NoDataFoundException("楽譜PDFが登録されていません。");
 		}
-		final HttpHeaders headers = new HttpHeaders();
+		final var headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_PDF);
 		headers.setContentDispositionFormData("attachment", hymnDto.id() + ".pdf");
 		return ResponseEntity.ok().headers(headers).body(hymnDto.score());
