@@ -237,7 +237,8 @@ public final class HymnsController {
 	 */
 	@GetMapping("/to-edition")
 	@Operation(summary = "画面遷移", description = "情報更新画面へ移動する")
-	public @NotNull ModelAndView toEdition(@RequestParam final Long editId, @RequestParam final Integer pageNum) {
+	public @NotNull ModelAndView toEdition(@RequestParam final Long editId, @RequestParam final Integer pageNum,
+			@RequestParam final String keyword) {
 		final var modelAndView = new ModelAndView("hymns-edition");
 		final CoResult<HymnDto, DataAccessException> hymnInfoById = this.iHymnService.getHymnInfoById(editId);
 		if (!hymnInfoById.isOk()) {
@@ -245,6 +246,7 @@ public final class HymnsController {
 		}
 		modelAndView.addObject(ProjectConstants.ATTRNAME_EDITED_INFO, hymnInfoById.getData());
 		modelAndView.addObject(ProjectConstants.ATTRNAME_PAGE_NUMBER, pageNum);
+		modelAndView.addObject(ProjectConstants.ATTRNAME_KEYWORD, keyword);
 		return modelAndView;
 	}
 
