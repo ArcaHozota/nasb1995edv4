@@ -77,21 +77,21 @@ public final class HymnsScoreController {
 	 * @param hymnDto 情報転送クラス
 	 * @return ResponseEntity<String>
 	 */
+	@Operation(summary = "情報保存", description = "IDを指定した賛美歌の楽譜の情報を保存する")
 	@PostMapping(value = "/score-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
-	@Operation(summary = "情報保存", description = "IDを指定した賛美歌の楽譜の情報を保存する")
-	public @NotNull ResponseEntity<String> scoreUpload(@RequestParam final Long id,
-			@RequestPart final MultipartFile score) {
-		CoResult<String, DataAccessException> scoreStorage = CoResult.getInstance();
+	public ResponseEntity<String> scoreUpload(@RequestParam final Long id,
+			@RequestPart("score") final MultipartFile score) {
 		try {
-			scoreStorage = this.iHymnService.scoreStorage(score.getBytes(), id);
+			final CoResult<String, DataAccessException> scoreStorage = this.iHymnService.scoreStorage(score.getBytes(),
+					id);
+			if (!scoreStorage.isOk()) {
+				throw scoreStorage.getErr();
+			}
+			return ResponseEntity.ok(scoreStorage.getData());
 		} catch (final IOException e) {
-			e.printStackTrace();
+			return ResponseEntity.badRequest().body("ファイル読み込みに失敗しました。");
 		}
-		if (!scoreStorage.isOk()) {
-			throw scoreStorage.getErr();
-		}
-		return ResponseEntity.ok(scoreStorage.getData());
 	}
 
 	/**
