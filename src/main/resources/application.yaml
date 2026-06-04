@@ -1,4 +1,5 @@
 server:
+   forward-headers-strategy: framework
    port: 8277
    compression:
       enabled: true
@@ -14,8 +15,8 @@ spring:
       name: nasb1995edv4
    servlet:
       multipart:
-         max-file-size: 10MB
-         max-request-size: 10MB
+         max-file-size: 16MB
+         max-request-size: 16MB
    datasource:
       hikari:
          maximum-pool-size: 40
