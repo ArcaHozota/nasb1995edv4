@@ -1,5 +1,6 @@
 package app.preach.gospel.controller;
 
+import java.io.IOException;
 import java.io.Serial;
 
 import org.jetbrains.annotations.NotNull;
@@ -11,10 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
@@ -75,12 +77,17 @@ public final class HymnsScoreController {
 	 * @param hymnDto 情報転送クラス
 	 * @return ResponseEntity<String>
 	 */
-	@PostMapping("/score-upload")
+	@PostMapping(value = "/score-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
 	@Operation(summary = "情報保存", description = "IDを指定した賛美歌の楽譜の情報を保存する")
-	public @NotNull ResponseEntity<String> scoreUpload(@RequestBody final HymnDto hymnDto) {
-		final CoResult<String, DataAccessException> scoreStorage = this.iHymnService.scoreStorage(hymnDto.score(),
-				hymnDto.id());
+	public @NotNull ResponseEntity<String> scoreUpload(@RequestParam final Long id,
+			@RequestPart final MultipartFile score) {
+		CoResult<String, DataAccessException> scoreStorage = CoResult.getInstance();
+		try {
+			scoreStorage = this.iHymnService.scoreStorage(score.getBytes(), id);
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
 		if (!scoreStorage.isOk()) {
 			throw scoreStorage.getErr();
 		}

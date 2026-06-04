@@ -34,40 +34,38 @@ document.getElementById("scoreUploadBtn")?.addEventListener("click", () => {
     const editId = document.getElementById("idContainer")?.value;
     const fileInput = document.getElementById("scoreEdit");
     const file = fileInput?.files[0];
-    if (!file) return;
+    if (!file) {
+        return;
+    }
+    upload(editId, file);
+});
+
+async function upload(editId, file) {
     const header = document.querySelector('meta[name="_csrf_header"]')?.content;
     const token = document.querySelector('meta[name="_csrf_token"]')?.content;
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-        const base64File = e.target.result.split(",")[1];
-        const jsonData = JSON.stringify({
-            id: editId,
-            score: base64File
+    const formData = new FormData();
+    formData.append("id", editId);
+    formData.append("score", file);
+    try {
+        const res = await fetch('/hymns/score-upload', {
+            method: 'POST',
+            headers: {
+                ...(header && token ? { [header]: token } : {})
+            },
+            body: formData
         });
-        try {
-            const res = await fetch('/hymns/score-upload', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json;charset=UTF-8',
-                    ...(header && token ? { [header]: token } : {})
-                },
-                body: jsonData
-            });
-            const text = await res.text();
-            const message = trimQuote(text);
-            if (!res.ok) {
-                layer.msg(message);
-                return;
-            }
-            localStorage.setItem('redirectMessage', message);
-            window.location.replace(
-                '/hymns/to-pages?pageNum=' + encodeURIComponent(pageNum)
-                + '&keyword=' + encodeURIComponent(keyword)
-            );
-        } catch (err) {
-            console.error(err);
-            layer.msg("通信エラーが発生しました。");
+        const text = await res.text();
+        if (!res.ok) {
+            layer.msg(text);
+            return;
         }
-    };
-    reader.readAsDataURL(file);
-});
+        localStorage.setItem('redirectMessage', text);
+        window.location.replace(
+            '/hymns/to-pages?pageNum=' + encodeURIComponent(pageNum)
+            + '&keyword=' + encodeURIComponent(keyword)
+        );
+    } catch (e) {
+        console.error(e);
+        layer.msg("通信エラーが発生しました。");
+    }
+}
