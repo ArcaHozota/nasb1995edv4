@@ -135,7 +135,7 @@ function buildTableBody1(response) {
                 tr.className = "table-success";
                 break;
             default:
-                tr.className = "table-light tr-glass";
+                tr.className = "tr-glass";
         }
         tableBody.appendChild(tr);
     });
@@ -179,7 +179,7 @@ function buildTableBody2(response) {
                 tr.className = "table-success";
                 break;
             default:
-                tr.className = "table-light tr-glass";
+                tr.className = "tr-glass";
         }
         tableBody.appendChild(tr);
     });
