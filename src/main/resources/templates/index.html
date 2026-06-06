@@ -38,7 +38,7 @@
 			background-color: #000000 !important;
 		}
 
-		.tr-glass {
+		.tr-porcelain {
 			background-color: rgba(248, 249, 250, 0.65);
 			/* 薄い白 + 透明 */
 			backdrop-filter: blur(12px);
@@ -52,10 +52,30 @@
 			transition: all 0.3s ease;
 		}
 
-		.tr-glass:hover {
+		.tr-porcelain:hover {
 			background-color: rgba(248, 249, 250, 0.75);
 			backdrop-filter: blur(16px);
 			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+		}
+
+		.tr-glass {
+			background-color: rgba(255, 255, 255, 0.33) !important;
+			/* 透明度を大幅に上げる */
+			backdrop-filter: blur(20px) saturate(180%);
+			/* ぼかしを強く + 彩度アップ */
+			-webkit-backdrop-filter: blur(20px) saturate(180%);
+			border: 1px solid rgba(255, 255, 255, 0.45);
+			/* ガラス縁を薄く */
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
+				inset 0 1px 0 rgba(255, 255, 255, 0.8);
+			/* 浮遊感 + 内側光 */
+			transition: all 0.3s ease;
+		}
+
+		.tr-glass:hover {
+			background-color: rgba(255, 255, 255, 0.42);
+			backdrop-filter: blur(24px) saturate(200%);
+			box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
 		}
 	</style>
 	<script type="text/javascript" th:src="@{/static/bootstrap/js/bootstrap.bundle.min.js}"></script>
