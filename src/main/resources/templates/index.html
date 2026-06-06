@@ -59,23 +59,28 @@
 		}
 
 		.tr-glass {
-			background-color: rgba(255, 255, 255, 0.33) !important;
-			/* 透明度を大幅に上げる */
-			backdrop-filter: blur(20px) saturate(180%);
-			/* ぼかしを強く + 彩度アップ */
-			-webkit-backdrop-filter: blur(20px) saturate(180%);
-			border: 1px solid rgba(255, 255, 255, 0.45);
-			/* ガラス縁を薄く */
-			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
-				inset 0 1px 0 rgba(255, 255, 255, 0.8);
-			/* 浮遊感 + 内側光 */
-			transition: all 0.3s ease;
+			background: rgba(255, 255, 255, 0.15) !important;
+			backdrop-filter: blur(28px) saturate(160%) contrast(105%) brightness(1.05) !important;
+			-webkit-backdrop-filter: blur(28px) saturate(160%) contrast(105%) brightness(1.05) !important;
+			border: 1px solid rgba(255, 255, 255, 0.3) !important;
+			box-shadow:
+				0 10px 35px rgba(0, 0, 0, 0.15),
+				inset 0 1px 0 rgba(255, 255, 255, 0.85),
+				inset 0 -1px 0 rgba(0, 0, 0, 0.08) !important;
+			transition: all 0.35s ease !important;
+			position: relative;
+			z-index: 1;
 		}
 
 		.tr-glass:hover {
-			background-color: rgba(255, 255, 255, 0.42);
-			backdrop-filter: blur(24px) saturate(200%);
-			box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+			background: rgba(255, 255, 255, 0.22) !important;
+			backdrop-filter: blur(32px) saturate(180%) !important;
+			box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
+		}
+
+		/* Bootstrapのtable上書き対策 */
+		table.table .tr-glass td {
+			background: transparent !important;
 		}
 	</style>
 	<script type="text/javascript" th:src="@{/static/bootstrap/js/bootstrap.bundle.min.js}"></script>
