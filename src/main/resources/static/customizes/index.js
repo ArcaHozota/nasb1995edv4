@@ -126,13 +126,13 @@ function buildTableBody1(response) {
         tr.appendChild(scoreTd);
         switch (item.lineNumber) {
             case 'BURGUNDY':
-                tr.className = "table-danger";
+                tr.className = "table-danger tr-glass";
                 break;
             case 'NAPLES':
-                tr.className = "table-warning";
+                tr.className = "table-warning tr-glass";
                 break;
             case 'CADMIUM':
-                tr.className = "table-success";
+                tr.className = "table-success tr-glass";
                 break;
             default:
                 tr.className = "tr-glass";
@@ -170,13 +170,13 @@ function buildTableBody2(response) {
         tr.appendChild(scoreTd);
         switch (item.lineNumber) {
             case 'BURGUNDY':
-                tr.className = "table-danger";
+                tr.className = "table-danger tr-glass";
                 break;
             case 'NAPLES':
-                tr.className = "table-warning";
+                tr.className = "table-warning tr-glass";
                 break;
             case 'CADMIUM':
-                tr.className = "table-success";
+                tr.className = "table-success tr-glass";
                 break;
             default:
                 tr.className = "tr-glass";

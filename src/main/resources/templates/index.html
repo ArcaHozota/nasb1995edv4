@@ -81,6 +81,25 @@
 		table.table .tr-glass td {
 			background: transparent !important;
 		}
+
+		/* table-danger用のガラス調整（赤みが残るように） */
+		.tr-glass.table-danger,
+		.table-danger.tr-glass {
+			background: rgba(128, 0, 32, 0.42) !important;
+			/* 赤のベースを少し残す */
+		}
+
+		.tr-glass.table-success,
+		.table-success.tr-glass {
+			background: rgba(13, 92, 51, 0.42) !important;
+			/* 赤のベースを少し残す */
+		}
+
+		.tr-glass.table-warning,
+		.table-warning.tr-glass {
+			background: rgba(246, 201, 28, 0.42) !important;
+			/* 赤のベースを少し残す */
+		}
 	</style>
 	<script type="text/javascript" th:src="@{/static/bootstrap/js/bootstrap.bundle.min.js}"></script>
 	<script type="text/javascript" th:src="@{/static/layer/neo-layer.js}"></script>
