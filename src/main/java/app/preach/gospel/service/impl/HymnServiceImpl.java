@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -67,6 +66,7 @@ import app.preach.gospel.utils.CoStringUtils;
 import app.preach.gospel.utils.LineNumber;
 import app.preach.gospel.utils.Pagination;
 import app.preach.gospel.utils.SnowflakeUtils;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap.Entry;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
@@ -332,27 +332,26 @@ public class HymnServiceImpl implements IHymnService {
 		}
 		final var elementVectors = elements.stream()
 				.map(item -> this.computeTfIdfVector(KR, corpusVersion, item.lyric(), idf)).toList();
-		final var maxHeap = new PriorityQueue<Object2DoubleOpenHashMap.Entry<HymnDto>>(
-				Comparator.comparing(Object2DoubleOpenHashMap.Entry<HymnDto>::getDoubleValue).reversed());
+		final var maxHeap = new ArrayList<Object2DoubleOpenHashMap.Entry<HymnDto>>();
 		for (var i = 0; i < elements.size(); i++) {
 			final double similarity = cosineSimilarity(targetVector, elementVectors.get(i));
 			maxHeap.add(new Object2DoubleOpenHashMap.BasicEntry<>(elements.get(i), similarity));
 		}
-		return maxHeap.stream().map(item -> {
+		return maxHeap.stream().sorted(Comparator.comparing(Entry<HymnDto>::getDoubleValue).reversed()).map(item -> {
 			final var similarity = item.getDoubleValue();
 			log.warn("類似程度：" + similarity);
 			final var hymnDto = item.getKey();
-			if (similarity >= 0.66) {
+			if (similarity >= 0.33) {
 				return new HymnDto(hymnDto.id(), hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.lyric(), hymnDto.link(),
 						hymnDto.score(), hymnDto.biko(), hymnDto.updatedUser(), hymnDto.updatedTime(),
 						LineNumber.CADMIUM);
 			}
-			if (similarity >= 0.33) {
+			if (similarity >= 0.21) {
 				return new HymnDto(hymnDto.id(), hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.lyric(), hymnDto.link(),
 						hymnDto.score(), hymnDto.biko(), hymnDto.updatedUser(), hymnDto.updatedTime(),
 						LineNumber.BURGUNDY);
 			}
-			if (similarity >= 0.11) {
+			if (similarity >= 0.12) {
 				return new HymnDto(hymnDto.id(), hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.lyric(), hymnDto.link(),
 						hymnDto.score(), hymnDto.biko(), hymnDto.updatedUser(), hymnDto.updatedTime(),
 						LineNumber.NAPLES);
