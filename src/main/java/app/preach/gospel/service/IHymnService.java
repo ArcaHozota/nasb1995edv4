@@ -60,14 +60,6 @@ public interface IHymnService {
 	CoResult<List<HymnDto>, DataAccessException> getHymnsInfoByRandom(String keyword);
 
 	/**
-	 * 金海氏の検索によって賛美歌情報を取得する
-	 *
-	 * @param id ID
-	 * @return CoResult<List<HymnDto>, DataAccessException>
-	 */
-	CoResult<List<HymnDto>, DataAccessException> getKanumiList(Long id);
-
-	/**
 	 * 賛美歌のレコード数を取得する
 	 *
 	 * @return CoResult<Long, DataAccessException>
