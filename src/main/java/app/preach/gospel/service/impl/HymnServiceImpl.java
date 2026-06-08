@@ -146,7 +146,7 @@ public class HymnServiceImpl implements IHymnService {
 		double dotProduct = 0.00;
 		double normA = 0.00;
 		double normB = 0.00;
-		for (var i = 0; i < vectorA.length; i++) {
+		for (var i = 0; i < Math.min(vectorA.length, vectorB.length); i++) {
 			dotProduct += vectorA[i] * vectorB[i];
 			normA += Math.pow(vectorA[i], 2);
 			normB += Math.pow(vectorB[i], 2);
