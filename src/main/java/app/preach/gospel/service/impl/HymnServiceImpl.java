@@ -351,7 +351,7 @@ public class HymnServiceImpl implements IHymnService {
 						hymnDto.score(), hymnDto.biko(), hymnDto.updatedUser(), hymnDto.updatedTime(),
 						LineNumber.BURGUNDY);
 			}
-			if (similarity >= 0.12) {
+			if (similarity >= 0.07) {
 				return new HymnDto(hymnDto.id(), hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.lyric(), hymnDto.link(),
 						hymnDto.score(), hymnDto.biko(), hymnDto.updatedUser(), hymnDto.updatedTime(),
 						LineNumber.NAPLES);
