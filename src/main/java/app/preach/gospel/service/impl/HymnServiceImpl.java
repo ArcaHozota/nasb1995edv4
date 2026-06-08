@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import com.atilika.kuromoji.ipadic.Token;
 import com.atilika.kuromoji.ipadic.Tokenizer;
@@ -341,17 +342,17 @@ public class HymnServiceImpl implements IHymnService {
 			final var similarity = item.getDoubleValue();
 			log.warn("類似程度：" + similarity);
 			final var hymnDto = item.getKey();
-			if (similarity >= 0.33) {
+			if (similarity >= 0.33 && hymnDto.lineNumber() == LineNumber.SNOWY) {
 				return new HymnDto(hymnDto.id(), hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.lyric(), hymnDto.link(),
 						hymnDto.score(), hymnDto.biko(), hymnDto.updatedUser(), hymnDto.updatedTime(),
 						LineNumber.CADMIUM);
 			}
-			if (similarity >= 0.21) {
+			if (similarity >= 0.21 && hymnDto.lineNumber() == LineNumber.SNOWY) {
 				return new HymnDto(hymnDto.id(), hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.lyric(), hymnDto.link(),
 						hymnDto.score(), hymnDto.biko(), hymnDto.updatedUser(), hymnDto.updatedTime(),
 						LineNumber.BURGUNDY);
 			}
-			if (similarity >= 0.07) {
+			if (similarity >= 0.07 && hymnDto.lineNumber() == LineNumber.SNOWY) {
 				return new HymnDto(hymnDto.id(), hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.lyric(), hymnDto.link(),
 						hymnDto.score(), hymnDto.biko(), hymnDto.updatedUser(), hymnDto.updatedTime(),
 						LineNumber.NAPLES);
@@ -438,8 +439,32 @@ public class HymnServiceImpl implements IHymnService {
 					return CoResult.ok(pagination);
 				}
 			}
-			final String[] splits = keyword.split("&");
-			final List<HymnDto> topMatches = this.findTopMatches(splits, hymnDtos);
+			final var hymnDtos2 = this.dslContext.selectFrom(HYMNS).where(COMMON_CONDITION)
+					.and(HYMNS.NAME_KR.like(getHymnSpecification(keyword))).orderBy(HYMNS.ID.asc()).fetch(rd -> {
+						final String hymnName = rd.getClassical().booleanValue() ? "★" + rd.getNameJp()
+								: rd.getNameJp();
+						return new HymnDto(rd.getId(), hymnName, rd.getNameKr(), rd.getLyric(), rd.getLink(), null,
+								null, rd.getUpdatedUser().toString(), rd.getUpdatedTime().toString(),
+								LineNumber.CADMIUM);
+					});
+			if (CollectionUtils.isEmpty(hymnDtos2)) {
+				final String[] splits = keyword.split("&");
+				final List<HymnDto> topMatches = this.findTopMatches(splits, hymnDtos);
+				final var sortedHymnDtos = topMatches.stream()
+						.sorted(Comparator.comparingInt(item -> item.lineNumber().getLineNo())).toList();
+				final var pagination = Pagination.of(sortedHymnDtos.subList(offset, margrave), totalRecords, pageNum,
+						ProjectConstants.DEFAULT_PAGE_SIZE);
+				this.nlpCache.put(docKey, sortedHymnDtos);
+				return CoResult.ok(pagination);
+			}
+			final var list = hymnDtos2.stream().map(HymnDto::lyric).toList();
+			final var targets = new String[list.size()];
+			for (var i = 0; i < targets.length; i++) {
+				targets[i] = list.get(i);
+			}
+			hymnDtos.removeIf(a -> list.contains(a.lyric()));
+			hymnDtos.addAll(hymnDtos2);
+			final List<HymnDto> topMatches = this.findTopMatches(targets, hymnDtos);
 			final var sortedHymnDtos = topMatches.stream()
 					.sorted(Comparator.comparingInt(item -> item.lineNumber().getLineNo())).toList();
 			final var pagination = Pagination.of(sortedHymnDtos.subList(offset, margrave), totalRecords, pageNum,
