@@ -340,6 +340,7 @@ public class HymnServiceImpl implements IHymnService {
 		}
 		return maxHeap.stream().map(item -> {
 			final var similarity = item.getDoubleValue();
+			log.warn("類似程度：" + similarity);
 			final var hymnDto = item.getKey();
 			if (similarity >= 0.66) {
 				return new HymnDto(hymnDto.id(), hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.lyric(), hymnDto.link(),

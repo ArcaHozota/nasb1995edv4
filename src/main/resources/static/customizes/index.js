@@ -30,7 +30,7 @@ hymnSearchBtn.addEventListener("click", (e) => {
         loadingContainer.style.display = "none";
         loadingBackground.style.display = "none";
         hymnSearchBtn.disabled = false;
-    }, 3300);
+    }, 6600);
 });
 
 tableBody.addEventListener("click", (e) => {
