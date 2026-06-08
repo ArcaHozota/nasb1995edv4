@@ -102,7 +102,7 @@
 		}
 
 
-		/* 特に色付き行（赤・緑など）でも白くする */
+		/* 特に色付き行（赤・緑など）でも白くする 
 		.table-danger.tr-glass .link-btn,
 		.table-success.tr-glass .link-btn,
 		.table-warning.tr-glass .link-btn,
@@ -111,7 +111,6 @@
 		.table-warning.tr-glass .score-download-btn {
 			color: #ffffff !important;
 			text-shadow: 0 1px 3px rgba(0, 0, 0, 0.66) !important;
-			/* 文字が浮き出るように */
 			transition: color 0.2s ease;
 		}
 
@@ -121,6 +120,19 @@
 		.table-danger.tr-glass .score-download-btn:hover,
 		.table-success.tr-glass .score-download-btn:hover,
 		.table-warning.tr-glass .score-download-btn:hover {
+			color: #f0f0f0 !important;
+			text-decoration: underline;
+		} */
+
+		.tr-glass .link-btn,
+		.tr-glass .score-download-btn {
+			color: #ffffff !important;
+			text-shadow: 0 1px 3px rgba(0, 0, 0, 0.66) !important;
+			transition: color 0.2s ease;
+		}
+
+		.tr-glass .link-btn:hover,
+		.tr-glass .score-download-btn:hover {
 			color: #f0f0f0 !important;
 			text-decoration: underline;
 		}
