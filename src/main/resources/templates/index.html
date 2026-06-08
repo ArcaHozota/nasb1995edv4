@@ -136,20 +136,25 @@
 			color: #f0f0f0 !important;
 			text-decoration: underline;
 		}
-		
+
 		.pagination .page-item.active .page-link {
-		    background-color: #e74c3c !important;   /* 少し明るめの赤 */
-		    border-color: #e74c3c !important;
-		    color: white !important;
-		    box-shadow: 0 2px 5px rgba(231, 76, 60, 0.4) !important;
+			background-color: #e74c3c !important;
+			/* 少し明るめの赤 */
+			border-color: #e74c3c !important;
+			color: white !important;
+			box-shadow: 0 2px 5px rgba(231, 76, 60, 0.4) !important;
 		}
 
 		.pagination .page-item .page-link {
-		    color: #555 !important;
+			color: #555 !important;
 		}
 
 		.pagination .page-item .page-link:hover {
-		    color: #e74c3c !important;
+			color: #e74c3c !important;
+		}
+
+		.pagination .page-item.active .page-link:hover {
+			color: #fff !important;
 		}
 	</style>
 	<script type="text/javascript" th:src="@{/static/bootstrap/js/bootstrap.bundle.min.js}"></script>
@@ -226,8 +231,7 @@
 			</div>
 		</div>
 		<div class="row" id="hintDiv">
-			<p style="font-size: 14px;color: #FFF;"
-				th:text="'※韓国語単語で検索してください。'" />
+			<p style="font-size: 13px;color: #FFF;" th:text="'※韓国語単語で検索してください。'" />
 		</div>
 	</div>
 	<script type="text/javascript" th:src="@{/static/customizes/index.js}"></script>
