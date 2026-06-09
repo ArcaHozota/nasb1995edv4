@@ -281,15 +281,15 @@ public class HymnServiceImpl implements IHymnService {
 //				// 画像が A4 より大きい → A4 に収まるように縮小
 //				scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
 //			}
-			final float scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-			final float drawWidth = imgWidth * scale;
-			final float drawHeight = imgHeight * scale;
+			final var scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+			final var drawWidth = imgWidth * scale;
+			final var drawHeight = imgHeight * scale;
 			// 画像オブジェクト作成
 			final PDImageXObject pdfImage = LosslessFactory.createFromImage(doc, image);
 			// 中央配置用の座標計算（原点は左下）
-			final float x = (pageWidth - drawWidth) / 2f;
-			final float y = (pageHeight - drawHeight) / 2f;
-			try (PDPageContentStream contentStream = new PDPageContentStream(doc, page)) {
+			final var x = (pageWidth - drawWidth) / 2f;
+			final var y = (pageHeight - drawHeight) / 2f;
+			try (var contentStream = new PDPageContentStream(doc, page)) {
 				contentStream.drawImage(pdfImage, x, y, drawWidth, drawHeight);
 			}
 			final var out = new ByteArrayOutputStream();
