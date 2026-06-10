@@ -62,7 +62,8 @@ async function downloadScores(scoreId) {
     if (!res.ok) {
         const message = await res.text();
         const encodedMsg = utf8ToBase64(message);
-        window.location.href = "/error-page?errMsg=" + encodedMsg;
+        const url = `/error-page2?errMsg=${encodeURIComponent(encodedMsg)}`;
+        window.location.href = url;
         return;
     }
     const blob = await res.blob();
