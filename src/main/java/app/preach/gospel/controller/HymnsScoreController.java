@@ -63,7 +63,7 @@ public final class HymnsScoreController {
 		}
 		final var hymnDto = hymnInfoById.getData();
 		if (hymnDto.score() == null || hymnDto.score().length == 0) {
-			throw new NoDataFoundException("楽譜PDFが登録されていません。");
+			throw new NoDataFoundException(ProjectConstants.MESSAGE_HYMNSWORK_NOT_FOUND);
 		}
 		final var headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_PDF);

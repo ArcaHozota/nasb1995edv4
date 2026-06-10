@@ -38,7 +38,7 @@ public final class ProjectConstants {
 
 	public static final String MESSAGE_HYMN_NOT_FOUND = "賛美歌情報が見つかりませんでした";
 
-	public static final String MESSAGE_HYMNSWORK_NOT_FOUND = "賛美歌ワーク情報が見つかりませんでした";
+	public static final String MESSAGE_HYMNSWORK_NOT_FOUND = "楽譜PDFが登録されておりません。";
 
 	public static final String MESSAGE_OPTIMISTIC_ERROR = "オプティミスティックロックの競合、データは他のトランザクションによって変更されました。";
 

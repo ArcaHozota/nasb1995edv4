@@ -16,14 +16,15 @@ const trimQuote = (str) =>
         : emptyString;
 // 【修正版】UTF-8 文字列を Base64 に
 const utf8ToBase64 = (str) => {
-    return encodeURIComponent(
-        btoa(unescape(encodeURIComponent(str)))
-    );
+    const bytes = new TextEncoder().encode(str);
+    const binString = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
+    return btoa(binString);
 };
-
 // 【修正版】Base64 を UTF-8 文字列に
 const base64ToUtf8 = (str) => {
-    return decodeURIComponent(escape(atob(str)));
+    const binString = atob(str);
+    const bytes = Uint8Array.from(binString, (m) => m.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
 };
 
 function buildPageInfos(response) {
