@@ -17,7 +17,7 @@ const trimQuote = (str) =>
 // 【修正版】UTF-8 文字列を Base64 に
 const utf8ToBase64 = (str) => {
     const bytes = new TextEncoder().encode(str);
-    const binString = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
+    const binString = Array.from(bytes, (byte) => String.fromCharCode(byte)).join(emptyString);
     return btoa(binString);
 };
 // 【修正版】Base64 を UTF-8 文字列に
