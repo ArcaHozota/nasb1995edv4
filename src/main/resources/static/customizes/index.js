@@ -48,10 +48,10 @@ tableBody.addEventListener("click", (e) => {
 async function downloadScores(scoreId) {
     const res = await fetch(`/hymns/score-download?id=${encodeURIComponent(scoreId)}`);
     if (!res.ok) {
-        const buffer = await res.arrayBuffer();  // バイト列として受け取る
-        const message = new TextDecoder('utf-8').decode(buffer);  // 明示的にUTF-8でデコード
+        const message = await res.text();
         const encodedMsg = utf8ToBase64(message);
-        window.location.href = "/error-page2?errMsg=" + encodedMsg;
+		const url = `/error-page2?errMsg=${encodeURIComponent(encodedMsg)}`;
+        window.location.href = url;
         return;
     }
     const blob = await res.blob();
