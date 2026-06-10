@@ -522,7 +522,8 @@ public class HymnServiceImpl implements IHymnService {
 			for (var i = 0; i < targets.length; i++) {
 				targets[i] = list.get(i);
 			}
-			totalRecords.removeIf(a -> list.contains(a.lyric()));
+			final var ids = hymnDtos2.stream().map(HymnDto::id).toList();
+			totalRecords.removeIf(a -> ids.contains(a.id()));
 			totalRecords.addAll(hymnDtos2);
 			final List<HymnDto> topMatches = this.findTopMatches(targets, totalRecords);
 			final List<HymnDto> randomFiveLoop = this.randomFiveLoop(topMatches.subList(0, 10), totalRecords);
