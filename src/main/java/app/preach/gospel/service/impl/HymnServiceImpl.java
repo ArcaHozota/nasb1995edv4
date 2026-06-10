@@ -456,7 +456,8 @@ public class HymnServiceImpl implements IHymnService {
 			for (var i = 0; i < targets.length; i++) {
 				targets[i] = list.get(i);
 			}
-			hymnDtos.removeIf(a -> list.contains(a.lyric()));
+			final var ids = hymnDtos2.stream().map(HymnDto::id).toList();
+			hymnDtos.removeIf(a -> ids.contains(a.id()));
 			hymnDtos.addAll(hymnDtos2);
 			final List<HymnDto> topMatches = this.findTopMatches(targets, hymnDtos);
 			final var sortedHymnDtos = topMatches.stream()
