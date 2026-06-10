@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 	const can = document.getElementById("errMsgContainer");
 	const msg = can.textContent;
-    const decodedMsg = decodeURIComponent(escape(atob(msg)));
+    const decodedMsg = base64ToUtf8(msg);
 	can.textContent = decodedMsg;
 });
 

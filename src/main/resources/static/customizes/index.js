@@ -49,9 +49,7 @@ async function downloadScores(scoreId) {
     const res = await fetch(`/hymns/score-download?id=${encodeURIComponent(scoreId)}`);
     if (!res.ok) {
         const message = await res.text();
-        const encodedMsg = encodeURIComponent(
-            btoa(unescape(encodeURIComponent(message)))
-        );
+        const encodedMsg = utf8ToBase64(message);
         window.location.href = "/error-page2?errMsg=" + encodedMsg;
         return;
     }

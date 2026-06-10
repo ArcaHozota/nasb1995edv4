@@ -15,6 +15,9 @@ const trimQuote = (str) =>
         ? str.replace(/^"|"$/g, emptyString)
         : emptyString;
 
+const utf8ToBase64 = (str) => btoa(String.fromCodePoint(...new TextEncoder().encode(str)));
+const base64ToUtf8 = (str) => new TextDecoder().decode(Uint8Array.from(atob(str), (c) => c.codePointAt(0)));
+
 function buildPageInfos(response) {
     const pageInfos = document.getElementById("pageInfos");
     pageInfos.innerHTML = emptyString;
