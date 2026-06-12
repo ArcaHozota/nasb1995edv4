@@ -41,9 +41,10 @@ document.getElementById("infoStorageBtn")?.addEventListener("click", () => {
         layer.msg(inputWarning);
     } else {
         const userId = document.getElementById("toPersonal").querySelector("input")?.value;
+		const nameKr = document.getElementById("nameKrInput").value.trim();
         const postData = JSON.stringify({
             nameJp: document.getElementById("nameJpInput").value.trim(),
-            nameKr: document.getElementById("nameKrInput").value.trim(),
+            nameKr: nameKr.normalize('NFC'),
             link: document.getElementById("linkInput").value,
             lyric: document.getElementById("serifInput").value,
             updatedUser: userId
@@ -78,10 +79,11 @@ document.getElementById("infoUpdateBtn")?.addEventListener("click", () => {
         layer.msg(inputWarning);
     } else {
         const userId = document.getElementById("toPersonal").querySelector("input")?.value;
+		const nameKr = document.getElementById("nameKrInput").value.trim();
         const putData = JSON.stringify({
             id: document.getElementById("idContainer").value,
             nameJp: document.getElementById("nameJpEdit").value.trim(),
-            nameKr: document.getElementById("nameKrEdit").value.trim(),
+            nameKr: nameKr.normalize('NFC'),
             link: document.getElementById("linkEdit").value,
             lyric: document.getElementById("serifEdit").value,
             updatedTime: document.getElementById("datestampContainer").value,
