@@ -43,9 +43,24 @@ public interface HymnDao {
 	int countByVisibleFlgTrueAndNameKrAndIdNot(@Param("nameKr") String nameKr, @Param("id") Long id);
 
 	/**
+	 * 賛美歌を論理削除（VISIBLE_FLG = 'false'）
+	 */
+	int deleteLogically(Long id);
+
+	/**
+	 * 賛美歌を1件登録
+	 */
+	int insert(Hymn hymn);
+
+	/**
 	 * 有効な賛美歌をNAME_KRでLIKE検索、ID昇順
 	 */
 	List<Hymn> selectActiveByNameKrLike(String keyword);
+
+	/**
+	 * 有効かつクラシックではない賛美歌をNAME_KRでLIKE検索、ID昇順
+	 */
+	List<Hymn> selectActiveByNameKrLikeAndClassicalFalse(String keyword);
 
 	/**
 	 * IDで有効な賛美歌を1件取得
@@ -68,17 +83,7 @@ public interface HymnDao {
 	LocalDateTime selectMaxUpdatedTime();
 
 	/**
-	 * 賛美歌を1件登録
-	 */
-	int insert(Hymn hymn);
-
-	/**
 	 * 賛美歌を1件更新
 	 */
 	int update(Hymn hymn);
-
-	/**
-	 * 賛美歌を論理削除（VISIBLE_FLG = 'false'）
-	 */
-	int deleteLogically(Long id);
 }

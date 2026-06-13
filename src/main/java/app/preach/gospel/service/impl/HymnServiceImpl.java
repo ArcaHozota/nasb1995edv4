@@ -33,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.data.jdbc.core.JdbcAggregateOperations;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,9 +41,9 @@ import org.springframework.util.CollectionUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.dao.HymnRepository;
-import app.preach.gospel.dao.HymnWorkRepository;
-import app.preach.gospel.dao.StudentRepository;
+import app.preach.gospel.dao.HymnDao;
+import app.preach.gospel.dao.HymnWorkDao;
+import app.preach.gospel.dao.StudentDao;
 import app.preach.gospel.dto.HymnDto;
 import app.preach.gospel.dto.dtokey.DocKey;
 import app.preach.gospel.dto.dtokey.IdfKey;
@@ -142,7 +141,6 @@ public class HymnServiceImpl implements IHymnService {
 			final var scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
 			final var drawWidth = imgWidth * scale;
 			final var drawHeight = imgHeight * scale;
-
 			final PDImageXObject pdfImage = LosslessFactory.createFromImage(doc, image);
 			final var x = (pageWidth - drawWidth) / 2f;
 			final var y = (pageHeight - drawHeight) / 2f;
@@ -203,36 +201,31 @@ public class HymnServiceImpl implements IHymnService {
 		return serif.replace(zenkakuSpace, CoStringUtils.EMPTY_STRING).trim();
 	}
 
+	// jOOQの依存関係を排除し、Spring Data JDBCリポとMapStructマッパーを注入
+	private final HymnDao hymnDao;
 	// Entity2DTO Mapper
 	private final HymnMapper hymnMapper;
-	// jOOQの依存関係を排除し、Spring Data JDBCリポとMapStructマッパーを注入
-	private final HymnRepository hymnRepository;
-	private final HymnWorkRepository hymnWorkRepository;
-
-	private final JdbcAggregateOperations jdbcAggregateOperations;
-
+	private final HymnWorkDao hymnWorkDao;
 	@Qualifier("nlpCache")
 	private final Cache<Object, Object> nlpCache;
 
-	private final StudentRepository studentRepository;
+	private final StudentDao studentDao;
 
 	/**
 	 * コンストラクタ
 	 *
 	 * @param hymnMapper
-	 * @param hymnRepository
-	 * @param hymnWorkRepository
-	 * @param studentRepository
+	 * @param hymnDao
+	 * @param hymnWorkDao
+	 * @param studentDao
 	 */
-	protected HymnServiceImpl(final Cache<Object, Object> nlpCache, final HymnMapper hymnMapper,
-			final HymnRepository hymnRepository, final HymnWorkRepository hymnWorkRepository,
-			final StudentRepository studentRepository, final JdbcAggregateOperations jdbcAggregateOperations) {
+	protected HymnServiceImpl(final Cache<Object, Object> nlpCache, final HymnMapper hymnMapper, final HymnDao hymnDao,
+			final HymnWorkDao hymnWorkDao, final StudentDao studentDao) {
 		this.nlpCache = nlpCache;
 		this.hymnMapper = hymnMapper;
-		this.hymnRepository = hymnRepository;
-		this.hymnWorkRepository = hymnWorkRepository;
-		this.studentRepository = studentRepository;
-		this.jdbcAggregateOperations = jdbcAggregateOperations;
+		this.hymnDao = hymnDao;
+		this.hymnWorkDao = hymnWorkDao;
+		this.studentDao = studentDao;
 	}
 
 	@Transactional(readOnly = true)
@@ -241,9 +234,9 @@ public class HymnServiceImpl implements IHymnService {
 		try {
 			int count;
 			if (CoStringUtils.isDigital(id)) {
-				count = this.hymnRepository.countByVisibleFlgTrueAndNameJpAndIdNot(nameJp, Long.parseLong(id));
+				count = this.hymnDao.countByVisibleFlgTrueAndNameJpAndIdNot(nameJp, Long.parseLong(id));
 			} else {
-				count = this.hymnRepository.countByVisibleFlgTrueAndNameJp(nameJp);
+				count = this.hymnDao.countByVisibleFlgTrueAndNameJp(nameJp);
 			}
 			return CoResult.ok(count);
 		} catch (final DataAccessException e) {
@@ -257,9 +250,9 @@ public class HymnServiceImpl implements IHymnService {
 		try {
 			int count;
 			if (CoStringUtils.isDigital(id)) {
-				count = this.hymnRepository.countByVisibleFlgTrueAndNameKrAndIdNot(nameKr, Long.parseLong(id));
+				count = this.hymnDao.countByVisibleFlgTrueAndNameKrAndIdNot(nameKr, Long.parseLong(id));
 			} else {
-				count = this.hymnRepository.countByVisibleFlgTrueAndNameKr(nameKr);
+				count = this.hymnDao.countByVisibleFlgTrueAndNameKr(nameKr);
 			}
 			return CoResult.ok(count);
 		} catch (final DataAccessException e) {
@@ -343,7 +336,7 @@ public class HymnServiceImpl implements IHymnService {
 	@Transactional(readOnly = true)
 	protected String getCorpusVersion() {
 		// 1. MAX(updated_time) をリポジトリ経由で取得
-		final LocalDateTime maxUpdatedAt = this.hymnRepository.findMaxUpdatedTime();
+		final LocalDateTime maxUpdatedAt = this.hymnDao.selectMaxUpdatedTime();
 		// 2. null の場合は現在時刻を代替
 		if (maxUpdatedAt == null) {
 			return LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -356,13 +349,13 @@ public class HymnServiceImpl implements IHymnService {
 	@Override
 	public CoResult<HymnDto, DataAccessException> getHymnInfoById(final Long id) {
 		try {
-			final Hymn hymn = this.hymnRepository.findByIdAndVisibleFlgTrue(id)
+			final Hymn hymn = this.hymnDao.selectByIdAndVisibleFlgTrue(id)
 					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_HYMN_NOT_FOUND) {
 					});
-			final HymnWork work = this.hymnWorkRepository.findByWorkId(id)
+			final HymnWork work = this.hymnWorkDao.selectByWorkId(id)
 					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_HYMNSWORK_NOT_FOUND) {
 					});
-			final Student student = this.studentRepository.findByIdAndVisibleFlgTrue(hymn.updatedUser())
+			final Student student = this.studentDao.selectByIdAndVisibleFlgTrue(hymn.updatedUser())
 					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_STUDENT_NOT_FOUND) {
 					});
 			// 時差計算 (+9時間)
@@ -384,7 +377,7 @@ public class HymnServiceImpl implements IHymnService {
 			final String keyword) {
 		try {
 			// 総件数の取得
-			final long totalRecords = this.hymnRepository.countByVisibleFlgTrue();
+			final long totalRecords = this.hymnDao.countByVisibleFlgTrue();
 			final int offset = (pageNum - 1) * ProjectConstants.DEFAULT_PAGE_SIZE;
 			final int margrave = (int) ((offset + ProjectConstants.DEFAULT_PAGE_SIZE) > totalRecords ? totalRecords
 					: offset + ProjectConstants.DEFAULT_PAGE_SIZE);
@@ -398,7 +391,7 @@ public class HymnServiceImpl implements IHymnService {
 				return CoResult.ok(pagination);
 			}
 			// 有効な讃美歌の一覧を取得し、MapStruct で DTO へ一括変換
-			final List<HymnDto> hymnDtos = this.hymnRepository.findByVisibleFlgTrueOrderByIdAsc().stream()
+			final List<HymnDto> hymnDtos = this.hymnDao.selectByVisibleFlgTrueOrderByIdAsc().stream()
 					.map(h -> this.hymnMapper.toDto2(h, LineNumber.SNOWY))
 					.collect(Collectors.toCollection(ArrayList::new)); // 後のremoveIf等の破壊的操作に備えて可変リストにする
 			if (CoStringUtils.isEmpty(keyword)) {
@@ -418,11 +411,10 @@ public class HymnServiceImpl implements IHymnService {
 				}
 			}
 			// NAME_KRのライク検索に該当する一覧を取得し、MapStructでDTO化
-			final List<HymnDto> hymnDtos2 = this.hymnRepository
-					.findActiveHymnsByNameKrLike(getHymnSpecification(keyword)).stream()
-					.map(h -> this.hymnMapper.toDto2(h, LineNumber.CADMIUM)).toList();
+			final List<HymnDto> hymnDtos2 = this.hymnDao.selectActiveByNameKrLike(getHymnSpecification(keyword))
+					.stream().map(h -> this.hymnMapper.toDto2(h, LineNumber.CADMIUM)).toList();
 			if (CollectionUtils.isEmpty(hymnDtos2)) {
-				final String[] splits = keyword.split("&");
+				final var splits = keyword.split("&");
 				final List<HymnDto> topMatches = this.findTopMatches(splits, hymnDtos);
 				final var sortedHymnDtos = topMatches.stream()
 						.sorted(Comparator.comparingInt(item -> item.lineNumber().getLineNo())).toList();
@@ -460,24 +452,23 @@ public class HymnServiceImpl implements IHymnService {
 			for (final String starngement : STRANGE_ARRAY) {
 				if (keyword.toLowerCase().contains(starngement) || keyword.length() >= 100) {
 					// 件数制限付き取得の代わりに、リポジトリから条件2（classical=false）のリストを取得して上限処理
-					final List<HymnDto> hymnDtos = this.hymnRepository
-							.findByVisibleFlgTrueAndClassicalFalseOrderByIdAsc().stream()
-							.limit(ProjectConstants.DEFAULT_PAGE_SIZE)
+					final List<HymnDto> hymnDtos = this.hymnDao.selectByVisibleFlgTrueAndClassicalFalseOrderByIdAsc()
+							.stream().limit(ProjectConstants.DEFAULT_PAGE_SIZE)
 							.map(h -> this.hymnMapper.toDto2(h, LineNumber.SNOWY)).toList();
 					log.warn("怪しいキーワード： " + keyword);
 					return CoResult.ok(hymnDtos);
 				}
 			}
 			// 全レコードのDTO変換リスト（可変）
-			final List<HymnDto> totalRecords = this.hymnRepository.findByVisibleFlgTrueAndClassicalFalseOrderByIdAsc()
+			final List<HymnDto> totalRecords = this.hymnDao.selectByVisibleFlgTrueAndClassicalFalseOrderByIdAsc()
 					.stream().map(h -> this.hymnMapper.toDto2(h, LineNumber.SNOWY))
 					.collect(Collectors.toCollection(ArrayList::new));
 			if (CoStringUtils.isEmpty(keyword)) {
 				final List<HymnDto> hymnDtos = this.randomFiveLoop2(totalRecords);
 				return CoResult.ok(hymnDtos);
 			}
-			final List<HymnDto> hymnDtos2 = this.hymnRepository
-					.findActiveHymnsByNameKrLike(getHymnSpecification(keyword)).stream()
+			final List<HymnDto> hymnDtos2 = this.hymnDao
+					.selectActiveByNameKrLikeAndClassicalFalse(getHymnSpecification(keyword)).stream()
 					.map(h -> this.hymnMapper.toDto2(h, LineNumber.CADMIUM)).toList();
 			if (CollectionUtils.isEmpty(hymnDtos2)) {
 				final String[] splits = keyword.split("&");
@@ -531,7 +522,7 @@ public class HymnServiceImpl implements IHymnService {
 	@Override
 	public CoResult<Long, DataAccessException> getTotalCounts() {
 		try {
-			final long totalRecords = this.hymnRepository.countByVisibleFlgTrue();
+			final long totalRecords = this.hymnDao.countByVisibleFlgTrue();
 			return CoResult.ok(totalRecords);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
@@ -572,14 +563,7 @@ public class HymnServiceImpl implements IHymnService {
 	@Override
 	public CoResult<String, DataAccessException> infoDeletion(final Long id) {
 		try {
-			final Hymn hymn = this.hymnRepository.findByIdAndVisibleFlgTrue(id)
-					.orElseThrow(() -> new DataAccessException("Hymn not found") {
-					});
-
-			// 論理削除フラグを偽に変更した新しいレコードインスタンスを保存
-			final Hymn deletedHymn = new Hymn(hymn.id(), hymn.nameJp(), hymn.nameKr(), hymn.link(), hymn.updatedTime(),
-					hymn.updatedUser(), hymn.lyric(), Boolean.FALSE.toString(), hymn.classical());
-			this.hymnRepository.save(deletedHymn);
+			this.hymnDao.deleteLogically(id);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_DELETED);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
@@ -597,13 +581,13 @@ public class HymnServiceImpl implements IHymnService {
 			final var newHymn = new Hymn(newHymnId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(), updateTime,
 					Long.parseLong(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE.toString(),
 					Boolean.FALSE.toString());
-			this.jdbcAggregateOperations.insert(newHymn);
+			this.hymnDao.insert(newHymn);
 			// 2. HYMNS_WORKテーブルへインサート
-			final int nextWorkSequenceId = this.hymnWorkRepository.countAllRecords() + 1;
+			final var nextWorkSequenceId = this.hymnWorkDao.countAllRecords() + 1;
 			final var newWork = new HymnWork(Long.valueOf(nextWorkSequenceId), newHymnId, null);
-			this.jdbcAggregateOperations.insert(newWork);
+			this.hymnWorkDao.insert(newWork);
 			// 3. 最大ページ数の算定
-			final long totalRecords = this.hymnRepository.countByVisibleFlgTrue();
+			final long totalRecords = this.hymnDao.countByVisibleFlgTrue();
 			final int discernLargestPage = CoStringUtils.discernLargestPage(totalRecords);
 			return CoResult.ok(discernLargestPage);
 		} catch (final DataAccessException e) {
@@ -620,8 +604,8 @@ public class HymnServiceImpl implements IHymnService {
 		try {
 			final var targetId = Long.valueOf(hymnDto.id());
 			// 既存の最新データをDBから直接取得（jOOQのセーブポイント比較に準拠）
-			final Hymn existingHymn = this.hymnRepository.findByIdAndVisibleFlgTrue(targetId)
-					.orElseThrow(() -> new DataAccessException("Hymn not found") {
+			final Hymn existingHymn = this.hymnDao.selectByIdAndVisibleFlgTrue(targetId)
+					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_HYMN_NOT_FOUND) {
 					});
 			// 楽観的排他チェック
 			if (existingHymn.updatedTime().isAfter(updateTime)) {
@@ -639,16 +623,16 @@ public class HymnServiceImpl implements IHymnService {
 				return CoResult.ok(ProjectConstants.MESSAGE_STRING_NO_CHANGE);
 			}
 			// 変動があった場合のみ永続化
-			final HymnWork existingWork = this.hymnWorkRepository.findByWorkId(targetId)
-					.orElseThrow(() -> new DataAccessException("HymnWork not found") {
+			final HymnWork existingWork = this.hymnWorkDao.selectByWorkId(targetId)
+					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_HYMNSWORK_NOT_FOUND) {
 					});
 			// 更新用インスタンスの作成（時間・ユーザーIDの上書き）
 			final var finalUpdatedHymn = new Hymn(targetId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(),
 					updateTime, Long.valueOf(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE.toString(),
 					existingHymn.classical());
 			final var finalUpdatedWork = new HymnWork(existingWork.id(), existingWork.workId(), existingWork.score());
-			this.hymnWorkRepository.save(finalUpdatedWork);
-			this.hymnRepository.save(finalUpdatedHymn);
+			this.hymnWorkDao.update(finalUpdatedWork);
+			this.hymnDao.update(finalUpdatedHymn);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
@@ -700,7 +684,7 @@ public class HymnServiceImpl implements IHymnService {
 	@Override
 	public CoResult<String, DataAccessException> scoreStorage(final @NotNull byte[] file, final Long id) {
 		try {
-			final HymnWork hymnsWorkRecord = this.hymnWorkRepository.findByWorkId(id)
+			final HymnWork hymnsWorkRecord = this.hymnWorkDao.selectByWorkId(id)
 					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_HYMNSWORK_NOT_FOUND) {
 					});
 			final var tika = new Tika();
@@ -719,7 +703,7 @@ public class HymnServiceImpl implements IHymnService {
 			} else {
 				updatedWork = new HymnWork(hymnsWorkRecord.id(), hymnsWorkRecord.workId(), centeredImage);
 			}
-			this.hymnWorkRepository.save(updatedWork);
+			this.hymnWorkDao.update(updatedWork);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
