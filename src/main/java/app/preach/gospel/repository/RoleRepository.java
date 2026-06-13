@@ -18,6 +18,6 @@ import app.preach.gospel.model.Role;
 public interface RoleRepository extends ListCrudRepository<Role, Long> {
 	// 組み込みの findAllById を使用するため、追加の実装は不要です
 
-	@Query("SELECT * FROM ROLE RO WHERE RO.ID = :id AND RO.VISIBLE_FLG = 'true'")
+	@Query("SELECT * FROM ROLES RO WHERE RO.ID = :id AND RO.VISIBLE_FLG = 'true'")
 	Optional<Role> findByIdAndVisibleFlgTrue(@Param("id") Long id);
 }
