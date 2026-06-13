@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
@@ -15,8 +16,9 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("ROLES")
 public record Role(@Id @Column("ID") Long id, @Column("NAME") String name, @Column("VISIBLE_FLG") String visibleFlg,
 		// Spring Data JDBCが自動的に中間テーブル(ROLE_AUTH)と紐付けます
-		// ※デフォルトでリレーションキーは「ROLE_ID」として扱われます
-		Set<AuthorityRef> authorities) {
+		// ROLE_AUTHテーブル側の外部キーカラム名を明示的に指定する
+		@MappedCollection(idColumn = "ROLE_ID") Set<AuthorityRef> authorities) {
+
 	/**
 	 * イミュータブルなrecord型で、権限を追加するための便利メソッド（Witherパターン）
 	 */
