@@ -21,7 +21,7 @@ public record Role(@Id @Column("ID") Long id, @Column("NAME") String name, @Colu
 	 * イミュータブルなrecord型で、権限を追加するための便利メソッド（Witherパターン）
 	 */
 	public Role withAddedAuthority(final Long authId) {
-		final Set<AuthorityRef> newAuths = new HashSet<>(this.authorities);
+		final var newAuths = new HashSet<AuthorityRef>(this.authorities);
 		newAuths.add(new AuthorityRef(authId));
 		return new Role(this.id, this.name, this.visibleFlg, java.util.Collections.unmodifiableSet(newAuths));
 	}
