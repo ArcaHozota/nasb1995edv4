@@ -20,9 +20,10 @@ import app.preach.gospel.model.Hymn;
 public interface HymnRepository extends ListCrudRepository<Hymn, Long> {
 
 	// 1. 全件数取得 (VISIBLE_FLG = 1)
-	@Query("SELECT COUNT(1) FROM HYMNS HM WHERE HM.VISIBLE_FLG = 1")
+	@Query("SELECT COUNT(1) FROM HYMNS HM WHERE HM.VISIBLE_FLG = 'true'")
 	long countByVisibleFlgTrue();
 
+	@Query("SELECT COUNT(1) FROM HYMNS HM WHERE HM.VISIBLE_FLG = 'true' AND HM.NAME_JP = :nameJp")
 	int countByVisibleFlgTrueAndNameJp(String nameJp);
 
 	// 重複チェック用（IDを指定する場合としない場合）

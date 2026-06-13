@@ -24,7 +24,6 @@ spring:
       username: NASB1995
       password: nasb1995
       hikari:
-         connection-init-sql: 'ALTER SESSION SET CURRENT_SCHEMA = NASB1995'
          maximum-pool-size: 40
          minimum-idle: 10
          connection-timeout: 30000
