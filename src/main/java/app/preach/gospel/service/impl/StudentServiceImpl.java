@@ -108,7 +108,7 @@ public class StudentServiceImpl implements IStudentService {
 					studentDto.username(), LocalDate.parse(studentDto.dateOfBirth(), FORMATTER), studentDto.email(),
 					existing.roleId(), // 必要に応じて変更
 					existing.updatedTime(), // タイムスタンプ維持
-					true);
+					Boolean.TRUE.toString());
 			this.studentRepository.save(updated);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 		} catch (final DataAccessException e) {
