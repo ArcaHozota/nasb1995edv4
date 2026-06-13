@@ -14,6 +14,11 @@ import app.preach.gospel.model.HymnWork;
 import app.preach.gospel.model.Student;
 import app.preach.gospel.utils.LineNumber;
 
+/**
+ * エンティティ2DTOマッパー
+ *
+ * @author aArkamahozota
+ */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface HymnMapper {
 
