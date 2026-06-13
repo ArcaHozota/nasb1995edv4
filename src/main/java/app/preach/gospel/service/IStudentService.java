@@ -1,6 +1,6 @@
 package app.preach.gospel.service;
 
-import org.jooq.exception.DataAccessException;
+import org.springframework.dao.DataAccessException;
 
 import app.preach.gospel.dto.StudentDto;
 import app.preach.gospel.utils.CoResult;

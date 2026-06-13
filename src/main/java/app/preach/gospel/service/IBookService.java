@@ -2,7 +2,7 @@ package app.preach.gospel.service;
 
 import java.util.List;
 
-import org.jooq.exception.DataAccessException;
+import org.springframework.dao.DataAccessException;
 
 import app.preach.gospel.dto.BookDto;
 import app.preach.gospel.dto.ChapterDto;
