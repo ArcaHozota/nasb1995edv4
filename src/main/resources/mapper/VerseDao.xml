@@ -43,4 +43,22 @@
 		ORDER BY VA.ID ASC
 	</select>
 
+	<!-- 聖書節を1件登録 -->
+	<insert id="insert">
+		INSERT INTO VERSES (ID, NAME, TEXT_EN, TEXT_JP,
+		CHAPTER_ID, CHANGE_LINE)
+		VALUES (#{id}, #{name}, #{textEn}, #{textJp},
+		#{chapterId}, #{chnageLine})
+	</insert>
+
+	<!-- 聖書節を1件登録 -->
+	<update id="update">
+		UPDATE VERSES
+		SET NAME = #{name},
+		TEXT_EN = #{textEn},
+		TEXT_JP = #{textJp},
+		CHANGE_LINE = #{chnageLine}
+		WHERE ID = #{id}
+	</update>
+
 </mapper>

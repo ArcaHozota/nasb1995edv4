@@ -16,9 +16,19 @@ import app.preach.gospel.model.Verse;
 public interface VerseDao {
 
 	/**
+	 * 聖書節を1件登録
+	 */
+	int insert(Verse verse);
+
+	/**
 	 * 全節を取得
 	 */
 	List<Verse> selectAll();
+
+	/**
+	 * chapterId指定でID昇順に取得
+	 */
+	List<Verse> selectByChapterIdOrderByIdAsc(Integer chapterId);
 
 	/**
 	 * IDで1件取得
@@ -26,7 +36,7 @@ public interface VerseDao {
 	Optional<Verse> selectById(Long id);
 
 	/**
-	 * chapterId指定でID昇順に取得
+	 * 聖書節を1件更新
 	 */
-	List<Verse> selectByChapterIdOrderByIdAsc(Integer chapterId);
+	int update(Verse verse);
 }

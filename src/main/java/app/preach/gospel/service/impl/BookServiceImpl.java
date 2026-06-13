@@ -4,18 +4,16 @@ import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.jdbc.core.JdbcAggregateOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.dao.BookRepository;
-import app.preach.gospel.dao.ChapterRepository;
-import app.preach.gospel.dao.VerseRepository;
+import app.preach.gospel.dao.BookDao;
+import app.preach.gospel.dao.ChapterDao;
+import app.preach.gospel.dao.VerseDao;
 import app.preach.gospel.dto.BookDto;
 import app.preach.gospel.dto.ChapterDto;
 import app.preach.gospel.dto.VerseDto;
-import app.preach.gospel.model.Chapter;
 import app.preach.gospel.model.Verse;
 import app.preach.gospel.service.IBookService;
 import app.preach.gospel.utils.CoResult;
@@ -30,31 +28,29 @@ import app.preach.gospel.utils.CoStringUtils;
 @Service
 public class BookServiceImpl implements IBookService {
 
-	private final BookRepository bookRepository;
-	private final ChapterRepository chapterRepository;
-	private final JdbcAggregateOperations jdbcAggregateOperations;
-	private final VerseRepository verseRepository;
+	/* DAOs */
+	private final BookDao bookDao;
+	private final ChapterDao chapterDao;
+	private final VerseDao verseDao;
 
 	/**
 	 * コンストラクタ
 	 *
-	 * @param bookRepository
-	 * @param chapterRepository
-	 * @param verseRepository
+	 * @param bookDao
+	 * @param chapterDao
+	 * @param verseDao
 	 */
-	protected BookServiceImpl(final BookRepository bookRepository, final ChapterRepository chapterRepository,
-			final VerseRepository verseRepository, final JdbcAggregateOperations jdbcAggregateOperations) {
-		this.bookRepository = bookRepository;
-		this.chapterRepository = chapterRepository;
-		this.verseRepository = verseRepository;
-		this.jdbcAggregateOperations = jdbcAggregateOperations;
+	protected BookServiceImpl(final BookDao bookDao, final ChapterDao chapterDao, final VerseDao verseDao) {
+		this.bookDao = bookDao;
+		this.chapterDao = chapterDao;
+		this.verseDao = verseDao;
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public CoResult<List<BookDto>, DataAccessException> getBooks() {
 		try {
-			final var bookDtos = this.bookRepository.findAllByOrderByIdAsc().stream()
+			final var bookDtos = this.bookDao.selectAllOrderByIdAsc().stream()
 					.map(r -> new BookDto(r.id(), r.name(), r.nameJp())).toList();
 			return CoResult.ok(bookDtos);
 		} catch (final DataAccessException e) {
@@ -69,8 +65,8 @@ public class BookServiceImpl implements IBookService {
 	public CoResult<List<ChapterDto>, DataAccessException> getChaptersByBookId(final Short id) {
 		try {
 			// 短絡評価のためにIntegerへラップ
-			final Integer bookId = (id != null) ? Integer.valueOf(id) : Integer.valueOf(1);
-			final var chapterDtos = this.chapterRepository.findByBookIdOrderByIdAsc(bookId).stream()
+			final var bookId = (id != null) ? Integer.valueOf(id) : Integer.valueOf(1);
+			final var chapterDtos = this.chapterDao.selectByBookIdOrderByIdAsc(bookId).stream()
 					.map(r -> new ChapterDto(r.id(), r.name(), r.nameJp(), r.bookId().toString())).toList();
 			return CoResult.ok(chapterDtos);
 		} catch (final DataAccessException e) {
@@ -89,13 +85,13 @@ public class BookServiceImpl implements IBookService {
 		final long targetPhraseId = (chapterId * 1000) + id;
 		try {
 			// 1. 章節情報の取得
-			final Chapter chaptersRecord = this.chapterRepository.findById(chapterId)
+			final var chaptersRecord = this.chapterDao.selectById(chapterId)
 					.orElseThrow(() -> new DataAccessException("Chapter not found: " + chapterId) {
 					});
 			// 2. 節名称（例: "創世記:1" のようなフォーマット）の組み立て
 			final String phraseName = chaptersRecord.name().concat("\u003a").concat(id.toString());
 			// 3. 英語テキストの処理と改行フラグの判定
-			final String textEnInput = phraseDto.textEn();
+			final var textEnInput = phraseDto.textEn();
 			final String textEn;
 			final String changeLine;
 			if (textEnInput != null && textEnInput.endsWith("#")) {
@@ -106,12 +102,12 @@ public class BookServiceImpl implements IBookService {
 				changeLine = Boolean.FALSE.toString();
 			}
 			// 4. 既存レコードの確認（UPSERTロジックの判定）
-			final var existingPhrase = this.verseRepository.findById(targetPhraseId);
+			final var existingPhrase = this.verseDao.selectById(targetPhraseId);
 			if (existingPhrase.isPresent()) {
 				// 更新用インスタンスを生成
 				final var updatedPhrase = new Verse(targetPhraseId, phraseName, textEn, phraseDto.textJp(), chapterId,
 						changeLine);
-				this.verseRepository.save(updatedPhrase);
+				this.verseDao.update(updatedPhrase);
 				return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 			}
 			// 新規登録用インスタンスを生成
@@ -120,7 +116,7 @@ public class BookServiceImpl implements IBookService {
 			// デフォルトで「UPDATE」を試みようとします（新しく払い出されたIDではないと認識するため）。
 			// しかし、既存確認をして存在しないことが保証されているため、ここではsave()メソッドを呼び出すことで、
 			// Spring Data JDBC内部のメカニズムによって新規インサート、または必要に応じた永続化処理が正しく行われます。
-			this.jdbcAggregateOperations.insert(verse);
+			this.verseDao.insert(verse);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_INSERTED);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
