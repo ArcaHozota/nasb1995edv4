@@ -118,6 +118,47 @@ public class HymnServiceImpl implements IHymnService {
 			")", "\"", "\'", "@", ":", "select" };
 
 	/**
+	 * イメージからPDFへ変換する
+	 *
+	 * @param img            イメージ
+	 * @param pdfDiscernment タイプ
+	 * @return byte[]
+	 */
+	private static byte[] convertCenteredImage(final byte[] img, final String pdfDiscernment) {
+		if (CoStringUtils.isEqual(MediaType.APPLICATION_PDF_VALUE, pdfDiscernment)) {
+			return img;
+		}
+		try (final var doc = new PDDocument()) {
+			final var page = new PDPage(PDRectangle.A4);
+			doc.addPage(page);
+			final BufferedImage image = (CoStringUtils.isEqual(MediaType.IMAGE_JPEG_VALUE, pdfDiscernment))
+					? CoSortsUtils.readAndNormalizeOrientation(img)
+					: ImageIO.read(new ByteArrayInputStream(img));
+			final float pageWidth = page.getMediaBox().getWidth();
+			final float pageHeight = page.getMediaBox().getHeight();
+			final float imgWidth = image.getWidth();
+			final float imgHeight = image.getHeight();
+			final var scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+			final var drawWidth = imgWidth * scale;
+			final var drawHeight = imgHeight * scale;
+
+			final PDImageXObject pdfImage = LosslessFactory.createFromImage(doc, image);
+			final var x = (pageWidth - drawWidth) / 2f;
+			final var y = (pageHeight - drawHeight) / 2f;
+			try (var contentStream = new PDPageContentStream(doc, page)) {
+				contentStream.drawImage(pdfImage, x, y, drawWidth, drawHeight);
+			}
+			final var out = new ByteArrayOutputStream();
+			doc.save(out);
+			return out.toByteArray();
+		} catch (final IOException e) {
+			return ProjectConstants.EMPTY_ARR;
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
 	 * コサイン類似度を計算する
 	 *
 	 * @param vectorA ベクターA
@@ -163,10 +204,10 @@ public class HymnServiceImpl implements IHymnService {
 
 	// Entity2DTO Mapper
 	private final HymnMapper hymnMapper;
-
 	// jOOQの依存関係を排除し、Spring Data JDBCリポとMapStructマッパーを注入
 	private final HymnRepository hymnRepository;
 	private final HymnWorkRepository hymnWorkRepository;
+
 	@Qualifier("nlpCache")
 	private final Cache<Object, Object> nlpCache;
 
@@ -243,49 +284,6 @@ public class HymnServiceImpl implements IHymnService {
 		});
 		this.nlpCache.put(key, vec);
 		return vec;
-	}
-
-	/**
-	 * イメージからPDFへ変換する
-	 *
-	 * @param img            イメージ
-	 * @param pdfDiscernment タイプ
-	 * @return byte[]
-	 */
-	private byte[] convertCenteredImage(final byte[] img, final String pdfDiscernment) {
-		if (CoStringUtils.isEqual(MediaType.APPLICATION_PDF_VALUE, pdfDiscernment)) {
-			return img;
-		}
-		try (final var doc = new PDDocument()) {
-			final var page = new PDPage(PDRectangle.A4);
-			doc.addPage(page);
-			final BufferedImage image = (CoStringUtils.isEqual(MediaType.IMAGE_JPEG_VALUE, pdfDiscernment))
-					? CoSortsUtils.readAndNormalizeOrientation(img)
-					: ImageIO.read(new ByteArrayInputStream(img));
-
-			final float pageWidth = page.getMediaBox().getWidth();
-			final float pageHeight = page.getMediaBox().getHeight();
-			final float imgWidth = image.getWidth();
-			final float imgHeight = image.getHeight();
-
-			final var scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-			final var drawWidth = imgWidth * scale;
-			final var drawHeight = imgHeight * scale;
-
-			final PDImageXObject pdfImage = LosslessFactory.createFromImage(doc, image);
-			final var x = (pageWidth - drawWidth) / 2f;
-			final var y = (pageHeight - drawHeight) / 2f;
-			try (var contentStream = new PDPageContentStream(doc, page)) {
-				contentStream.drawImage(pdfImage, x, y, drawWidth, drawHeight);
-			}
-			final var out = new ByteArrayOutputStream();
-			doc.save(out);
-			return out.toByteArray();
-		} catch (final IOException e) {
-			return ProjectConstants.EMPTY_ARR;
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	/**
@@ -704,7 +702,7 @@ public class HymnServiceImpl implements IHymnService {
 					});
 			final var tika = new Tika();
 			final String pdfDiscernment = tika.detect(file);
-			final byte[] centeredImage = this.convertCenteredImage(file, pdfDiscernment);
+			final byte[] centeredImage = convertCenteredImage(file, pdfDiscernment);
 			// コンテンツ変更チェック
 			if ((CoStringUtils.isEqual(MediaType.APPLICATION_PDF_VALUE, pdfDiscernment)
 					&& Arrays.equals(hymnsWorkRecord.score(), file))
@@ -714,9 +712,9 @@ public class HymnServiceImpl implements IHymnService {
 			}
 			final HymnWork updatedWork;
 			if (Arrays.equals(ProjectConstants.EMPTY_ARR, centeredImage)) {
-				updatedWork = new HymnWork(hymnsWorkRecord.id(), hymnsWorkRecord.workId(), file);
+				updatedWork = new HymnWork(hymnsWorkRecord.id(), hymnsWorkRecord.workId(), file, false);
 			} else {
-				updatedWork = new HymnWork(hymnsWorkRecord.id(), hymnsWorkRecord.workId(), centeredImage);
+				updatedWork = new HymnWork(hymnsWorkRecord.id(), hymnsWorkRecord.workId(), centeredImage, false);
 			}
 			this.hymnWorkRepository.save(updatedWork);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
