@@ -79,7 +79,7 @@ document.getElementById("infoUpdateBtn")?.addEventListener("click", () => {
         layer.msg(inputWarning);
     } else {
         const userId = document.getElementById("toPersonal").querySelector("input")?.value;
-		const nameKr = document.getElementById("nameKrInput").value.trim();
+		const nameKr = document.getElementById("nameKrEdit").value.trim();
         const putData = JSON.stringify({
             id: document.getElementById("idContainer").value,
             nameJp: document.getElementById("nameJpEdit").value.trim(),
