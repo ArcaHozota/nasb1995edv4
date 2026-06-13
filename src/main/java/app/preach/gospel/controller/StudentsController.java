@@ -3,7 +3,7 @@ package app.preach.gospel.controller;
 import java.io.Serial;
 
 import org.jetbrains.annotations.NotNull;
-import org.jooq.exception.DataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
