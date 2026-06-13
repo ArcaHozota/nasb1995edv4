@@ -344,10 +344,10 @@ public class HymnServiceImpl implements IHymnService {
 		final LocalDateTime maxUpdatedAt = this.hymnRepository.findMaxUpdatedTime();
 		// 2. null の場合は現在時刻を代替
 		if (maxUpdatedAt == null) {
-			return LocalDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+			return LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 		}
 		// 3. ISO 文字列に変換
-		return maxUpdatedAt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		return maxUpdatedAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 	}
 
 	@Transactional(readOnly = true)
@@ -581,7 +581,7 @@ public class HymnServiceImpl implements IHymnService {
 
 			// 論理削除フラグを偽に変更した新しいレコードインスタンスを保存
 			final Hymn deletedHymn = new Hymn(hymn.id(), hymn.nameJp(), hymn.nameKr(), hymn.link(), hymn.updatedTime(),
-					hymn.updatedUser(), hymn.lyric(), Boolean.FALSE, hymn.classical());
+					hymn.updatedUser(), hymn.lyric(), Boolean.FALSE.toString(), hymn.classical());
 			this.hymnRepository.save(deletedHymn);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_DELETED);
 		} catch (final DataAccessException e) {
@@ -598,7 +598,8 @@ public class HymnServiceImpl implements IHymnService {
 			final String trimmedSerif = trimSerif(hymnDto.lyric());
 			// 1. HYMNSテーブルへインサート
 			final var newHymn = new Hymn(newHymnId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(), updateTime,
-					Long.parseLong(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE, Boolean.FALSE);
+					Long.parseLong(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE.toString(),
+					Boolean.FALSE.toString());
 			this.hymnRepository.save(newHymn);
 			// 2. HYMNS_WORKテーブルへインサート
 			final int nextWorkSequenceId = this.hymnWorkRepository.countAllRecords() + 1;
@@ -634,7 +635,7 @@ public class HymnServiceImpl implements IHymnService {
 			// 入力値と既存レコードから仮想上書きオブジェクトを組み立てる（レコード比較のため）
 			final String trimmedSerif = trimSerif(hymnDto.lyric());
 			final var virtualUpdatedHymn = new Hymn(targetId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(),
-					existingHymn.updatedTime(), existingHymn.updatedUser(), trimmedSerif, Boolean.TRUE,
+					existingHymn.updatedTime(), existingHymn.updatedUser(), trimmedSerif, Boolean.TRUE.toString(),
 					existingHymn.classical());
 			// イミュータブル特性を活かしたデータ無変更チェック（record型は全プロパティのequalsが備わっています）
 			if (existingHymn.equals(virtualUpdatedHymn)) {
@@ -646,7 +647,7 @@ public class HymnServiceImpl implements IHymnService {
 					});
 			// 更新用インスタンスの作成（時間・ユーザーIDの上書き）
 			final var finalUpdatedHymn = new Hymn(targetId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(),
-					updateTime, Long.valueOf(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE,
+					updateTime, Long.valueOf(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE.toString(),
 					existingHymn.classical());
 			final var finalUpdatedWork = new HymnWork(existingWork.id(), existingWork.workId(), existingWork.score());
 			this.hymnWorkRepository.save(finalUpdatedWork);

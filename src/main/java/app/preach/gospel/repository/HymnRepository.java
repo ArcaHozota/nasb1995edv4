@@ -11,42 +11,43 @@ import org.springframework.stereotype.Repository;
 
 import app.preach.gospel.model.Hymn;
 
-/**
- * 賛美歌リポ
- *
- * @author ArkamaHozota
- */
 @Repository
 public interface HymnRepository extends ListCrudRepository<Hymn, Long> {
 
-	// 1. 全件数取得 (VISIBLE_FLG = 1)
+	// 1. 全件数取得
 	@Query("SELECT COUNT(1) FROM HYMNS HM WHERE HM.VISIBLE_FLG = 'true'")
 	long countByVisibleFlgTrue();
 
 	@Query("SELECT COUNT(1) FROM HYMNS HM WHERE HM.VISIBLE_FLG = 'true' AND HM.NAME_JP = :nameJp")
 	int countByVisibleFlgTrueAndNameJp(String nameJp);
 
-	// 重複チェック用（IDを指定する場合としない場合）
-	int countByVisibleFlgTrueAndNameJpAndIdNot(String nameJp, Long id);
+	// 重複チェック用
+	@Query("SELECT COUNT(1) FROM HYMNS HM WHERE HM.VISIBLE_FLG = 'true' AND HM.NAME_JP = :nameJp AND HM.ID <> :id")
+	int countByVisibleFlgTrueAndNameJpAndIdNot(@Param("nameJp") String nameJp, @Param("id") Long id);
 
-	int countByVisibleFlgTrueAndNameKr(String nameKr);
+	@Query("SELECT COUNT(1) FROM HYMNS HM WHERE HM.VISIBLE_FLG = 'true' AND HM.NAME_KR = :nameKr")
+	int countByVisibleFlgTrueAndNameKr(@Param("nameKr") String nameKr);
 
-	int countByVisibleFlgTrueAndNameKrAndIdNot(String nameKr, Long id);
+	@Query("SELECT COUNT(1) FROM HYMNS HM WHERE HM.VISIBLE_FLG = 'true' AND HM.NAME_KR = :nameKr AND HM.ID <> :id")
+	int countByVisibleFlgTrueAndNameKrAndIdNot(@Param("nameKr") String nameKr, @Param("id") Long id);
 
-	// 5. NAME_KRに対するLIKE検索（大文字小文字の差異を吸収するためOracle標準に合わせて記述）
-	@Query("SELECT * FROM HYMNS WHERE VISIBLE_FLG = 1 AND NAME_KR LIKE :keyword ORDER BY ID ASC")
+	// 5. NAME_KRに対するLIKE検索
+	@Query("SELECT * FROM HYMNS HM WHERE HM.VISIBLE_FLG = 'true' AND HM.NAME_KR LIKE :keyword ORDER BY HM.ID ASC")
 	List<Hymn> findActiveHymnsByNameKrLike(@Param("keyword") String keyword);
 
 	// 有効な賛美歌をIDで1件取得
-	Optional<Hymn> findByIdAndVisibleFlgTrue(Long id);
+	@Query("SELECT * FROM HYMNS HM WHERE HM.ID = :id AND HM.VISIBLE_FLG = 'true'")
+	Optional<Hymn> findByIdAndVisibleFlgTrue(@Param("id") Long id);
 
 	// 4. 有効かつクラシックではない(CLASSICAL = 0)賛美歌をID昇順で全件取得
+	@Query("SELECT * FROM HYMNS HM WHERE HM.VISIBLE_FLG = 'true' AND HM.CLASSICAL = 'false' ORDER BY HM.ID ASC")
 	List<Hymn> findByVisibleFlgTrueAndClassicalFalseOrderByIdAsc();
 
 	// 3. 有効な賛美歌をID昇順で全件取得
+	@Query("SELECT * FROM HYMNS HM WHERE HM.VISIBLE_FLG = 'true' ORDER BY HM.ID ASC")
 	List<Hymn> findByVisibleFlgTrueOrderByIdAsc();
 
-	// 2. 最新の更新時間を取得する（MAX(updated_time)）
-	@Query("SELECT MAX(UPDATED_TIME) FROM HYMNS")
+	// 2. 最新の更新時間を取得する
+	@Query("SELECT MAX(HM.UPDATED_TIME) FROM HYMNS HM")
 	LocalDateTime findMaxUpdatedTime();
 }

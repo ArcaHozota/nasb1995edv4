@@ -15,5 +15,5 @@ import org.springframework.data.relational.core.mapping.Table;
 public record Hymn(@Id @Column("ID") Long id, @Column("NAME_JP") String nameJp, @Column("NAME_KR") String nameKr,
 		@Column("LINK") String link, @Column("UPDATED_TIME") LocalDateTime updatedTime,
 		@Column("UPDATED_USER") Long updatedUser, @Column("LYRIC") String lyric,
-		@Column("VISIBLE_FLG") Boolean visibleFlg, @Column("CLASSICAL") Boolean classical) {
+		@Column("VISIBLE_FLG") String visibleFlg, @Column("CLASSICAL") String classical) {
 }
