@@ -17,5 +17,5 @@ public record StudentDto(
 		@Schema(description = "パスワード", example = "123456") String password,
 		@Schema(description = "メール", example = "louis@example.com") String email,
 		@Schema(description = "生年月日", example = "2009/12/07") String dateOfBirth,
-		@Schema(description = "役割ID", example = "0123456789876543210") String roleId) {
+		@Schema(description = "役割ID", example = "0123456789876543210") Long roleId) {
 }

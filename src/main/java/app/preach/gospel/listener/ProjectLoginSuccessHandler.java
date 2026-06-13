@@ -2,7 +2,7 @@ package app.preach.gospel.listener;
 
 import java.io.IOException;
 
-import org.jooq.exception.DataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;

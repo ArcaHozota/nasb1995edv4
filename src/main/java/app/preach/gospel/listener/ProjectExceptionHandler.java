@@ -1,6 +1,6 @@
 package app.preach.gospel.listener;
 
-import org.jooq.exception.DataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
