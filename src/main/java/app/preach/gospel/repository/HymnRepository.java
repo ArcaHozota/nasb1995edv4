@@ -11,6 +11,11 @@ import org.springframework.stereotype.Repository;
 
 import app.preach.gospel.model.Hymn;
 
+/**
+ * 賛美歌リポ
+ *
+ * @author ArkamaHozota
+ */
 @Repository
 public interface HymnRepository extends ListCrudRepository<Hymn, Long> {
 
