@@ -77,7 +77,8 @@ async function downloadScores(scoreId) {
 }
 
 function toSelectedPg(pageNum, keyword) {
-    fetch(`/hymns/pagination?pageNum=${encodeURIComponent(pageNum)}&keyword=${encodeURIComponent(keyword)}`)
+	const searchStr = keyword.normalize('NFC');
+    fetch(`/hymns/pagination?pageNum=${encodeURIComponent(pageNum)}&keyword=${encodeURIComponent(searchStr)}`)
         .then(res => res.json())
         .then(response => {
             buildTableBody(response);

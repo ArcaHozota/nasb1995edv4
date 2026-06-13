@@ -143,7 +143,8 @@ function checkHymnName2(hymnNameInput, idVal) {
     if (nameVal === emptyString) {
         showValidationMsg(hymnNameInput, responseFailure, showVadMsgError);
     } else {
-        fetch(`/hymns/check-duplicated2?id=${encodeURIComponent(idVal)}&nameKr=${encodeURIComponent(nameVal)}`)
+		const searchStr = nameVal.normalize('NFC');
+        fetch(`/hymns/check-duplicated2?id=${encodeURIComponent(idVal)}&nameKr=${encodeURIComponent(searchStr)}`)
             .then(async res => {
                 const text = await res.text();
                 if (res.ok) {

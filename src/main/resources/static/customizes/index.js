@@ -80,7 +80,8 @@ function randomRetrieve(keyword) {
 }
 
 function toSelectedPg(pageNum, keyword) {
-    fetch(`/hymns/pagination?pageNum=${encodeURIComponent(pageNum)}&keyword=${encodeURIComponent(keyword)}`)
+	const searchStr = keyword.normalize('NFC');
+    fetch(`/hymns/pagination?pageNum=${encodeURIComponent(pageNum)}&keyword=${encodeURIComponent(searchStr)}`)
         .then(async res => {
             if (!res.ok) {
                 const text = await res.text();
