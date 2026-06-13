@@ -41,6 +41,22 @@ spring:
       suffix: .html
    profiles:
       active: prod
+mybatis:
+   mapper-locations: classpath:mapper/*Dao.xml
+# エイリアス対象パッケージ(XMLのtypeでFQCN省略が可能になる)
+# XMLマッパーファイルの配置パス
+   type-aliases-package: app.preach.gospel.model
+   configuration:
+# スネークケース(DB列名) → キャメルケース(Javaフィールド名)の自動変換
+      map-underscore-to-camel-case: true
+# Oracle JDBCとの相性を考慮してNULL値パラメータのJdbcType指定
+      jdbc-type-for-null: null
+      lazy-loading-enabled: false
+# キャッシュは無効(リアルタイム性重視のため常にDBから取得)
+# N+1問題の早期発見のためlazyLoadingは無効(リアルタイム性重視のため即時ロード)
+      cache-enabled: false
+# SQLログ出力(開発時のデバッグ用、本番では下記のlogging設定でWARN以上に絞る)
+      log-impl: org.apache.ibatis.logging.log4j2.Log4j2Impl
 springdoc:
    api-docs:
       path: /v3/api-docs
@@ -50,3 +66,11 @@ springdoc:
       enabled: true
       operationsSorter: method
       tagsSorter: alpha
+logging:
+   level:
+# MyBatis SQLログ: 開発時はDEBUG、本番運用時はWARNに変更推奨
+      app.preach.gospel.dao: INFO
+# HikariCPの接続ログ
+      com.zaxxer.hikari: WARN
+# Oracle JDBCドライバのログ抑制
+      oracle.jdbc: WARN
