@@ -683,7 +683,7 @@ public class HymnServiceImpl implements IHymnService {
 	public CoResult<String, DataAccessException> scoreStorage(final @NotNull byte[] file, final Long id) {
 		try {
 			final HymnWork hymnsWorkRecord = this.hymnWorkRepository.findByWorkId(id)
-					.orElseThrow(() -> new DataAccessException("HymnWork not found") {
+					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_HYMNSWORK_NOT_FOUND) {
 					});
 			final var tika = new Tika();
 			final String pdfDiscernment = tika.detect(file);
