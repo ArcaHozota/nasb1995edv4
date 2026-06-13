@@ -9,14 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import app.preach.gospel.common.ProjectConstants;
+import app.preach.gospel.dao.BookRepository;
+import app.preach.gospel.dao.ChapterRepository;
+import app.preach.gospel.dao.VerseRepository;
 import app.preach.gospel.dto.BookDto;
 import app.preach.gospel.dto.ChapterDto;
 import app.preach.gospel.dto.VerseDto;
 import app.preach.gospel.model.Chapter;
 import app.preach.gospel.model.Verse;
-import app.preach.gospel.repository.BookRepository;
-import app.preach.gospel.repository.ChapterRepository;
-import app.preach.gospel.repository.VerseRepository;
 import app.preach.gospel.service.IBookService;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.CoStringUtils;
