@@ -45,5 +45,5 @@ public interface IStudentService {
 	 * @param password     パスワード
 	 * @return CoResult<String, DataAccessException>
 	 */
-	CoResult<String, DataAccessException> preLoginUpdate(String loginAccount);
+	CoResult<String, Object> preLoginUpdate(String loginAccount);
 }

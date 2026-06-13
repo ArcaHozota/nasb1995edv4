@@ -35,9 +35,9 @@ public class ProjectLoginSuccessHandler implements AuthenticationSuccessHandler 
 	public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response,
 			final Authentication authentication) throws IOException, ServletException {
 		final String loginAcct = authentication.getName();
-		final CoResult<String, DataAccessException> preLoginUpdate = this.iStudentService.preLoginUpdate(loginAcct);
+		final CoResult<String, Object> preLoginUpdate = this.iStudentService.preLoginUpdate(loginAcct);
 		if (!preLoginUpdate.isOk()) {
-			throw preLoginUpdate.getErr();
+			throw (DataAccessException) preLoginUpdate.getErr();
 		}
 		log.info("ログイン成功: " + loginAcct);
 		request.getSession().setAttribute("loginMessage", preLoginUpdate.getData());

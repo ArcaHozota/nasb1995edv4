@@ -1,16 +1,12 @@
 package app.preach.gospel.service.impl;
 
-import static app.preach.gospel.jooq.Tables.STUDENTS;
-
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.jetbrains.annotations.NotNull;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.exception.ConfigurationException;
-import org.jooq.exception.DataAccessException;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVersion;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,8 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import app.preach.gospel.common.ProjectConstants;
 import app.preach.gospel.dto.StudentDto;
+import app.preach.gospel.model.Student;
+import app.preach.gospel.repository.StudentRepository;
 import app.preach.gospel.service.IStudentService;
-import app.preach.gospel.utils.CoBeanUtils;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.CoStringUtils;
 import lombok.AccessLevel;
@@ -37,12 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class StudentServiceImpl implements IStudentService {
 
 	/**
-	 * 共通検索条件
-	 */
-	protected static final Condition COMMON_CONDITION = STUDENTS.VISIBLE_FLG.eq(Boolean.TRUE);
-
-	/**
-	 * 共通検索条件
+	 * エンコーダー
 	 */
 	private static final PasswordEncoder ENCODER = new BCryptPasswordEncoder(BCryptVersion.$2A, 7);
 
@@ -52,27 +44,24 @@ public class StudentServiceImpl implements IStudentService {
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	/**
-	 * 共通リポジトリ
+	 * 奉仕者リポ
 	 */
-	private final DSLContext dslContext;
+	private final StudentRepository studentRepository;
 
 	@Transactional(readOnly = true)
 	@Override
 	public CoResult<Integer, DataAccessException> checkDuplicated(final String id, final String loginAccount) {
 		try {
+			int count;
 			if (CoStringUtils.isDigital(id)) {
-				final var checkDuplicated = this.dslContext.selectCount().from(STUDENTS).where(COMMON_CONDITION)
-						.and(STUDENTS.ID.ne(Long.parseLong(id))).and(STUDENTS.LOGIN_ACCOUNT.eq(loginAccount))
-						.fetchSingle().into(Integer.class);
-				return CoResult.ok(checkDuplicated);
+				count = this.studentRepository.countByLoginAccountAndVisibleFlgTrueAndIdNot(Long.parseLong(id),
+						loginAccount);
+			} else {
+				count = this.studentRepository.countByLoginAccountAndVisibleFlgTrue(loginAccount);
 			}
-			final var checkDuplicated = this.dslContext.selectCount().from(STUDENTS).where(COMMON_CONDITION)
-					.and(STUDENTS.LOGIN_ACCOUNT.eq(loginAccount)).fetchSingle().into(Integer.class);
-			return CoResult.ok(checkDuplicated);
+			return CoResult.ok(count);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -80,75 +69,68 @@ public class StudentServiceImpl implements IStudentService {
 	@Override
 	public CoResult<StudentDto, DataAccessException> getStudentInfoById(final Long id) {
 		try {
-			final var studentsRecord = this.dslContext.selectFrom(STUDENTS).where(COMMON_CONDITION)
-					.and(STUDENTS.ID.eq(id)).fetchSingle();
-			final var studentDto = new StudentDto(studentsRecord.getId(), studentsRecord.getLoginAccount(),
-					studentsRecord.getUsername(), studentsRecord.getPassword(), studentsRecord.getEmail(),
-					FORMATTER.format(studentsRecord.getDateOfBirth()), null);
-			return CoResult.ok(studentDto);
+			final Student student = this.studentRepository.findByIdAndVisibleFlgTrue(id)
+					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_STUDENT_NOT_FOUND) {
+					}); // または適切な例外
+			final var dto = new StudentDto(student.id(), student.loginAccount(), student.username(), student.password(),
+					student.email(), FORMATTER.format(student.dateOfBirth()), null);
+			return CoResult.ok(dto);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 
+	@Transactional
 	@Override
 	public CoResult<String, DataAccessException> infoUpdation(final @NotNull StudentDto studentDto) {
 		try {
-			final var studentsRecord = this.dslContext.newRecord(STUDENTS);
-			studentsRecord.setId(Long.valueOf(studentDto.id()));
-			studentsRecord.setLoginAccount(studentDto.loginAccount());
-			studentsRecord.setUsername(studentDto.username());
-			studentsRecord.setDateOfBirth(LocalDate.parse(studentDto.dateOfBirth(), FORMATTER));
-			studentsRecord.setEmail(studentDto.email());
-			studentsRecord.setVisibleFlg(Boolean.TRUE);
-			final var studentsRecord2 = this.dslContext.selectFrom(STUDENTS).where(COMMON_CONDITION)
-					.and(STUDENTS.ID.eq(studentsRecord.getId())).fetchSingle();
-			final var password = studentsRecord2.getPassword();
-			final var updatedTime = studentsRecord2.getUpdatedTime();
-			studentsRecord2.setPassword(null);
-			studentsRecord2.setUpdatedTime(null);
-			boolean passwordDiscernment;
-			if (CoStringUtils.isEqual(studentDto.password(), password)) {
-				passwordDiscernment = true;
-			} else {
-				passwordDiscernment = ENCODER.matches(studentDto.password(), password);
+			// 1. 既存データの取得
+			final Student existing = this.studentRepository.findByIdAndVisibleFlgTrue(Long.valueOf(studentDto.id()))
+					.orElseThrow(() -> new DataAccessException("User not found") {
+					});
+			// 2. パスワードの判定
+			final boolean passwordMatch = CoStringUtils.isEqual(studentDto.password(), existing.password())
+					|| ENCODER.matches(studentDto.password(), existing.password());
+			// 3. 変更チェック（簡易版：全フィールド比較）
+			// ※CoBeanUtils等でマッピング前後のdiffを取ることも可能ですが、レコードならequalsで比較できます
+			if (passwordMatch && this.isSameAs(existing, studentDto)) {
+				return CoResult.err(new DataRetrievalFailureException(ProjectConstants.MESSAGE_STRING_NO_CHANGE));
 			}
-			if (CoStringUtils.isEqual(studentsRecord, studentsRecord2) && passwordDiscernment) {
-				return CoResult.err(new ConfigurationException(ProjectConstants.MESSAGE_STRING_NO_CHANGE));
-			}
-			CoBeanUtils.copyNullableProperties(studentsRecord, studentsRecord2);
-			studentsRecord2.setUpdatedTime(updatedTime);
-			if (passwordDiscernment) {
-				studentsRecord2.setPassword(password);
-			} else {
-				studentsRecord2.setPassword(ENCODER.encode(studentDto.password()));
-			}
-			studentsRecord2.update();
+			// 4. 更新用レコードの生成（不変オブジェクトのため、新しいインスタンスを作成）
+			final String newPassword = passwordMatch ? existing.password() : ENCODER.encode(studentDto.password());
+			final Student updated = new Student(existing.id(), studentDto.loginAccount(), newPassword,
+					studentDto.username(), LocalDate.parse(studentDto.dateOfBirth(), FORMATTER), studentDto.email(),
+					existing.roleId(), // 必要に応じて変更
+					existing.updatedTime(), // タイムスタンプ維持
+					true);
+			this.studentRepository.save(updated);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 
+	// 変更差分チェックのヘルパーメソッド
+	private boolean isSameAs(final Student s, final StudentDto dto) {
+		return s.loginAccount().equals(dto.loginAccount()) && s.username().equals(dto.username())
+				&& s.email().equals(dto.email()) && s.dateOfBirth().format(FORMATTER).equals(dto.dateOfBirth());
+	}
+
+	@Transactional
 	@Override
-	public CoResult<String, DataAccessException> preLoginUpdate(final String loginAccount) {
+	public CoResult<String, Object> preLoginUpdate(final String loginAccount) {
 		try {
-			final var studentsRecord = this.dslContext.selectFrom(STUDENTS).where(COMMON_CONDITION)
-					.and(STUDENTS.LOGIN_ACCOUNT.eq(loginAccount)).fetchOne();
-			if (studentsRecord == null) {
-				return CoResult.err(new ConfigurationException(ProjectConstants.MESSAGE_SPRINGSECURITY_LOGINERROR1));
-			}
-			studentsRecord.setUpdatedTime(OffsetDateTime.now());
-			studentsRecord.update();
-			return CoResult.ok(ProjectConstants.MESSAGE_STRING_LOGIN_SUCCESS);
+			return this.studentRepository.findByVisibleFlgTrueAndLoginAccount(loginAccount).map(student -> {
+				// 不変レコードのコピーを作成して更新時間をセット
+				final var updated = new Student(student.id(), student.loginAccount(), student.password(),
+						student.username(), student.dateOfBirth(), student.email(), student.roleId(),
+						OffsetDateTime.now(), student.visibleFlg());
+				this.studentRepository.save(updated);
+				return CoResult.ok(ProjectConstants.MESSAGE_STRING_LOGIN_SUCCESS);
+			}).orElse(CoResult
+					.err(new DataRetrievalFailureException(ProjectConstants.MESSAGE_SPRINGSECURITY_LOGINERROR1)));
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 
