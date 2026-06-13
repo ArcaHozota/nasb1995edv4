@@ -1,17 +1,12 @@
 package app.preach.gospel.service.impl;
 
-import static app.preach.gospel.jooq.Tables.HYMNS;
-import static app.preach.gospel.jooq.Tables.HYMNS_WORK;
-import static app.preach.gospel.jooq.Tables.STUDENTS;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -32,13 +28,9 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.tika.Tika;
 import org.jetbrains.annotations.NotNull;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.exception.ConfigurationException;
-import org.jooq.exception.DataAccessException;
-import org.jooq.exception.DataChangedException;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,9 +44,14 @@ import app.preach.gospel.dto.dtokey.DocKey;
 import app.preach.gospel.dto.dtokey.IdfKey;
 import app.preach.gospel.dto.dtokey.TokKey;
 import app.preach.gospel.dto.dtokey.VecKey;
-import app.preach.gospel.jooq.tables.records.HymnsWorkRecord;
+import app.preach.gospel.mapper.HymnMapper;
+import app.preach.gospel.model.Hymn;
+import app.preach.gospel.model.HymnWork;
+import app.preach.gospel.model.Student;
+import app.preach.gospel.repository.HymnRepository;
+import app.preach.gospel.repository.HymnWorkRepository;
+import app.preach.gospel.repository.StudentRepository;
 import app.preach.gospel.service.IHymnService;
-import app.preach.gospel.utils.CoBeanUtils;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.CoSortsUtils;
 import app.preach.gospel.utils.CoStringUtils;
@@ -71,7 +68,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * 賛美歌サービス実装クラス
+ * 賛美歌サービス実装クラス - Spring Data JDBC 移行版(部分1)
  *
  * @author ArkamaHozota
  * @since 1.00beta
@@ -80,17 +77,6 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class HymnServiceImpl implements IHymnService {
-
-	/**
-	 * 共通検索条件
-	 */
-	protected static final Condition COMMON_CONDITION = HYMNS.VISIBLE_FLG.eq(Boolean.TRUE);
-
-	/**
-	 * 共通検索条件
-	 */
-	protected static final Condition COMMON_CONDITION2 = HYMNS.VISIBLE_FLG.eq(Boolean.TRUE)
-			.and(HYMNS.CLASSICAL.eq(Boolean.FALSE));
 
 	/**
 	 * 日時フォマーター
@@ -146,7 +132,7 @@ public class HymnServiceImpl implements IHymnService {
 			normB += Math.pow(vectorB[i], 2);
 		}
 		if ((normA == 0) || (normB == 0)) {
-			return 0; // 避免除0
+			return 0;
 		}
 		return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 	}
@@ -170,38 +156,33 @@ public class HymnServiceImpl implements IHymnService {
 	 */
 	private static @NotNull String trimSerif(final @NotNull String serif) {
 		final var zenkakuSpace = "\u3000";
-		final var replace = serif.replace(zenkakuSpace, CoStringUtils.EMPTY_STRING);
-		return replace.trim();
+		return serif.replace(zenkakuSpace, CoStringUtils.EMPTY_STRING).trim();
 	}
 
-	/**
-	 * 共通リポジトリ
-	 */
-	private final DSLContext dslContext;
+	// Entity2DTO Mapper
+	private final HymnMapper hymnMapper;
 
-	/**
-	 * キャシュー
-	 */
+	// jOOQの依存関係を排除し、Spring Data JDBCリポとMapStructマッパーを注入
+	private final HymnRepository hymnRepository;
+	private final HymnWorkRepository hymnWorkRepository;
 	@Qualifier("nlpCache")
 	private final Cache<Object, Object> nlpCache;
+
+	private final StudentRepository studentRepository;
 
 	@Transactional(readOnly = true)
 	@Override
 	public CoResult<Integer, DataAccessException> checkDuplicated(final String id, final String nameJp) {
 		try {
+			int count;
 			if (CoStringUtils.isDigital(id)) {
-				final var checkDuplicated = this.dslContext.selectCount().from(HYMNS).where(COMMON_CONDITION)
-						.and(HYMNS.ID.ne(Long.parseLong(id))).and(HYMNS.NAME_JP.eq(nameJp)).fetchSingle()
-						.into(Integer.class);
-				return CoResult.ok(checkDuplicated);
+				count = this.hymnRepository.countByVisibleFlgTrueAndNameJpAndIdNot(nameJp, Long.parseLong(id));
+			} else {
+				count = this.hymnRepository.countByVisibleFlgTrueAndNameJp(nameJp);
 			}
-			final var checkDuplicated = this.dslContext.selectCount().from(HYMNS).where(COMMON_CONDITION)
-					.and(HYMNS.NAME_JP.eq(nameJp)).fetchSingle().into(Integer.class);
-			return CoResult.ok(checkDuplicated);
+			return CoResult.ok(count);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -209,23 +190,18 @@ public class HymnServiceImpl implements IHymnService {
 	@Override
 	public CoResult<Integer, DataAccessException> checkDuplicated2(final String id, final String nameKr) {
 		try {
+			int count;
 			if (CoStringUtils.isDigital(id)) {
-				final var checkDuplicated = this.dslContext.selectCount().from(HYMNS).where(COMMON_CONDITION)
-						.and(HYMNS.ID.ne(Long.parseLong(id))).and(HYMNS.NAME_KR.eq(nameKr)).fetchSingle()
-						.into(Integer.class);
-				return CoResult.ok(checkDuplicated);
+				count = this.hymnRepository.countByVisibleFlgTrueAndNameKrAndIdNot(nameKr, Long.parseLong(id));
+			} else {
+				count = this.hymnRepository.countByVisibleFlgTrueAndNameKr(nameKr);
 			}
-			final var checkDuplicated = this.dslContext.selectCount().from(HYMNS).where(COMMON_CONDITION)
-					.and(HYMNS.NAME_KR.eq(nameKr)).fetchSingle().into(Integer.class);
-			return CoResult.ok(checkDuplicated);
+			return CoResult.ok(count);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 
-	// 3) TF-IDF ベクトルキャッシュ
 	private double[] computeTfIdfVector(final String lang, final String hymnVersion, final String text,
 			final Object2DoubleOpenHashMap<String> idf) {
 		final var key = new VecKey(lang, hymnVersion, this.hash(text));
@@ -237,7 +213,7 @@ public class HymnServiceImpl implements IHymnService {
 		final var tf = new Object2IntOpenHashMap<String>();
 		tokens.forEach(t -> tf.merge(t, 1, Integer::sum));
 		final var vec = new double[idf.size()];
-		final Object2IntOpenHashMap<String> termIndex = this.indexOf(idf.keySet()); // term -> position の固定順序マップを作る
+		final Object2IntOpenHashMap<String> termIndex = this.indexOf(idf.keySet());
 		tf.object2IntEntrySet().fastForEach(en -> {
 			final var term = en.getKey();
 			final int cnt = en.getIntValue();
@@ -266,27 +242,17 @@ public class HymnServiceImpl implements IHymnService {
 			final BufferedImage image = (CoStringUtils.isEqual(MediaType.IMAGE_JPEG_VALUE, pdfDiscernment))
 					? CoSortsUtils.readAndNormalizeOrientation(img)
 					: ImageIO.read(new ByteArrayInputStream(img));
-			// A4 の幅・高さ（ポイント: 1pt = 1/72 inch）
+
 			final float pageWidth = page.getMediaBox().getWidth();
 			final float pageHeight = page.getMediaBox().getHeight();
-			// 画像の元サイズ（ピクセル）。PDFBox はピクセルをそのままポイントとして扱ってもOK
 			final float imgWidth = image.getWidth();
 			final float imgHeight = image.getHeight();
-			// 描画サイズ計算
-//			float scale;
-//			if (imgWidth <= pageWidth && imgHeight <= pageHeight) {
-//				// 画像が A4 より小さい → A4 に満たされように拡大
-//				scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-//			} else {
-//				// 画像が A4 より大きい → A4 に収まるように縮小
-//				scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-//			}
+
 			final var scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
 			final var drawWidth = imgWidth * scale;
 			final var drawHeight = imgHeight * scale;
-			// 画像オブジェクト作成
+
 			final PDImageXObject pdfImage = LosslessFactory.createFromImage(doc, image);
-			// 中央配置用の座標計算（原点は左下）
 			final var x = (pageWidth - drawWidth) / 2f;
 			final var y = (pageHeight - drawHeight) / 2f;
 			try (var contentStream = new PDPageContentStream(doc, page)) {
@@ -338,31 +304,27 @@ public class HymnServiceImpl implements IHymnService {
 			final var hymnDto = item.getKey();
 			if (similarity >= 0.33 && hymnDto.lineNumber() == LineNumber.SNOWY) {
 				return new HymnDto(hymnDto.id(), hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.lyric(), hymnDto.link(),
-						hymnDto.score(), hymnDto.biko(), hymnDto.updatedUser(), hymnDto.updatedTime(),
-						LineNumber.CADMIUM);
+						hymnDto.score(), hymnDto.updatedUser(), hymnDto.updatedTime(), LineNumber.CADMIUM);
 			}
 			if (similarity >= 0.21 && hymnDto.lineNumber() == LineNumber.SNOWY) {
 				return new HymnDto(hymnDto.id(), hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.lyric(), hymnDto.link(),
-						hymnDto.score(), hymnDto.biko(), hymnDto.updatedUser(), hymnDto.updatedTime(),
-						LineNumber.BURGUNDY);
+						hymnDto.score(), hymnDto.updatedUser(), hymnDto.updatedTime(), LineNumber.BURGUNDY);
 			}
 			if (similarity >= 0.07 && hymnDto.lineNumber() == LineNumber.SNOWY) {
 				return new HymnDto(hymnDto.id(), hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.lyric(), hymnDto.link(),
-						hymnDto.score(), hymnDto.biko(), hymnDto.updatedUser(), hymnDto.updatedTime(),
-						LineNumber.NAPLES);
+						hymnDto.score(), hymnDto.updatedUser(), hymnDto.updatedTime(), LineNumber.NAPLES);
 			}
 			return hymnDto;
 		}).toList();
 	}
 
 	@Transactional(readOnly = true)
-	private String getCorpusVersion() {
-		// 1. MAX(updated_at) を取得
-		final var maxUpdatedAt = this.dslContext.select(DSL.max(HYMNS.UPDATED_TIME)).from(HYMNS).fetchOne(0,
-				OffsetDateTime.class);
-		// 2. null の場合（レコードなし）は現在時刻を代替
+	protected String getCorpusVersion() {
+		// 1. MAX(updated_time) をリポジトリ経由で取得
+		final LocalDateTime maxUpdatedAt = this.hymnRepository.findMaxUpdatedTime();
+		// 2. null の場合は現在時刻を代替
 		if (maxUpdatedAt == null) {
-			return OffsetDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+			return LocalDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 		}
 		// 3. ISO 文字列に変換
 		return maxUpdatedAt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
@@ -372,17 +334,20 @@ public class HymnServiceImpl implements IHymnService {
 	@Override
 	public CoResult<HymnDto, DataAccessException> getHymnInfoById(final Long id) {
 		try {
-			final var hymnsRecord = this.dslContext.selectFrom(HYMNS).where(COMMON_CONDITION).and(HYMNS.ID.eq(id))
-					.fetchSingle();
-			final var hymnsWorkRecord = this.dslContext.selectFrom(HYMNS_WORK).where(HYMNS_WORK.WORK_ID.eq(id))
-					.fetchSingle();
-			final var studentsRecord = this.dslContext.selectFrom(STUDENTS).where(StudentServiceImpl.COMMON_CONDITION)
-					.and(STUDENTS.ID.eq(hymnsRecord.getUpdatedUser())).fetchSingle();
-			final var zonedDateTime = hymnsRecord.getUpdatedTime().atZoneSameInstant(ZoneOffset.ofHours(9));
-			final var hymnDto = new HymnDto(hymnsRecord.getId(), hymnsRecord.getNameJp(), hymnsRecord.getNameKr(),
-					hymnsRecord.getLyric(), hymnsRecord.getLink(), hymnsWorkRecord.getScore(),
-					hymnsWorkRecord.getBiko(), studentsRecord.getUsername(),
-					FORMATTER.format(zonedDateTime.toLocalDateTime()), null);
+			final Hymn hymn = this.hymnRepository.findByIdAndVisibleFlgTrue(id)
+					.orElseThrow(() -> new DataAccessException("Hymn not found") {
+					});
+			final HymnWork work = this.hymnWorkRepository.findByWorkId(id)
+					.orElseThrow(() -> new DataAccessException("HymnWork not found") {
+					});
+			final Student student = this.studentRepository.findByIdAndVisibleFlgTrue(hymn.updatedUser())
+					.orElseThrow(() -> new DataAccessException("Student not found") {
+					});
+			// 時差計算 (+9時間)
+			final LocalDateTime targetLocalTime = hymn.updatedTime();
+			final String formattedTime = FORMATTER.format(targetLocalTime);
+			// MapStruct マッパーによる高度な複数集約オブジェクト変換
+			final HymnDto hymnDto = this.hymnMapper.toDto(hymn, work, student, formattedTime);
 			return CoResult.ok(hymnDto);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
@@ -396,8 +361,8 @@ public class HymnServiceImpl implements IHymnService {
 	public CoResult<Pagination<HymnDto>, DataAccessException> getHymnsInfoByPagination(final Integer pageNum,
 			final String keyword) {
 		try {
-			final var totalRecords = this.dslContext.selectCount().from(HYMNS).where(COMMON_CONDITION).fetchSingle()
-					.into(Long.class);
+			// 総件数の取得
+			final long totalRecords = this.hymnRepository.countByVisibleFlgTrue();
 			final int offset = (pageNum - 1) * ProjectConstants.DEFAULT_PAGE_SIZE;
 			final int margrave = (int) ((offset + ProjectConstants.DEFAULT_PAGE_SIZE) > totalRecords ? totalRecords
 					: offset + ProjectConstants.DEFAULT_PAGE_SIZE);
@@ -410,19 +375,17 @@ public class HymnServiceImpl implements IHymnService {
 						ProjectConstants.DEFAULT_PAGE_SIZE);
 				return CoResult.ok(pagination);
 			}
-			final var hymnDtos = this.dslContext.selectFrom(HYMNS).where(COMMON_CONDITION).orderBy(HYMNS.ID.asc())
-					.fetch(rd -> {
-						final String hymnName = rd.getClassical().booleanValue() ? "★" + rd.getNameJp()
-								: rd.getNameJp();
-						return new HymnDto(rd.getId(), hymnName, rd.getNameKr(), rd.getLyric(), rd.getLink(), null,
-								null, rd.getUpdatedUser().toString(), rd.getUpdatedTime().toString(), LineNumber.SNOWY);
-					});
+			// 有効な讃美歌の一覧を取得し、MapStruct で DTO へ一括変換
+			final List<HymnDto> hymnDtos = this.hymnRepository.findByVisibleFlgTrueOrderByIdAsc().stream()
+					.map(h -> this.hymnMapper.toDto2(h, LineNumber.SNOWY))
+					.collect(Collectors.toCollection(ArrayList::new)); // 後のremoveIf等の破壊的操作に備えて可変リストにする
 			if (CoStringUtils.isEmpty(keyword)) {
 				final var pagination = Pagination.of(hymnDtos.subList(offset, margrave), totalRecords, pageNum,
 						ProjectConstants.DEFAULT_PAGE_SIZE);
 				this.nlpCache.put(docKey, hymnDtos);
 				return CoResult.ok(pagination);
 			}
+
 			for (final String starngement : STRANGE_ARRAY) {
 				if (keyword.toLowerCase().contains(starngement) || keyword.length() >= 100) {
 					log.warn("怪しいキーワード： " + keyword);
@@ -433,14 +396,12 @@ public class HymnServiceImpl implements IHymnService {
 					return CoResult.ok(pagination);
 				}
 			}
-			final var hymnDtos2 = this.dslContext.selectFrom(HYMNS).where(COMMON_CONDITION)
-					.and(HYMNS.NAME_KR.like(getHymnSpecification(keyword))).orderBy(HYMNS.ID.asc()).fetch(rd -> {
-						final String hymnName = rd.getClassical().booleanValue() ? "★" + rd.getNameJp()
-								: rd.getNameJp();
-						return new HymnDto(rd.getId(), hymnName, rd.getNameKr(), rd.getLyric(), rd.getLink(), null,
-								null, rd.getUpdatedUser().toString(), rd.getUpdatedTime().toString(),
-								LineNumber.CADMIUM);
-					});
+
+			// NAME_KRのライク検索に該当する一覧を取得し、MapStructでDTO化
+			final List<HymnDto> hymnDtos2 = this.hymnRepository
+					.findActiveHymnsByNameKrLike(getHymnSpecification(keyword)).stream()
+					.map(h -> this.hymnMapper.toDto2(h, LineNumber.CADMIUM)).toList();
+
 			if (CollectionUtils.isEmpty(hymnDtos2)) {
 				final String[] splits = keyword.split("&");
 				final List<HymnDto> topMatches = this.findTopMatches(splits, hymnDtos);
@@ -451,6 +412,7 @@ public class HymnServiceImpl implements IHymnService {
 				this.nlpCache.put(docKey, sortedHymnDtos);
 				return CoResult.ok(pagination);
 			}
+
 			final var list = hymnDtos2.stream().map(HymnDto::lyric).toList();
 			final var targets = new String[list.size()];
 			for (var i = 0; i < targets.length; i++) {
@@ -459,6 +421,7 @@ public class HymnServiceImpl implements IHymnService {
 			final var ids = hymnDtos2.stream().map(HymnDto::id).toList();
 			hymnDtos.removeIf(a -> ids.contains(a.id()));
 			hymnDtos.addAll(hymnDtos2);
+
 			final List<HymnDto> topMatches = this.findTopMatches(targets, hymnDtos);
 			final var sortedHymnDtos = topMatches.stream()
 					.sorted(Comparator.comparingInt(item -> item.lineNumber().getLineNo())).toList();
@@ -479,37 +442,26 @@ public class HymnServiceImpl implements IHymnService {
 		try {
 			for (final String starngement : STRANGE_ARRAY) {
 				if (keyword.toLowerCase().contains(starngement) || keyword.length() >= 100) {
-					final var hymnDtos = this.dslContext.selectFrom(HYMNS).where(COMMON_CONDITION2)
-							.orderBy(HYMNS.ID.asc()).limit(ProjectConstants.DEFAULT_PAGE_SIZE).fetch(rd -> {
-								final String hymnName = rd.getClassical().booleanValue() ? "★" + rd.getNameJp()
-										: rd.getNameJp();
-								return new HymnDto(rd.getId(), hymnName, rd.getNameKr(), rd.getLyric(), rd.getLink(),
-										null, null, rd.getUpdatedUser().toString(), rd.getUpdatedTime().toString(),
-										LineNumber.SNOWY);
-							});
+					// 件数制限付き取得の代わりに、リポジトリから条件2（classical=false）のリストを取得して上限処理
+					final List<HymnDto> hymnDtos = this.hymnRepository
+							.findByVisibleFlgTrueAndClassicalFalseOrderByIdAsc().stream()
+							.limit(ProjectConstants.DEFAULT_PAGE_SIZE)
+							.map(h -> this.hymnMapper.toDto2(h, LineNumber.SNOWY)).toList();
 					log.warn("怪しいキーワード： " + keyword);
 					return CoResult.ok(hymnDtos);
 				}
 			}
-			final var totalRecords = this.dslContext.selectFrom(HYMNS).where(COMMON_CONDITION2).orderBy(HYMNS.ID.asc())
-					.fetch(rd -> {
-						final String hymnName = rd.getClassical().booleanValue() ? "★" + rd.getNameJp()
-								: rd.getNameJp();
-						return new HymnDto(rd.getId(), hymnName, rd.getNameKr(), rd.getLyric(), rd.getLink(), null,
-								null, rd.getUpdatedUser().toString(), rd.getUpdatedTime().toString(), LineNumber.SNOWY);
-					});
+			// 全レコードのDTO変換リスト（可変）
+			final List<HymnDto> totalRecords = this.hymnRepository.findByVisibleFlgTrueAndClassicalFalseOrderByIdAsc()
+					.stream().map(h -> this.hymnMapper.toDto2(h, LineNumber.SNOWY))
+					.collect(Collectors.toCollection(ArrayList::new));
 			if (CoStringUtils.isEmpty(keyword)) {
 				final List<HymnDto> hymnDtos = this.randomFiveLoop2(totalRecords);
 				return CoResult.ok(hymnDtos);
 			}
-			final var hymnDtos2 = this.dslContext.selectFrom(HYMNS).where(COMMON_CONDITION)
-					.and(HYMNS.NAME_KR.like(getHymnSpecification(keyword))).orderBy(HYMNS.ID.asc()).fetch(rd -> {
-						final String hymnName = rd.getClassical().booleanValue() ? "★" + rd.getNameJp()
-								: rd.getNameJp();
-						return new HymnDto(rd.getId(), hymnName, rd.getNameKr(), rd.getLyric(), rd.getLink(), null,
-								null, rd.getUpdatedUser().toString(), rd.getUpdatedTime().toString(),
-								LineNumber.CADMIUM);
-					});
+			final List<HymnDto> hymnDtos2 = this.hymnRepository
+					.findActiveHymnsByNameKrLike(getHymnSpecification(keyword)).stream()
+					.map(h -> this.hymnMapper.toDto2(h, LineNumber.CADMIUM)).toList();
 			if (CollectionUtils.isEmpty(hymnDtos2)) {
 				final String[] splits = keyword.split("&");
 				final List<HymnDto> topMatches = this.findTopMatches(splits, totalRecords);
@@ -536,7 +488,6 @@ public class HymnServiceImpl implements IHymnService {
 		}
 	}
 
-	// 2) IDF キャッシュ（コーパススナップショットで）
 	private Object2DoubleOpenHashMap<String> getIdf(final String[] corpusVersion, final Stream<List<String>> allDocs) {
 		final var key = new IdfKey(corpusVersion);
 		@SuppressWarnings("unchecked")
@@ -563,13 +514,10 @@ public class HymnServiceImpl implements IHymnService {
 	@Override
 	public CoResult<Long, DataAccessException> getTotalCounts() {
 		try {
-			final var totalRecords = this.dslContext.selectCount().from(HYMNS).where(COMMON_CONDITION).fetchSingle()
-					.into(Long.class);
+			final long totalRecords = this.hymnRepository.countByVisibleFlgTrue();
 			return CoResult.ok(totalRecords);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -603,46 +551,41 @@ public class HymnServiceImpl implements IHymnService {
 		return map;
 	}
 
+	@Transactional
 	@Override
 	public CoResult<String, DataAccessException> infoDeletion(final Long id) {
 		try {
-			final var hymnsRecord = this.dslContext.selectFrom(HYMNS).where(COMMON_CONDITION).and(HYMNS.ID.eq(id))
-					.fetchSingle();
-			hymnsRecord.setVisibleFlg(Boolean.FALSE);
-			// this.dslContext.deleteFrom(HYMNS_WORK).where(HYMNS_WORK.WORK_ID.eq(id)).execute();
-			hymnsRecord.update();
+			final Hymn hymn = this.hymnRepository.findByIdAndVisibleFlgTrue(id)
+					.orElseThrow(() -> new DataAccessException("Hymn not found") {
+					});
+
+			// 論理削除フラグを偽に変更した新しいレコードインスタンスを保存
+			final Hymn deletedHymn = new Hymn(hymn.id(), hymn.nameJp(), hymn.nameKr(), hymn.link(), hymn.updatedTime(),
+					hymn.updatedUser(), hymn.lyric(), Boolean.FALSE, hymn.classical());
+			this.hymnRepository.save(deletedHymn);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_DELETED);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 
+	@Transactional
 	@Override
 	public CoResult<Integer, DataAccessException> infoStorage(final @NotNull HymnDto hymnDto) {
-		final OffsetDateTime updateTime = OffsetDateTime.now();
+		final var updateTime = LocalDateTime.now();
 		try {
-			final var hymnsRecord = this.dslContext.newRecord(HYMNS);
-			final var trimedSerif = trimSerif(hymnDto.lyric());
-			hymnsRecord.setId(SnowflakeUtils.snowflakeId());
-			hymnsRecord.setNameJp(hymnDto.nameJp());
-			hymnsRecord.setNameKr(hymnDto.nameKr());
-			hymnsRecord.setLink(hymnDto.link());
-			hymnsRecord.setLyric(trimedSerif);
-			hymnsRecord.setVisibleFlg(Boolean.TRUE);
-			hymnsRecord.setUpdatedUser(Long.parseLong(hymnDto.updatedUser()));
-			hymnsRecord.setUpdatedTime(updateTime);
-			hymnsRecord.setClassical(Boolean.FALSE);
-			hymnsRecord.insert();
-			final var hymnsWorkRecord = this.dslContext.newRecord(HYMNS_WORK);
-			final int count = this.dslContext.selectCount().from(HYMNS_WORK).fetchSingle().into(Integer.class);
-			hymnsWorkRecord.setId(Long.valueOf(count + 1L));
-			hymnsWorkRecord.setWorkId(hymnsRecord.getId());
-			hymnsWorkRecord.setUpdatedTime(updateTime);
-			hymnsWorkRecord.insert();
-			final var totalRecords = this.dslContext.selectCount().from(HYMNS).where(COMMON_CONDITION).fetchSingle()
-					.into(Long.class);
+			final long newHymnId = SnowflakeUtils.snowflakeId();
+			final String trimmedSerif = trimSerif(hymnDto.lyric());
+			// 1. HYMNSテーブルへインサート
+			final var newHymn = new Hymn(newHymnId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(), updateTime,
+					Long.parseLong(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE, Boolean.FALSE);
+			this.hymnRepository.save(newHymn);
+			// 2. HYMNS_WORKテーブルへインサート
+			final int nextWorkSequenceId = this.hymnWorkRepository.countAllRecords() + 1;
+			final var newWork = new HymnWork(Long.valueOf(nextWorkSequenceId), newHymnId, null);
+			this.hymnWorkRepository.save(newWork);
+			// 3. 最大ページ数の算定
+			final long totalRecords = this.hymnRepository.countByVisibleFlgTrue();
 			final int discernLargestPage = CoStringUtils.discernLargestPage(totalRecords);
 			return CoResult.ok(discernLargestPage);
 		} catch (final DataAccessException e) {
@@ -652,38 +595,42 @@ public class HymnServiceImpl implements IHymnService {
 		}
 	}
 
+	@Transactional
 	@Override
 	public CoResult<String, DataAccessException> infoUpdate(final @NotNull HymnDto hymnDto) {
-		final OffsetDateTime updateTime = OffsetDateTime.now();
+		final LocalDateTime updateTime = LocalDateTime.now();
 		try {
-			final var hymnsRecord = this.dslContext.newRecord(HYMNS);
-			hymnsRecord.setId(Long.valueOf(hymnDto.id()));
-			hymnsRecord.setNameJp(hymnDto.nameJp());
-			hymnsRecord.setNameKr(hymnDto.nameKr());
-			hymnsRecord.setLink(hymnDto.link());
-			hymnsRecord.setLyric(hymnDto.lyric());
-			hymnsRecord.setVisibleFlg(Boolean.TRUE);
-			final var hymnsRecord2 = this.dslContext.selectFrom(HYMNS).where(COMMON_CONDITION)
-					.and(HYMNS.ID.eq(hymnsRecord.getId())).fetchSingle();
-			if (hymnsRecord2.getUpdatedTime().isAfter(updateTime)) {
-				return CoResult.err(new DataChangedException(ProjectConstants.MESSAGE_OPTIMISTIC_ERROR));
+			final var targetId = Long.valueOf(hymnDto.id());
+			// 既存の最新データをDBから直接取得（jOOQのセーブポイント比較に準拠）
+			final Hymn existingHymn = this.hymnRepository.findByIdAndVisibleFlgTrue(targetId)
+					.orElseThrow(() -> new DataAccessException("Hymn not found") {
+					});
+			// 楽観的排他チェック
+			if (existingHymn.updatedTime().isAfter(updateTime)) {
+				return CoResult.err(new org.springframework.dao.OptimisticLockingFailureException(
+						ProjectConstants.MESSAGE_OPTIMISTIC_ERROR) {
+				});
 			}
-			hymnsRecord.setClassical(hymnsRecord2.getClassical());
-			hymnsRecord2.setUpdatedTime(null);
-			hymnsRecord2.setUpdatedUser(null);
-			if (CoStringUtils.isEqual(hymnsRecord, hymnsRecord2)) {
+			// 入力値と既存レコードから仮想上書きオブジェクトを組み立てる（レコード比較のため）
+			final String trimmedSerif = trimSerif(hymnDto.lyric());
+			final var virtualUpdatedHymn = new Hymn(targetId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(),
+					existingHymn.updatedTime(), existingHymn.updatedUser(), trimmedSerif, Boolean.TRUE,
+					existingHymn.classical());
+			// イミュータブル特性を活かしたデータ無変更チェック（record型は全プロパティのequalsが備わっています）
+			if (existingHymn.equals(virtualUpdatedHymn)) {
 				return CoResult.ok(ProjectConstants.MESSAGE_STRING_NO_CHANGE);
 			}
-			CoBeanUtils.copyNullableProperties(hymnsRecord, hymnsRecord2);
-			final var trimedSerif = trimSerif(hymnsRecord.getLyric());
-			final HymnsWorkRecord hymnsWorkRecord = this.dslContext.selectFrom(HYMNS_WORK)
-					.where(HYMNS_WORK.WORK_ID.eq(hymnsRecord2.getId())).fetchSingle();
-			hymnsWorkRecord.setUpdatedTime(updateTime);
-			hymnsRecord2.setUpdatedUser(Long.valueOf(hymnDto.updatedUser()));
-			hymnsRecord2.setLyric(trimedSerif);
-			hymnsRecord2.setUpdatedTime(updateTime);
-			hymnsWorkRecord.update();
-			hymnsRecord2.update();
+			// 変動があった場合のみ永続化
+			final HymnWork existingWork = this.hymnWorkRepository.findByWorkId(targetId)
+					.orElseThrow(() -> new DataAccessException("HymnWork not found") {
+					});
+			// 更新用インスタンスの作成（時間・ユーザーIDの上書き）
+			final var finalUpdatedHymn = new Hymn(targetId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(),
+					updateTime, Long.valueOf(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE,
+					existingHymn.classical());
+			final var finalUpdatedWork = new HymnWork(existingWork.id(), existingWork.workId(), existingWork.score());
+			this.hymnWorkRepository.save(finalUpdatedWork);
+			this.hymnRepository.save(finalUpdatedHymn);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
@@ -702,16 +649,12 @@ public class HymnServiceImpl implements IHymnService {
 	private @NotNull List<HymnDto> randomFiveLoop(final @NotNull List<HymnDto> hymnsRecords,
 			final @NotNull List<HymnDto> totalRecords) {
 		final var ids = hymnsRecords.stream().map(HymnDto::id).distinct().toList();
-		// 既に含まれていないレコード候補
 		final var filteredRecords = totalRecords.stream().filter(item -> !ids.contains(item.id())).toList();
-		// 結果リストを初期化
 		final var result = new ArrayList<>(hymnsRecords);
-		// 足りない分をランダム補充
 		while (result.stream().distinct().count() < ProjectConstants.DEFAULT_PAGE_SIZE && !filteredRecords.isEmpty()) {
 			final int indexOf = RANDOM.nextInt(filteredRecords.size());
 			result.add(filteredRecords.get(indexOf));
 		}
-		// 最終的に distinct して返す
 		return result.stream().distinct().toList();
 	}
 
@@ -735,31 +678,30 @@ public class HymnServiceImpl implements IHymnService {
 		return this.randomFiveLoop(concernList2, hymnsRecords);
 	}
 
+	@Transactional
 	@Override
 	public CoResult<String, DataAccessException> scoreStorage(final @NotNull byte[] file, final Long id) {
 		try {
-			final var hymnsWorkRecord = this.dslContext.selectFrom(HYMNS_WORK).where(HYMNS_WORK.WORK_ID.eq(id))
-					.fetchSingle();
+			final HymnWork hymnsWorkRecord = this.hymnWorkRepository.findByWorkId(id)
+					.orElseThrow(() -> new DataAccessException("HymnWork not found") {
+					});
 			final var tika = new Tika();
 			final String pdfDiscernment = tika.detect(file);
 			final byte[] centeredImage = this.convertCenteredImage(file, pdfDiscernment);
+			// コンテンツ変更チェック
 			if ((CoStringUtils.isEqual(MediaType.APPLICATION_PDF_VALUE, pdfDiscernment)
-					&& Arrays.equals(hymnsWorkRecord.getScore(), file))
+					&& Arrays.equals(hymnsWorkRecord.score(), file))
 					|| (CoStringUtils.isNotEqual(MediaType.APPLICATION_PDF_VALUE, pdfDiscernment)
-							&& Arrays.equals(hymnsWorkRecord.getScore(), centeredImage))) {
-				return CoResult.err(new ConfigurationException(ProjectConstants.MESSAGE_STRING_NO_CHANGE));
+							&& Arrays.equals(hymnsWorkRecord.score(), centeredImage))) {
+				return CoResult.err(new DataRetrievalFailureException(ProjectConstants.MESSAGE_STRING_NO_CHANGE)); // 適切な例外オブジェクトへフォールバック
 			}
+			final HymnWork updatedWork;
 			if (Arrays.equals(ProjectConstants.EMPTY_ARR, centeredImage)) {
-				hymnsWorkRecord.setBiko(pdfDiscernment);
-				hymnsWorkRecord.setScore(file);
-				hymnsWorkRecord.setUpdatedTime(OffsetDateTime.now());
-				hymnsWorkRecord.update();
-				return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
+				updatedWork = new HymnWork(hymnsWorkRecord.id(), hymnsWorkRecord.workId(), file);
+			} else {
+				updatedWork = new HymnWork(hymnsWorkRecord.id(), hymnsWorkRecord.workId(), centeredImage);
 			}
-			hymnsWorkRecord.setBiko(MediaType.APPLICATION_PDF_VALUE);
-			hymnsWorkRecord.setScore(centeredImage);
-			hymnsWorkRecord.setUpdatedTime(OffsetDateTime.now());
-			hymnsWorkRecord.update();
+			this.hymnWorkRepository.save(updatedWork);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
@@ -787,8 +729,7 @@ public class HymnServiceImpl implements IHymnService {
 		if (cached != null) {
 			return cached;
 		}
-		final var tokens = KOMORAN.analyze(koreanText).getTokenList().stream().map(t -> t.getMorph()) // 正規化前
-				.toList();
+		final var tokens = KOMORAN.analyze(koreanText).getTokenList().stream().map(t -> t.getMorph()).toList();
 		this.nlpCache.put(key, tokens);
 		return tokens;
 	}
