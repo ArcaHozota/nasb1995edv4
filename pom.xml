@@ -14,8 +14,7 @@
 	<version>3</version>
 	<name>nasb1995edv4</name>
 	<properties>
-		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
-		<lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+		<org.mapstruct.version>1.6.3</org.mapstruct.version>
 		<maven.compiler.release>17</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -81,11 +80,13 @@
 			<groupId>com.github.ben-manes.caffeine</groupId>
 			<artifactId>caffeine</artifactId>
 		</dependency>
+		<!-- MyBatis Spring Boot Starter (Spring Data JDBCから移行) -->
 		<!--
-		https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jooq -->
+		https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jdbc</artifactId>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>3.0.4</version>
 		</dependency>
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2 -->
@@ -100,6 +101,15 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- MyBatis用テストサポート -->
+		<!--
+		https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter-test -->
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter-test</artifactId>
+			<version>3.0.4</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- Source:
 		https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
 		<dependency>
@@ -109,21 +119,21 @@
 			<scope>compile</scope>
 		</dependency>
 		<!-- Source:
-		https://mvnrepository.com/artifact/software.amazon.awssdk/secretsmanager -->
+		https://mvnrepository.com/artifact/software.amazon.awssdk/secretsmanager 
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>secretsmanager</artifactId>
 			<version>2.41.19</version>
 			<scope>compile</scope>
-		</dependency>
+		</dependency> -->
 		<!-- Source:
-		https://mvnrepository.com/artifact/software.amazon.awssdk/regions -->
+		https://mvnrepository.com/artifact/software.amazon.awssdk/regions 
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>regions</artifactId>
 			<version>2.41.19</version>
 			<scope>compile</scope>
-		</dependency>
+		</dependency> -->
 		<!--
 		https://mvnrepository.com/artifact/org.jetbrains/annotations -->
 		<dependency>
@@ -187,10 +197,12 @@
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<!-- Source: https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
 			<version>${org.mapstruct.version}</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -208,7 +220,6 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
