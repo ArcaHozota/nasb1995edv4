@@ -20,6 +20,7 @@ import app.preach.gospel.model.Hymn;
 public interface HymnRepository extends ListCrudRepository<Hymn, Long> {
 
 	// 1. 全件数取得 (VISIBLE_FLG = 1)
+	@Query("SELECT COUNT(1) FROM HYMNS HM WHERE HM.VISIBLE_FLG = 1")
 	long countByVisibleFlgTrue();
 
 	int countByVisibleFlgTrueAndNameJp(String nameJp);
