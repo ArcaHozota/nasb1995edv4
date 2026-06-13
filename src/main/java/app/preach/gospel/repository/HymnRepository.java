@@ -48,6 +48,6 @@ public interface HymnRepository extends ListCrudRepository<Hymn, Long> {
 	List<Hymn> findByVisibleFlgTrueOrderByIdAsc();
 
 	// 2. 最新の更新時間を取得する
-	@Query("SELECT MAX(HM.UPDATED_TIME) FROM HYMNS HM")
+	@Query("SELECT MAX(HM.UPDATED_TIME) FROM HYMNS HM WHERE HM.VISIBLE_FLG = 'true'")
 	LocalDateTime findMaxUpdatedTime();
 }
