@@ -1,7 +1,7 @@
 package app.preach.gospel.service.impl;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.jetbrains.annotations.NotNull;
@@ -124,7 +124,7 @@ public class StudentServiceImpl implements IStudentService {
 				// 不変レコードのコピーを作成して更新時間をセット
 				final var updated = new Student(student.id(), student.loginAccount(), student.password(),
 						student.username(), student.dateOfBirth(), student.email(), student.roleId(),
-						OffsetDateTime.now(), student.visibleFlg());
+						LocalDateTime.now(), student.visibleFlg());
 				this.studentRepository.save(updated);
 				return CoResult.ok(ProjectConstants.MESSAGE_STRING_LOGIN_SUCCESS);
 			}).orElse(CoResult
