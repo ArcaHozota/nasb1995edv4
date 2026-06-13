@@ -19,6 +19,10 @@ spring:
          max-request-size: 30MB
          file-size-threshold: 1MB
    datasource:
+      driver-class-name: oracle.jdbc.OracleDriver
+      url: jdbc:oracle:thin:@57.181.134.161:1521/XEPDB1
+      username: nasb1995
+      password: nasb1995
       hikari:
          maximum-pool-size: 40
          minimum-idle: 10
