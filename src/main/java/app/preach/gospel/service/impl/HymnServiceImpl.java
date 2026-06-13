@@ -643,8 +643,9 @@ public class HymnServiceImpl implements IHymnService {
 			// 更新用インスタンスの作成（時間・ユーザーIDの上書き）
 			final var finalUpdatedHymn = new Hymn(targetId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(),
 					updateTime, Long.valueOf(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE.toString(),
-					existingHymn.classical());
-			final var finalUpdatedWork = new HymnWork(existingWork.id(), existingWork.workId(), existingWork.score());
+					existingHymn.classical(), false);
+			final var finalUpdatedWork = new HymnWork(existingWork.id(), existingWork.workId(), existingWork.score(),
+					false);
 			this.hymnWorkRepository.save(finalUpdatedWork);
 			this.hymnRepository.save(finalUpdatedHymn);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
