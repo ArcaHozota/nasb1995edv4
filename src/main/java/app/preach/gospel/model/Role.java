@@ -13,7 +13,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author ArkamaHozota
  */
 @Table("ROLES")
-public record Role(@Id @Column("ID") Long id, @Column("NAME") String name, @Column("VISIBLE_FLG") Boolean visibleFlg,
+public record Role(@Id @Column("ID") Long id, @Column("NAME") String name, @Column("VISIBLE_FLG") String visibleFlg,
 		// Spring Data JDBCが自動的に中間テーブル(ROLE_AUTH)と紐付けます
 		// ※デフォルトでリレーションキーは「ROLE_ID」として扱われます
 		Set<AuthorityRef> authorities) {

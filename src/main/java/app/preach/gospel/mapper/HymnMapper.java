@@ -12,6 +12,7 @@ import app.preach.gospel.dto.HymnDto;
 import app.preach.gospel.model.Hymn;
 import app.preach.gospel.model.HymnWork;
 import app.preach.gospel.model.Student;
+import app.preach.gospel.utils.CoStringUtils;
 import app.preach.gospel.utils.LineNumber;
 
 /**
@@ -36,7 +37,7 @@ public interface HymnMapper {
 		if (hymn == null) {
 			return null;
 		}
-		return Boolean.TRUE.equals(hymn.classical()) ? "★" + hymn.nameJp() : hymn.nameJp();
+		return CoStringUtils.isEqual(hymn.classical(), Boolean.TRUE.toString()) ? "★" + hymn.nameJp() : hymn.nameJp();
 	}
 
 	@Named("objectToString")

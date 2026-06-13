@@ -48,7 +48,7 @@ public class ProjectUserDetailsService implements UserDetailsService {
 				.orElseThrow(() -> new DisabledException(ProjectConstants.MESSAGE_SPRINGSECURITY_LOGINERROR1));
 		// 2. 学生の持つ役割ID（roleId）から、紐づく権限IDのセット（集約オブジェクト）を取得
 		// 推奨構成により、roleを取得した時点で中間テーブル(ROLE_AUTH)の内容が role.authorities() に自動ロードされています
-		final var role = this.roleRepository.findById(student.roleId())
+		final var role = this.roleRepository.findByIdAndVisibleFlgTrue(student.roleId())
 				.orElseThrow(() -> new AuthenticationCredentialsNotFoundException(
 						ProjectConstants.MESSAGE_SPRINGSECURITY_LOGINERROR2));
 		final Set<AuthorityRef> authorityRefs = role.authorities();
