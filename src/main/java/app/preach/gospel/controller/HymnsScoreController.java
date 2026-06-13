@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.Serial;
 
 import org.jetbrains.annotations.NotNull;
-import org.jooq.exception.DataAccessException;
-import org.jooq.exception.NoDataFoundException;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +63,7 @@ public final class HymnsScoreController {
 		}
 		final var hymnDto = hymnInfoById.getData();
 		if (hymnDto.score() == null || hymnDto.score().length == 0) {
-			throw new NoDataFoundException(ProjectConstants.MESSAGE_HYMNSWORK_NOT_FOUND);
+			throw new DataRetrievalFailureException(ProjectConstants.MESSAGE_HYMNSWORK_NOT_FOUND);
 		}
 		final var headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_PDF);
