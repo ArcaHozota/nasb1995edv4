@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.data.jdbc.core.JdbcAggregateOperations;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -208,6 +209,8 @@ public class HymnServiceImpl implements IHymnService {
 	private final HymnRepository hymnRepository;
 	private final HymnWorkRepository hymnWorkRepository;
 
+	private final JdbcAggregateOperations jdbcAggregateOperations;
+
 	@Qualifier("nlpCache")
 	private final Cache<Object, Object> nlpCache;
 
@@ -223,12 +226,13 @@ public class HymnServiceImpl implements IHymnService {
 	 */
 	protected HymnServiceImpl(final Cache<Object, Object> nlpCache, final HymnMapper hymnMapper,
 			final HymnRepository hymnRepository, final HymnWorkRepository hymnWorkRepository,
-			final StudentRepository studentRepository) {
+			final StudentRepository studentRepository, final JdbcAggregateOperations jdbcAggregateOperations) {
 		this.nlpCache = nlpCache;
 		this.hymnMapper = hymnMapper;
 		this.hymnRepository = hymnRepository;
 		this.hymnWorkRepository = hymnWorkRepository;
 		this.studentRepository = studentRepository;
+		this.jdbcAggregateOperations = jdbcAggregateOperations;
 	}
 
 	@Transactional(readOnly = true)
@@ -593,11 +597,11 @@ public class HymnServiceImpl implements IHymnService {
 			final var newHymn = new Hymn(newHymnId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(), updateTime,
 					Long.parseLong(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE.toString(),
 					Boolean.FALSE.toString());
-			this.hymnRepository.save(newHymn);
+			this.jdbcAggregateOperations.insert(newHymn);
 			// 2. HYMNS_WORKテーブルへインサート
 			final int nextWorkSequenceId = this.hymnWorkRepository.countAllRecords() + 1;
 			final var newWork = new HymnWork(Long.valueOf(nextWorkSequenceId), newHymnId, null);
-			this.hymnWorkRepository.save(newWork);
+			this.jdbcAggregateOperations.insert(newWork);
 			// 3. 最大ページ数の算定
 			final long totalRecords = this.hymnRepository.countByVisibleFlgTrue();
 			final int discernLargestPage = CoStringUtils.discernLargestPage(totalRecords);
@@ -641,9 +645,8 @@ public class HymnServiceImpl implements IHymnService {
 			// 更新用インスタンスの作成（時間・ユーザーIDの上書き）
 			final var finalUpdatedHymn = new Hymn(targetId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(),
 					updateTime, Long.valueOf(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE.toString(),
-					existingHymn.classical(), false);
-			final var finalUpdatedWork = new HymnWork(existingWork.id(), existingWork.workId(), existingWork.score(),
-					false);
+					existingHymn.classical());
+			final var finalUpdatedWork = new HymnWork(existingWork.id(), existingWork.workId(), existingWork.score());
 			this.hymnWorkRepository.save(finalUpdatedWork);
 			this.hymnRepository.save(finalUpdatedHymn);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
@@ -712,9 +715,9 @@ public class HymnServiceImpl implements IHymnService {
 			}
 			final HymnWork updatedWork;
 			if (Arrays.equals(ProjectConstants.EMPTY_ARR, centeredImage)) {
-				updatedWork = new HymnWork(hymnsWorkRecord.id(), hymnsWorkRecord.workId(), file, false);
+				updatedWork = new HymnWork(hymnsWorkRecord.id(), hymnsWorkRecord.workId(), file);
 			} else {
-				updatedWork = new HymnWork(hymnsWorkRecord.id(), hymnsWorkRecord.workId(), centeredImage, false);
+				updatedWork = new HymnWork(hymnsWorkRecord.id(), hymnsWorkRecord.workId(), centeredImage);
 			}
 			this.hymnWorkRepository.save(updatedWork);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);

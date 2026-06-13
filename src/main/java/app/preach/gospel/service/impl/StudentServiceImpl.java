@@ -108,7 +108,7 @@ public class StudentServiceImpl implements IStudentService {
 					studentDto.username(), LocalDate.parse(studentDto.dateOfBirth(), FORMATTER), studentDto.email(),
 					existing.roleId(), // 必要に応じて変更
 					existing.updatedTime(), // タイムスタンプ維持
-					Boolean.TRUE.toString(), false);
+					Boolean.TRUE.toString());
 			this.studentRepository.save(updated);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 		} catch (final DataAccessException e) {
@@ -130,7 +130,7 @@ public class StudentServiceImpl implements IStudentService {
 				// 不変レコードのコピーを作成して更新時間をセット
 				final var updated = new Student(student.id(), student.loginAccount(), student.password(),
 						student.username(), student.dateOfBirth(), student.email(), student.roleId(),
-						LocalDateTime.now(), student.visibleFlg(), false);
+						LocalDateTime.now(), student.visibleFlg());
 				this.studentRepository.save(updated);
 				return CoResult.ok(ProjectConstants.MESSAGE_STRING_LOGIN_SUCCESS);
 			}).orElse(CoResult

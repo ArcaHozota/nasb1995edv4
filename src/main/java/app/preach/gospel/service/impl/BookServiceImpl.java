@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.jdbc.core.JdbcAggregateOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,7 @@ public class BookServiceImpl implements IBookService {
 
 	private final BookRepository bookRepository;
 	private final ChapterRepository chapterRepository;
+	private final JdbcAggregateOperations jdbcAggregateOperations;
 	private final VerseRepository verseRepository;
 
 	/**
@@ -41,10 +43,11 @@ public class BookServiceImpl implements IBookService {
 	 * @param verseRepository
 	 */
 	protected BookServiceImpl(final BookRepository bookRepository, final ChapterRepository chapterRepository,
-			final VerseRepository verseRepository) {
+			final VerseRepository verseRepository, final JdbcAggregateOperations jdbcAggregateOperations) {
 		this.bookRepository = bookRepository;
 		this.chapterRepository = chapterRepository;
 		this.verseRepository = verseRepository;
+		this.jdbcAggregateOperations = jdbcAggregateOperations;
 	}
 
 	@Transactional(readOnly = true)
@@ -107,7 +110,7 @@ public class BookServiceImpl implements IBookService {
 			if (existingPhrase.isPresent()) {
 				// 更新用インスタンスを生成
 				final var updatedPhrase = new Verse(targetPhraseId, phraseName, textEn, phraseDto.textJp(), chapterId,
-						changeLine, false);
+						changeLine);
 				this.verseRepository.save(updatedPhrase);
 				return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 			}
@@ -117,7 +120,7 @@ public class BookServiceImpl implements IBookService {
 			// デフォルトで「UPDATE」を試みようとします（新しく払い出されたIDではないと認識するため）。
 			// しかし、既存確認をして存在しないことが保証されているため、ここではsave()メソッドを呼び出すことで、
 			// Spring Data JDBC内部のメカニズムによって新規インサート、または必要に応じた永続化処理が正しく行われます。
-			this.verseRepository.save(verse);
+			this.jdbcAggregateOperations.insert(verse);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_INSERTED);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
