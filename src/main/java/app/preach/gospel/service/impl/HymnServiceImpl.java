@@ -355,13 +355,13 @@ public class HymnServiceImpl implements IHymnService {
 	public CoResult<HymnDto, DataAccessException> getHymnInfoById(final Long id) {
 		try {
 			final Hymn hymn = this.hymnRepository.findByIdAndVisibleFlgTrue(id)
-					.orElseThrow(() -> new DataAccessException("Hymn not found") {
+					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_HYMN_NOT_FOUND) {
 					});
 			final HymnWork work = this.hymnWorkRepository.findByWorkId(id)
-					.orElseThrow(() -> new DataAccessException("HymnWork not found") {
+					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_HYMNSWORK_NOT_FOUND) {
 					});
 			final Student student = this.studentRepository.findByIdAndVisibleFlgTrue(hymn.updatedUser())
-					.orElseThrow(() -> new DataAccessException("Student not found") {
+					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_STUDENT_NOT_FOUND) {
 					});
 			// 時差計算 (+9時間)
 			final LocalDateTime targetLocalTime = hymn.updatedTime();
@@ -405,7 +405,6 @@ public class HymnServiceImpl implements IHymnService {
 				this.nlpCache.put(docKey, hymnDtos);
 				return CoResult.ok(pagination);
 			}
-
 			for (final String starngement : STRANGE_ARRAY) {
 				if (keyword.toLowerCase().contains(starngement) || keyword.length() >= 100) {
 					log.warn("怪しいキーワード： " + keyword);
@@ -416,12 +415,10 @@ public class HymnServiceImpl implements IHymnService {
 					return CoResult.ok(pagination);
 				}
 			}
-
 			// NAME_KRのライク検索に該当する一覧を取得し、MapStructでDTO化
 			final List<HymnDto> hymnDtos2 = this.hymnRepository
 					.findActiveHymnsByNameKrLike(getHymnSpecification(keyword)).stream()
 					.map(h -> this.hymnMapper.toDto2(h, LineNumber.CADMIUM)).toList();
-
 			if (CollectionUtils.isEmpty(hymnDtos2)) {
 				final String[] splits = keyword.split("&");
 				final List<HymnDto> topMatches = this.findTopMatches(splits, hymnDtos);
@@ -432,7 +429,6 @@ public class HymnServiceImpl implements IHymnService {
 				this.nlpCache.put(docKey, sortedHymnDtos);
 				return CoResult.ok(pagination);
 			}
-
 			final var list = hymnDtos2.stream().map(HymnDto::lyric).toList();
 			final var targets = new String[list.size()];
 			for (var i = 0; i < targets.length; i++) {
@@ -441,7 +437,6 @@ public class HymnServiceImpl implements IHymnService {
 			final var ids = hymnDtos2.stream().map(HymnDto::id).toList();
 			hymnDtos.removeIf(a -> ids.contains(a.id()));
 			hymnDtos.addAll(hymnDtos2);
-
 			final List<HymnDto> topMatches = this.findTopMatches(targets, hymnDtos);
 			final var sortedHymnDtos = topMatches.stream()
 					.sorted(Comparator.comparingInt(item -> item.lineNumber().getLineNo())).toList();

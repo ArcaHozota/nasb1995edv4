@@ -32,7 +32,7 @@ public interface StudentRepository extends ListCrudRepository<Student, Long> {
 	Optional<Student> findActiveUserByUsernameOrEmail(@Param("username") String username);
 
 	// IDで取得（有効なもののみ）
-	@Query("SELECT * FROM STUDENTS WHERE VISIBLE_FLG = 'true' AND ID = :id")
+	@Query("SELECT * FROM STUDENTS ST WHERE ST.VISIBLE_FLG = 'true' AND ST.ID = :id")
 	Optional<Student> findByIdAndVisibleFlgTrue(@Param("id") Long id);
 
 	// アカウントで取得
