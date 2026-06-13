@@ -2,6 +2,8 @@ package app.preach.gospel.listener;
 
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -11,7 +13,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * ログアウトコントローラ
@@ -19,9 +20,10 @@ import lombok.extern.log4j.Log4j2;
  * @author ArkamaHozota
  * @since 2.33
  */
-@Log4j2
 @Component
 public class ProjectLogoutSuccessHandler implements LogoutSuccessHandler {
+
+	private static final Logger log = LogManager.getLogger(ProjectLogoutSuccessHandler.class);
 
 	/**
 	 * キャッシュ

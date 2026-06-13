@@ -1,6 +1,5 @@
 package app.preach.gospel.utils;
 
-import lombok.Data;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
  * @param <T> データ
  * @param <E> エラー
  */
-@Data
 public final class CoResult<T, E> {
 
 	/**
@@ -63,7 +61,7 @@ public final class CoResult<T, E> {
 
 	/**
 	 * 正常系あるかどうか -- GETTER -- 正常系あるかどうかを判断する。
-	 * 
+	 *
 	 */
 	private boolean ok;
 
@@ -77,6 +75,30 @@ public final class CoResult<T, E> {
 	private CoResult(final T data, final E err, final boolean ok) {
 		this.data = data;
 		this.err = err;
+		this.ok = ok;
+	}
+
+	public T getData() {
+		return this.data;
+	}
+
+	public E getErr() {
+		return this.err;
+	}
+
+	public boolean isOk() {
+		return this.ok;
+	}
+
+	public void setData(final T data) {
+		this.data = data;
+	}
+
+	public void setErr(final E err) {
+		this.err = err;
+	}
+
+	public void setOk(final boolean ok) {
 		this.ok = ok;
 	}
 

@@ -19,7 +19,6 @@ import app.preach.gospel.model.AuthorityRef;
 import app.preach.gospel.repository.AuthorityRepository;
 import app.preach.gospel.repository.RoleRepository;
 import app.preach.gospel.repository.StudentRepository;
-import lombok.RequiredArgsConstructor;
 
 /**
  * ログインコントローラ(SpringSecurity関連) - Spring Data JDBC 移行版
@@ -28,13 +27,19 @@ import lombok.RequiredArgsConstructor;
  * @since 2.00
  */
 @Component
-@RequiredArgsConstructor
 public class ProjectUserDetailsService implements UserDetailsService {
 
 	private final AuthorityRepository authorityRepository;
 	private final RoleRepository roleRepository;
 	// jOOQのDSLContextを排除し、Spring Data JDBCのリポジトリを注入
 	private final StudentRepository studentRepository;
+
+	public ProjectUserDetailsService(final AuthorityRepository authorityRepository, final RoleRepository roleRepository,
+			final StudentRepository studentRepository) {
+		this.authorityRepository = authorityRepository;
+		this.studentRepository = studentRepository;
+		this.roleRepository = roleRepository;
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {

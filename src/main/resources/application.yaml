@@ -21,7 +21,7 @@ spring:
    datasource:
       driver-class-name: oracle.jdbc.OracleDriver
       url: jdbc:oracle:thin:@172.26.14.43:1521/XEPDB1
-      username: nasb1995
+      username: NASB1995
       password: nasb1995
       hikari:
          connection-init-sql: 'ALTER SESSION SET CURRENT_SCHEMA = NASB1995'

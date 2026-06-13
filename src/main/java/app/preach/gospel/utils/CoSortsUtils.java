@@ -15,10 +15,11 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifDirectoryBase;
 import com.drew.metadata.exif.ExifIFD0Directory;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import io.micrometer.common.util.StringUtils;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+/**
+ * {@link StringUtils}
+ */
 public final class CoSortsUtils {
 
 	private static final int INSERTION_SORT_THRESHOLD = 32;

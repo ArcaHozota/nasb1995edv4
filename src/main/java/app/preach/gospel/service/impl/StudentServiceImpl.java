@@ -20,8 +20,6 @@ import app.preach.gospel.repository.StudentRepository;
 import app.preach.gospel.service.IStudentService;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.CoStringUtils;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 奉仕者サービス実装クラス
@@ -30,7 +28,6 @@ import lombok.RequiredArgsConstructor;
  * @since 1.00beta
  */
 @Service
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class StudentServiceImpl implements IStudentService {
 
 	/**
@@ -47,6 +44,15 @@ public class StudentServiceImpl implements IStudentService {
 	 * 奉仕者リポ
 	 */
 	private final StudentRepository studentRepository;
+
+	/**
+	 * コンストラクタ
+	 *
+	 * @param studentRepository
+	 */
+	protected StudentServiceImpl(final StudentRepository studentRepository) {
+		this.studentRepository = studentRepository;
+	}
 
 	@Transactional(readOnly = true)
 	@Override

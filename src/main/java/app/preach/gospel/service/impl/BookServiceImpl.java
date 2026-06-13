@@ -19,8 +19,6 @@ import app.preach.gospel.repository.VerseRepository;
 import app.preach.gospel.service.IBookService;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.CoStringUtils;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 聖書章節サービス実装クラス - Spring Data JDBC 移行版
@@ -29,12 +27,25 @@ import lombok.RequiredArgsConstructor;
  * @since 1.00beta
  */
 @Service
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookServiceImpl implements IBookService {
 
 	private final BookRepository bookRepository;
 	private final ChapterRepository chapterRepository;
 	private final VerseRepository verseRepository;
+
+	/**
+	 * コンストラクタ
+	 *
+	 * @param bookRepository
+	 * @param chapterRepository
+	 * @param verseRepository
+	 */
+	protected BookServiceImpl(final BookRepository bookRepository, final ChapterRepository chapterRepository,
+			final VerseRepository verseRepository) {
+		this.bookRepository = bookRepository;
+		this.chapterRepository = chapterRepository;
+		this.verseRepository = verseRepository;
+	}
 
 	@Transactional(readOnly = true)
 	@Override

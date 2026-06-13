@@ -1,14 +1,11 @@
 package app.preach.gospel.utils;
 
-import lombok.Getter;
-
 /**
  * LINE_NUMBER表示クラス
  *
  * @author ArkamaHozota
  * @since 1.00beta
  */
-@Getter
 public enum LineNumber {
 
 	BURGUNDY(2),
@@ -31,6 +28,10 @@ public enum LineNumber {
 	 */
 	LineNumber(final Integer lineNo) {
 		this.lineNo = lineNo;
+	}
+
+	public Integer getLineNo() {
+		return this.lineNo;
 	}
 
 }

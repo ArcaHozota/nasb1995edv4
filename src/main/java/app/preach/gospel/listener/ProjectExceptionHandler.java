@@ -1,5 +1,7 @@
 package app.preach.gospel.listener;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * SpringMVC例外処理インターセプト
@@ -18,9 +19,10 @@ import lombok.extern.log4j.Log4j2;
  * @author ArkamaHozota
  * @since 2.00
  */
-@Log4j2
 @ControllerAdvice
 public class ProjectExceptionHandler {
+
+	private static final Logger log = LogManager.getLogger(ProjectExceptionHandler.class);
 
 //	@ExceptionHandler(AccessDeniedException.class)
 //	public Object handleAccessDeniedException(final AccessDeniedException exception) {

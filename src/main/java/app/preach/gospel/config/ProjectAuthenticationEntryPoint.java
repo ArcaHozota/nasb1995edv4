@@ -2,6 +2,8 @@ package app.preach.gospel.config;
 
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Component;
 import app.preach.gospel.common.ProjectConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * ログインエラーコントローラ
@@ -20,9 +21,10 @@ import lombok.extern.log4j.Log4j2;
  * @author ArkamaHozota
  * @since 1.00beta
  */
-@Log4j2
 @Component
 public class ProjectAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+	private static final Logger log = LogManager.getLogger(ProjectAuthenticationEntryPoint.class);
 
 	@Override
 	public void commence(final HttpServletRequest request, final @NotNull HttpServletResponse response,

@@ -13,15 +13,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
-import lombok.extern.log4j.Log4j2;
-
 /**
  * SpringMVC配置クラス
  *
  * @author ArkamaHozota
  * @since 6.11
  */
-@Log4j2
 @Configuration
 public class SpringWebMvcConfiguration implements WebMvcConfigurer {
 

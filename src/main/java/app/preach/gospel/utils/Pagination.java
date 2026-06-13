@@ -8,9 +8,6 @@ import java.util.List;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * 共通ページングクラス
  *
@@ -18,8 +15,6 @@ import lombok.Setter;
  * @author ArkamaHozota
  * @since 1.00beta
  */
-@Getter
-@Setter
 public final class Pagination<T> {
 
 	/**
@@ -77,9 +72,39 @@ public final class Pagination<T> {
 	}
 
 	/**
-	 * 毎ページのレコード
+	 * 次のページはあるか
 	 */
-	private List<T> records;
+	private boolean hasNextPage = false;
+
+	/**
+	 * 前のページはあるか
+	 */
+	private boolean hasPrevPage = false;
+
+	/**
+	 * ナビゲーションの最初のページ
+	 */
+	private int naviFirstPage;
+
+	/**
+	 * ナビゲーションページの数の集合
+	 */
+	private int[] navigateNos;
+
+	/**
+	 * ナビゲーションのページ数
+	 */
+	private int navigatePages;
+
+	/**
+	 * ナビゲーションの最後のページ
+	 */
+	private int naviLastPage;
+
+	/**
+	 * 次のページ
+	 */
+	private int nextPage;
 
 	/**
 	 * 当ページ
@@ -92,6 +117,16 @@ public final class Pagination<T> {
 	private int pageSize;
 
 	/**
+	 * 前のページ
+	 */
+	private int prevPage;
+
+	/**
+	 * 毎ページのレコード
+	 */
+	private List<T> records;
+
+	/**
 	 * すべてのページ数
 	 */
 	private long totalPages;
@@ -100,46 +135,6 @@ public final class Pagination<T> {
 	 * すべてのレコード数
 	 */
 	private long totalRecords;
-
-	/**
-	 * 前のページはあるか
-	 */
-	private boolean hasPrevPage = false;
-
-	/**
-	 * 次のページはあるか
-	 */
-	private boolean hasNextPage = false;
-
-	/**
-	 * 前のページ
-	 */
-	private int prevPage;
-
-	/**
-	 * 次のページ
-	 */
-	private int nextPage;
-
-	/**
-	 * ナビゲーションのページ数
-	 */
-	private int navigatePages;
-
-	/**
-	 * ナビゲーションの最初のページ
-	 */
-	private int naviFirstPage;
-
-	/**
-	 * ナビゲーションの最後のページ
-	 */
-	private int naviLastPage;
-
-	/**
-	 * ナビゲーションページの数の集合
-	 */
-	private int[] navigateNos;
 
 	/**
 	 * コンストラクタ
@@ -244,11 +239,115 @@ public final class Pagination<T> {
 		this.hasNextPage = this.pageNum < this.totalPages;
 	}
 
+	public int getNaviFirstPage() {
+		return this.naviFirstPage;
+	}
+
+	public int[] getNavigateNos() {
+		return this.navigateNos;
+	}
+
+	public int getNavigatePages() {
+		return this.navigatePages;
+	}
+
+	public int getNaviLastPage() {
+		return this.naviLastPage;
+	}
+
+	public int getNextPage() {
+		return this.nextPage;
+	}
+
+	public int getPageNum() {
+		return this.pageNum;
+	}
+
+	public int getPageSize() {
+		return this.pageSize;
+	}
+
+	public int getPrevPage() {
+		return this.prevPage;
+	}
+
+	public List<T> getRecords() {
+		return this.records;
+	}
+
+	public long getTotalPages() {
+		return this.totalPages;
+	}
+
+	public long getTotalRecords() {
+		return this.totalRecords;
+	}
+
 	/**
 	 * 内容はあるかどうかを判断する
 	 */
 	public boolean hasContent() {
 		return !this.records.isEmpty();
+	}
+
+	public boolean isHasNextPage() {
+		return this.hasNextPage;
+	}
+
+	public boolean isHasPrevPage() {
+		return this.hasPrevPage;
+	}
+
+	public void setHasNextPage(final boolean hasNextPage) {
+		this.hasNextPage = hasNextPage;
+	}
+
+	public void setHasPrevPage(final boolean hasPrevPage) {
+		this.hasPrevPage = hasPrevPage;
+	}
+
+	public void setNaviFirstPage(final int naviFirstPage) {
+		this.naviFirstPage = naviFirstPage;
+	}
+
+	public void setNavigateNos(final int[] navigateNos) {
+		this.navigateNos = navigateNos;
+	}
+
+	public void setNavigatePages(final int navigatePages) {
+		this.navigatePages = navigatePages;
+	}
+
+	public void setNaviLastPage(final int naviLastPage) {
+		this.naviLastPage = naviLastPage;
+	}
+
+	public void setNextPage(final int nextPage) {
+		this.nextPage = nextPage;
+	}
+
+	public void setPageNum(final int pageNum) {
+		this.pageNum = pageNum;
+	}
+
+	public void setPageSize(final int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public void setPrevPage(final int prevPage) {
+		this.prevPage = prevPage;
+	}
+
+	public void setRecords(final List<T> records) {
+		this.records = records;
+	}
+
+	public void setTotalPages(final long totalPages) {
+		this.totalPages = totalPages;
+	}
+
+	public void setTotalRecords(final long totalRecords) {
+		this.totalRecords = totalRecords;
 	}
 
 	/**

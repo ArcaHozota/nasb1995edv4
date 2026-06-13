@@ -20,6 +20,8 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -63,9 +65,6 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
 import kr.co.shineware.nlp.komoran.core.Komoran;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * 賛美歌サービス実装クラス - Spring Data JDBC 移行版(部分1)
@@ -73,9 +72,7 @@ import lombok.extern.log4j.Log4j2;
  * @author ArkamaHozota
  * @since 1.00beta
  */
-@Log4j2
 @Service
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class HymnServiceImpl implements IHymnService {
 
 	/**
@@ -92,6 +89,11 @@ public class HymnServiceImpl implements IHymnService {
 	 * Korean Language
 	 */
 	private static final String KR = "Korean";
+
+	/**
+	 * ログ
+	 */
+	private static final Logger log = LogManager.getLogger(HymnServiceImpl.class);
 
 	/**
 	 * ランドム選択
@@ -169,6 +171,24 @@ public class HymnServiceImpl implements IHymnService {
 	private final Cache<Object, Object> nlpCache;
 
 	private final StudentRepository studentRepository;
+
+	/**
+	 * コンストラクタ
+	 *
+	 * @param hymnMapper
+	 * @param hymnRepository
+	 * @param hymnWorkRepository
+	 * @param studentRepository
+	 */
+	protected HymnServiceImpl(final Cache<Object, Object> nlpCache, final HymnMapper hymnMapper,
+			final HymnRepository hymnRepository, final HymnWorkRepository hymnWorkRepository,
+			final StudentRepository studentRepository) {
+		this.nlpCache = nlpCache;
+		this.hymnMapper = hymnMapper;
+		this.hymnRepository = hymnRepository;
+		this.hymnWorkRepository = hymnWorkRepository;
+		this.studentRepository = studentRepository;
+	}
 
 	@Transactional(readOnly = true)
 	@Override

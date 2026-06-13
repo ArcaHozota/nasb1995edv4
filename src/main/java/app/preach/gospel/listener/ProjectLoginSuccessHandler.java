@@ -2,6 +2,8 @@ package app.preach.gospel.listener;
 
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -13,7 +15,6 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * ログインコントローラ
@@ -21,9 +22,10 @@ import lombok.extern.log4j.Log4j2;
  * @author ArkamaHozota
  * @since 2.16
  */
-@Log4j2
 @Component
 public class ProjectLoginSuccessHandler implements AuthenticationSuccessHandler {
+
+	private static final Logger log = LogManager.getLogger(ProjectLoginSuccessHandler.class);
 
 	/**
 	 * 奉仕者サービスインターフェス

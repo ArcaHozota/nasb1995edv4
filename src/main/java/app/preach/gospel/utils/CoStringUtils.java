@@ -15,8 +15,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import app.preach.gospel.common.ProjectConstants;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 /**
  * プロジェクト共通ツール
@@ -24,7 +22,6 @@ import lombok.NoArgsConstructor;
  * @author ArkamaHozota
  * @since 1.00beta
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CoStringUtils {
 
 	/**

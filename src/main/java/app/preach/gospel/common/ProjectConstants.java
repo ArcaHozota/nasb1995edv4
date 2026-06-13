@@ -1,15 +1,11 @@
 package app.preach.gospel.common;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 /**
  * プロジェクトコンスタント
  *
  * @author ArkamaHozota
  * @since 1.00beta
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ProjectConstants {
 
 	public static final String ATTRNAME_EDITED_INFO = "arawaseta";

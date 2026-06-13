@@ -1,5 +1,7 @@
 package app.preach.gospel.config;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -19,9 +21,6 @@ import app.preach.gospel.common.ProjectConstants;
 import app.preach.gospel.listener.ProjectLoginSuccessHandler;
 import app.preach.gospel.listener.ProjectLogoutSuccessHandler;
 import app.preach.gospel.listener.ProjectUserDetailsService;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * SpringSecurity配置クラス
@@ -29,10 +28,8 @@ import lombok.extern.log4j.Log4j2;
  * @author ArkamaHozota
  * @since 1.00beta
  */
-@Log4j2
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class SpringSecurityConfiguration {
 
 	/**
@@ -42,6 +39,8 @@ public class SpringSecurityConfiguration {
 			"/home/to-login-with-error", "/error-page2", "/static/**", "/swagger-ui/**", "/v3/api-docs/**",
 			"/hymns/pagination", "/hymns/get-info-id", "/hymns/get-records", "/hymns/kanumi-retrieve",
 			"/hymns/random-retrieve", "/hymns/score-download" };
+
+	private static final Logger log = LogManager.getLogger(SpringSecurityConfiguration.class);
 
 	/**
 	 * ログインエラー処理
@@ -62,6 +61,24 @@ public class SpringSecurityConfiguration {
 	 * ログインDTOサービス
 	 */
 	private final ProjectUserDetailsService projectUserDetailsService;
+
+	/**
+	 * コンストラクタ
+	 *
+	 * @param projectAuthenticationEntryPoint
+	 * @param projectLoginSuccessHandler
+	 * @param projectLogoutSuccessHandler
+	 * @param projectUserDetailsService
+	 */
+	protected SpringSecurityConfiguration(final ProjectAuthenticationEntryPoint projectAuthenticationEntryPoint,
+			final ProjectLoginSuccessHandler projectLoginSuccessHandler,
+			final ProjectLogoutSuccessHandler projectLogoutSuccessHandler,
+			final ProjectUserDetailsService projectUserDetailsService) {
+		this.projectAuthenticationEntryPoint = projectAuthenticationEntryPoint;
+		this.projectLoginSuccessHandler = projectLoginSuccessHandler;
+		this.projectLogoutSuccessHandler = projectLogoutSuccessHandler;
+		this.projectUserDetailsService = projectUserDetailsService;
+	}
 
 	@Bean
 	@Order(1)

@@ -8,8 +8,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import app.preach.gospel.dto.StudentDto;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 /**
  * User拡張クラス(SpringSecurity関連)
@@ -17,8 +15,6 @@ import lombok.Getter;
  * @author ArkamaHozota
  * @since 1.00beta
  */
-@Getter
-@EqualsAndHashCode(callSuper = false)
 public final class ProjectSecurityAdmin extends User {
 
 	@Serial
@@ -38,6 +34,10 @@ public final class ProjectSecurityAdmin extends User {
 	ProjectSecurityAdmin(final @NotNull StudentDto admin, final Collection<SimpleGrantedAuthority> authorities) {
 		super(admin.loginAccount(), admin.password(), true, true, true, true, authorities);
 		this.originalAdmin = admin;
+	}
+
+	public StudentDto getOriginalAdmin() {
+		return this.originalAdmin;
 	}
 
 }
