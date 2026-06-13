@@ -97,8 +97,8 @@ public class StudentServiceImpl implements IStudentService {
 				return CoResult.err(new DataRetrievalFailureException(ProjectConstants.MESSAGE_STRING_NO_CHANGE));
 			}
 			// 4. 更新用レコードの生成（不変オブジェクトのため、新しいインスタンスを作成）
-			final String newPassword = passwordMatch ? existing.password() : ENCODER.encode(studentDto.password());
-			final Student updated = new Student(existing.id(), studentDto.loginAccount(), newPassword,
+			final var newPassword = passwordMatch ? existing.password() : ENCODER.encode(studentDto.password());
+			final var updated = new Student(existing.id(), studentDto.loginAccount(), newPassword,
 					studentDto.username(), LocalDate.parse(studentDto.dateOfBirth(), FORMATTER), studentDto.email(),
 					existing.roleId(), // 必要に応じて変更
 					existing.updatedTime(), // タイムスタンプ維持

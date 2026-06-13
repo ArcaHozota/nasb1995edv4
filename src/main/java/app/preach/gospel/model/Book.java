@@ -10,5 +10,5 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author ArkamaHozota
  */
 @Table("BOOKS")
-public record Book(@Id @Column("ID") Integer id, @Column("NAME") String name, @Column("NAME_JP") String nameJp) {
+public record Book(@Id @Column("ID") Short id, @Column("NAME") String name, @Column("NAME_JP") String nameJp) {
 }
