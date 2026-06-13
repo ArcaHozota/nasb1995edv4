@@ -94,20 +94,20 @@ public class BookServiceImpl implements IBookService {
 			// 3. 英語テキストの処理と改行フラグの判定
 			final String textEnInput = phraseDto.textEn();
 			final String textEn;
-			final Boolean changeLine;
+			final String changeLine;
 			if (textEnInput != null && textEnInput.endsWith("#")) {
 				textEn = textEnInput.replace("#", CoStringUtils.EMPTY_STRING);
-				changeLine = Boolean.TRUE;
+				changeLine = Boolean.TRUE.toString();
 			} else {
 				textEn = textEnInput;
-				changeLine = Boolean.FALSE;
+				changeLine = Boolean.FALSE.toString();
 			}
 			// 4. 既存レコードの確認（UPSERTロジックの判定）
 			final var existingPhrase = this.verseRepository.findById(targetPhraseId);
 			if (existingPhrase.isPresent()) {
 				// 更新用インスタンスを生成
 				final var updatedPhrase = new Verse(targetPhraseId, phraseName, textEn, phraseDto.textJp(), chapterId,
-						changeLine);
+						changeLine, false);
 				this.verseRepository.save(updatedPhrase);
 				return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 			}
