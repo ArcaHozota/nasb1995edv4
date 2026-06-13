@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.preach.gospel.dao.RoleDao">
+
+	<resultMap id="roleResultMap"
+		type="app.preach.gospel.model.Role">
+		<constructor>
+			<idArg column="ID" javaType="Long" />
+			<arg column="NAME" javaType="String" />
+			<arg column="VISIBLE_FLG" javaType="String" />
+		</constructor>
+	</resultMap>
+
+	<!-- 全役割を取得 -->
+	<select id="selectAll" resultMap="roleResultMap">
+		SELECT RO.ID, RO.NAME, RO.VISIBLE_FLG
+		FROM ROLES RO
+		ORDER BY ID ASC
+	</select>
+
+	<!-- IDで1件取得 -->
+	<select id="selectById" resultMap="roleResultMap">
+		SELECT RO.ID, RO.NAME, RO.VISIBLE_FLG
+		FROM ROLES RO
+		WHERE RO.ID = #{id}
+	</select>
+
+	<!-- IDで有効な役割を1件取得 -->
+	<select id="selectByIdAndVisibleFlgTrue"
+		resultMap="roleResultMap">
+		SELECT RO.ID, RO.NAME, RO.VISIBLE_FLG
+		FROM ROLES RO
+		WHERE RO.ID = #{id}
+		AND RO.VISIBLE_FLG = 'true'
+	</select>
+
+	<!-- 役割を1件登録 -->
+	<insert id="insert">
+		INSERT INTO ROLES (ID, NAME, VISIBLE_FLG)
+		VALUES (#{id}, #{name}, #{visibleFlg})
+	</insert>
+
+	<!-- 役割を1件更新 -->
+	<update id="update">
+		UPDATE ROLES
+		SET NAME = #{name},
+		VISIBLE_FLG = #{visibleFlg}
+		WHERE ID = #{id}
+	</update>
+
+	<!-- 中間テーブル(ROLE_AUTH)に権限を追加 -->
+	<insert id="insertRoleAuth">
+		INSERT INTO ROLE_AUTH (ROLE_ID, AUTH_ID)
+		VALUES (#{roleId}, #{authId})
+	</insert>
+
+	<!-- 中間テーブル(ROLE_AUTH)から指定役割の権限を全削除 -->
+	<delete id="deleteRoleAuthByRoleId">
+		DELETE FROM ROLE_AUTH
+		WHERE ROLE_ID = #{roleId}
+	</delete>
+
+</mapper>

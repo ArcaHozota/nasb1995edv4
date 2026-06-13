@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.preach.gospel.dao.AuthorityDao">
+
+	<resultMap id="authorityResultMap"
+		type="app.preach.gospel.model.Authority">
+		<constructor>
+			<idArg column="ID" javaType="Long" />
+			<arg column="NAME" javaType="String" />
+			<arg column="TITLE" javaType="String" />
+			<arg column="CATEGORY_ID" javaType="Long" />
+		</constructor>
+	</resultMap>
+
+	<!-- 全権限を取得 -->
+	<select id="selectAll" resultMap="authorityResultMap">
+		SELECT AU.ID, AU.NAME,
+		AU.TITLE, AU.CATEGORY_ID
+		FROM AUTHORITIES AU
+		ORDER BY AU.ID ASC
+	</select>
+
+	<!-- IDリストで権限を取得 -->
+	<select id="selectByIds" resultMap="authorityResultMap">
+		SELECT AU.ID, AU.NAME,
+		AU.TITLE, AU.CATEGORY_ID
+		FROM AUTHORITIES AU
+		WHERE AU.ID IN
+		<foreach collection="list" item="id" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</select>
+
+	<!-- IDで1件取得 -->
+	<select id="selectById" resultMap="authorityResultMap">
+		SELECT AU.ID, AU.NAME,
+		AU.TITLE, AU.CATEGORY_ID
+		FROM AUTHORITIES AU
+		WHERE AU.ID = #{id}
+	</select>
+
+</mapper>

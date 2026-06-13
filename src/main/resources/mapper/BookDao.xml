@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.preach.gospel.dao.BookDao">
+
+	<resultMap id="bookResultMap"
+		type="app.preach.gospel.model.Book">
+		<constructor>
+			<idArg column="ID" javaType="Short" />
+			<arg column="NAME" javaType="String" />
+			<arg column="NAME_JP" javaType="String" />
+		</constructor>
+	</resultMap>
+
+	<!-- ID昇順で全書別を取得 -->
+	<select id="selectAllOrderByIdAsc" resultMap="bookResultMap">
+		SELECT BK.ID, BK.NAME, BK.NAME_JP
+		FROM BOOKS BK
+		ORDER BY BK.ID ASC
+	</select>
+
+	<!-- IDで1件取得 -->
+	<select id="selectById" resultMap="bookResultMap">
+		SELECT BK.ID, BK.NAME, BK.NAME_JP
+		FROM BOOKS BK
+		WHERE BK.ID = #{id}
+	</select>
+
+</mapper>

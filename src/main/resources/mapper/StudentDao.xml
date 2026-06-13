@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.preach.gospel.dao.StudentDao">
+
+	<resultMap id="studentResultMap"
+		type="app.preach.gospel.model.Student">
+		<constructor>
+			<idArg column="ID" javaType="Long" />
+			<arg column="LOGIN_ACCOUNT" javaType="String" />
+			<arg column="PASSWORD" javaType="String" />
+			<arg column="USERNAME" javaType="String" />
+			<arg column="DATE_OF_BIRTH" javaType="java.time.LocalDate" />
+			<arg column="EMAIL" javaType="String" />
+			<arg column="ROLE_ID" javaType="Long" />
+			<arg column="UPDATED_TIME" javaType="java.time.LocalDateTime" />
+			<arg column="VISIBLE_FLG" javaType="String" />
+		</constructor>
+	</resultMap>
+
+	<!-- 有効かつログインアカウントに一致する件数を取得（重複チェック用） -->
+	<select id="countByLoginAccountAndVisibleFlgTrue"
+		resultType="int">
+		SELECT COUNT(1)
+		FROM STUDENTS ST
+		WHERE ST.VISIBLE_FLG = 'true'
+		AND ST.LOGIN_ACCOUNT = #{loginAccount}
+	</select>
+
+	<!-- 有効かつログインアカウントに一致し、指定IDを除く件数を取得（重複チェック用） -->
+	<select id="countByLoginAccountAndVisibleFlgTrueAndIdNot"
+		resultType="int">
+		SELECT COUNT(1)
+		FROM STUDENTS ST
+		WHERE ST.VISIBLE_FLG = 'true'
+		AND ST.ID &lt;&gt; #{id}
+		AND ST.LOGIN_ACCOUNT = #{loginAccount}
+	</select>
+
+	<!-- アカウント名またはメールアドレスで有効な奉仕者を検索 -->
+	<select id="selectActiveByUsernameOrEmail"
+		resultMap="studentResultMap">
+		SELECT ST.ID, ST.LOGIN_ACCOUNT, ST.PASSWORD, ST.USERNAME, ST.DATE_OF_BIRTH, ST.EMAIL, ST.ROLE_ID,
+		ST.UPDATED_TIME, ST.VISIBLE_FLG
+		FROM STUDENTS ST
+		WHERE ST.VISIBLE_FLG = 'true'
+		AND (ST.LOGIN_ACCOUNT = #{username} OR ST.EMAIL = #{username})
+	</select>
+
+	<!-- IDで有効な奉仕者を1件取得 -->
+	<select id="selectByIdAndVisibleFlgTrue"
+		resultMap="studentResultMap">
+		SELECT ST.ID, ST.LOGIN_ACCOUNT, ST.PASSWORD, ST.USERNAME, ST.DATE_OF_BIRTH, ST.EMAIL, ST.ROLE_ID,
+		ST.UPDATED_TIME, ST.VISIBLE_FLG
+		FROM STUDENTS ST
+		WHERE ST.VISIBLE_FLG = 'true'
+		AND ST.ID = #{id}
+	</select>
+
+	<!-- ログインアカウントで有効な奉仕者を1件取得 -->
+	<select id="selectByVisibleFlgTrueAndLoginAccount"
+		resultMap="studentResultMap">
+		SELECT ST.ID, ST.LOGIN_ACCOUNT, ST.PASSWORD, ST.USERNAME, ST.DATE_OF_BIRTH, ST.EMAIL, ST.ROLE_ID,
+		ST.UPDATED_TIME, ST.VISIBLE_FLG
+		FROM STUDENTS ST
+		WHERE ST.VISIBLE_FLG = 'true'
+		AND ST.LOGIN_ACCOUNT = #{loginAccount}
+	</select>
+
+	<!-- 奉仕者を1件登録 -->
+	<insert id="insert">
+		INSERT INTO STUDENTS (ID, LOGIN_ACCOUNT, PASSWORD, USERNAME, DATE_OF_BIRTH,
+		EMAIL, ROLE_ID, UPDATED_TIME, VISIBLE_FLG)
+		VALUES (#{id}, #{loginAccount}, #{password}, #{username}, #{dateOfBirth},
+		#{email}, #{roleId}, #{updatedTime}, #{visibleFlg})
+	</insert>
+
+	<!-- 奉仕者を1件更新 -->
+	<update id="update">
+		UPDATE STUDENTS
+		SET LOGIN_ACCOUNT = #{loginAccount},
+		PASSWORD = #{password},
+		USERNAME = #{username},
+		DATE_OF_BIRTH = #{dateOfBirth},
+		EMAIL = #{email},
+		ROLE_ID = #{roleId},
+		UPDATED_TIME = #{updatedTime},
+		VISIBLE_FLG = #{visibleFlg}
+		WHERE ID = #{id}
+	</update>
+
+	<!-- 奉仕者を論理削除 -->
+	<update id="deleteLogically">
+		UPDATE STUDENTS
+		SET VISIBLE_FLG = 'false'
+		WHERE ID = #{id}
+	</update>
+
+</mapper>
