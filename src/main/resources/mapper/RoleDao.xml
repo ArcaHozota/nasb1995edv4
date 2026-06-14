@@ -34,7 +34,11 @@
 		SELECT RO.ID, RO.NAME,
 		RO.VISIBLE_FLG
 		FROM ROLES RO
-		WHERE RO.ID = #{id}
+		<where>
+			<if test="id != null and id != ''">
+				RO.ID = #{id}
+			</if>
+		</where>
 	</select>
 
 	<!-- IDで有効な役割を1件取得 -->
@@ -42,9 +46,12 @@
 		resultMap="roleResultMap">
 		SELECT RO.ID, RO.NAME, RO.VISIBLE_FLG
 		FROM ROLES RO
-		WHERE
-		RO.ID = #{id}
-		AND RO.VISIBLE_FLG = 'true'
+		<where>
+			RO.VISIBLE_FLG = 'true'
+			<if test="id != null and id != ''">
+				AND RO.ID = #{id}
+			</if>
+		</where>
 	</select>
 
 	<!-- 役割を1件登録 -->
@@ -57,18 +64,21 @@
 	<!-- 役割を1件更新 -->
 	<update id="update">
 		UPDATE ROLES
-		SET NAME = #{name},
-		VISIBLE_FLG =
-		#{visibleFlg}
-		WHERE ID = #{id}
+		<set>
+			<if test="name != null and name != ''">NAME = #{name},</if>
+		</set>
+		WHERE ID = #{id} AND VISIBLE_FLG = 'true'
 	</update>
 
 	<!-- 中間テーブル(ROLE_AUTH)に権限を検索 -->
 	<select id="selectRoleAuthByRoleId"
 		resultMap="roleAuthResultMap">
 		SELECT RA.ROLE_ID, RA.AUTH_ID FROM ROLE_AUTH RA
-		WHERE
-		RA.ROLE_ID = #{roleId}
+		<where>
+			<if test="roleId != null and roleId != ''">
+				RA.ROLE_ID = #{roleId}
+			</if>
+		</where>
 	</select>
 
 	<!-- 中間テーブル(ROLE_AUTH)に権限を追加 -->
@@ -81,7 +91,11 @@
 	<!-- 中間テーブル(ROLE_AUTH)から指定役割の権限を全削除 -->
 	<delete id="deleteRoleAuthByRoleId">
 		DELETE FROM ROLE_AUTH
-		WHERE ROLE_ID = #{roleId}
+		<where>
+			<if test="roleId != null and roleId != ''">
+				ROLE_ID = #{roleId}
+			</if>
+		</where>
 	</delete>
 
 </mapper>

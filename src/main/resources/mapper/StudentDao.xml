@@ -4,123 +4,129 @@
 
 <mapper namespace="app.preach.gospel.dao.StudentDao">
 
-    <resultMap id="studentResultMap" type="app.preach.gospel.model.Student">
-        <constructor>
-            <idArg column="ID"            javaType="Long"                    />
-            <arg   column="LOGIN_ACCOUNT" javaType="String"                  />
-            <arg   column="PASSWORD"      javaType="String"                  />
-            <arg   column="USERNAME"      javaType="String"                  />
-            <arg   column="DATE_OF_BIRTH" javaType="java.time.LocalDate"     />
-            <arg   column="EMAIL"         javaType="String"                  />
-            <arg   column="ROLE_ID"       javaType="Long"                    />
-            <arg   column="UPDATED_TIME"  javaType="java.time.LocalDateTime" />
-            <arg   column="VISIBLE_FLG"   javaType="String"                  />
-        </constructor>
-    </resultMap>
+	<resultMap id="studentResultMap"
+		type="app.preach.gospel.model.Student">
+		<constructor>
+			<idArg column="ID" javaType="Long" />
+			<arg column="LOGIN_ACCOUNT" javaType="String" />
+			<arg column="PASSWORD" javaType="String" />
+			<arg column="USERNAME" javaType="String" />
+			<arg column="DATE_OF_BIRTH" javaType="java.time.LocalDate" />
+			<arg column="EMAIL" javaType="String" />
+			<arg column="ROLE_ID" javaType="Long" />
+			<arg column="UPDATED_TIME" javaType="java.time.LocalDateTime" />
+			<arg column="VISIBLE_FLG" javaType="String" />
+		</constructor>
+	</resultMap>
 
-    <!-- 有効かつログインアカウントに一致する件数を取得（重複チェック用） -->
-    <select id="countByLoginAccountAndVisibleFlgTrue" resultType="int">
-        SELECT COUNT(1)
-        FROM STUDENTS ST
-        <where>
-            ST.VISIBLE_FLG = 'true'
-            <if test="loginAccount != null and loginAccount != ''">
-                AND ST.LOGIN_ACCOUNT = #{loginAccount}
-            </if>
-        </where>
-    </select>
+	<!-- 有効かつログインアカウントに一致する件数を取得（重複チェック用） -->
+	<select id="countByLoginAccountAndVisibleFlgTrue"
+		resultType="int">
+		SELECT COUNT(1)
+		FROM STUDENTS ST
+		<where>
+			ST.VISIBLE_FLG = 'true'
+			<if test="loginAccount != null and loginAccount != ''">
+				AND ST.LOGIN_ACCOUNT = #{loginAccount}
+			</if>
+		</where>
+	</select>
 
-    <!-- 有効かつログインアカウントに一致し、指定IDを除く件数を取得（重複チェック用） -->
-    <select id="countByLoginAccountAndVisibleFlgTrueAndIdNot" resultType="int">
-        SELECT COUNT(1)
-        FROM STUDENTS ST
-        <where>
-            ST.VISIBLE_FLG = 'true'
-            <if test="id != null">
-                AND ST.ID &lt;&gt; #{id}
-            </if>
-            <if test="loginAccount != null and loginAccount != ''">
-                AND ST.LOGIN_ACCOUNT = #{loginAccount}
-            </if>
-        </where>
-    </select>
+	<!-- 有効かつログインアカウントに一致し、指定IDを除く件数を取得（重複チェック用） -->
+	<select id="countByLoginAccountAndVisibleFlgTrueAndIdNot"
+		resultType="int">
+		SELECT COUNT(1)
+		FROM STUDENTS ST
+		<where>
+			ST.VISIBLE_FLG = 'true'
+			<if test="id != null">
+				AND ST.ID &lt;&gt; #{id}
+			</if>
+			<if test="loginAccount != null and loginAccount != ''">
+				AND ST.LOGIN_ACCOUNT = #{loginAccount}
+			</if>
+		</where>
+	</select>
 
-    <!-- アカウント名またはメールアドレスで有効な奉仕者を検索 -->
-    <select id="selectActiveByUsernameOrEmail" resultMap="studentResultMap">
-        SELECT ST.ID, ST.LOGIN_ACCOUNT, ST.PASSWORD, ST.USERNAME,
-               ST.DATE_OF_BIRTH, ST.EMAIL, ST.ROLE_ID,
-               ST.UPDATED_TIME, ST.VISIBLE_FLG
-        FROM STUDENTS ST
-        <where>
-            ST.VISIBLE_FLG = 'true'
-            <if test="username != null and username != ''">
-                AND (ST.LOGIN_ACCOUNT = #{username} OR ST.EMAIL = #{username})
-            </if>
-        </where>
-    </select>
+	<!-- アカウント名またはメールアドレスで有効な奉仕者を検索 -->
+	<select id="selectActiveByUsernameOrEmail"
+		resultMap="studentResultMap">
+		SELECT ST.ID, ST.LOGIN_ACCOUNT, ST.PASSWORD, ST.USERNAME,
+		ST.DATE_OF_BIRTH, ST.EMAIL, ST.ROLE_ID,
+		ST.UPDATED_TIME, ST.VISIBLE_FLG
+		FROM STUDENTS ST
+		<where>
+			ST.VISIBLE_FLG = 'true'
+			<if test="username != null and username != ''">
+				AND (ST.LOGIN_ACCOUNT = #{username} OR ST.EMAIL = #{username})
+			</if>
+		</where>
+	</select>
 
-    <!-- IDで有効な奉仕者を1件取得 -->
-    <select id="selectByIdAndVisibleFlgTrue" resultMap="studentResultMap">
-        SELECT ST.ID, ST.LOGIN_ACCOUNT, ST.PASSWORD, ST.USERNAME,
-               ST.DATE_OF_BIRTH, ST.EMAIL, ST.ROLE_ID,
-               ST.UPDATED_TIME, ST.VISIBLE_FLG
-        FROM STUDENTS ST
-        <where>
-            ST.VISIBLE_FLG = 'true'
-            <if test="id != null">
-                AND ST.ID = #{id}
-            </if>
-        </where>
-    </select>
+	<!-- IDで有効な奉仕者を1件取得 -->
+	<select id="selectByIdAndVisibleFlgTrue"
+		resultMap="studentResultMap">
+		SELECT ST.ID, ST.LOGIN_ACCOUNT, ST.PASSWORD, ST.USERNAME,
+		ST.DATE_OF_BIRTH, ST.EMAIL, ST.ROLE_ID,
+		ST.UPDATED_TIME, ST.VISIBLE_FLG
+		FROM STUDENTS ST
+		<where>
+			ST.VISIBLE_FLG = 'true'
+			<if test="id != null">
+				AND ST.ID = #{id}
+			</if>
+		</where>
+	</select>
 
-    <!-- ログインアカウントで有効な奉仕者を1件取得 -->
-    <select id="selectByVisibleFlgTrueAndLoginAccount" resultMap="studentResultMap">
-        SELECT ST.ID, ST.LOGIN_ACCOUNT, ST.PASSWORD, ST.USERNAME,
-               ST.DATE_OF_BIRTH, ST.EMAIL, ST.ROLE_ID,
-               ST.UPDATED_TIME, ST.VISIBLE_FLG
-        FROM STUDENTS ST
-        <where>
-            ST.VISIBLE_FLG = 'true'
-            <if test="loginAccount != null and loginAccount != ''">
-                AND ST.LOGIN_ACCOUNT = #{loginAccount}
-            </if>
-        </where>
-    </select>
+	<!-- ログインアカウントで有効な奉仕者を1件取得 -->
+	<select id="selectByVisibleFlgTrueAndLoginAccount"
+		resultMap="studentResultMap">
+		SELECT ST.ID, ST.LOGIN_ACCOUNT, ST.PASSWORD, ST.USERNAME,
+		ST.DATE_OF_BIRTH, ST.EMAIL, ST.ROLE_ID,
+		ST.UPDATED_TIME, ST.VISIBLE_FLG
+		FROM STUDENTS ST
+		<where>
+			ST.VISIBLE_FLG = 'true'
+			<if test="loginAccount != null and loginAccount != ''">
+				AND ST.LOGIN_ACCOUNT = #{loginAccount}
+			</if>
+		</where>
+	</select>
 
-    <!-- 奉仕者を1件登録 -->
-    <insert id="insert">
-        INSERT INTO STUDENTS (
-            ID, LOGIN_ACCOUNT, PASSWORD, USERNAME, DATE_OF_BIRTH,
-            EMAIL, ROLE_ID, UPDATED_TIME, VISIBLE_FLG
-        ) VALUES (
-            #{id}, #{loginAccount}, #{password}, #{username}, #{dateOfBirth},
-            #{email}, #{roleId}, #{updatedTime}, #{visibleFlg}
-        )
-    </insert>
+	<!-- 奉仕者を1件登録 -->
+	<insert id="insert">
+		INSERT INTO STUDENTS (
+		ID, LOGIN_ACCOUNT, PASSWORD, USERNAME, DATE_OF_BIRTH,
+		EMAIL, ROLE_ID, UPDATED_TIME, VISIBLE_FLG
+		) VALUES (
+		#{id}, #{loginAccount}, #{password}, #{username}, #{dateOfBirth},
+		#{email}, #{roleId}, #{updatedTime}, #{visibleFlg}
+		)
+	</insert>
 
-    <!-- 奉仕者を1件更新 -->
-    <update id="update">
-        UPDATE STUDENTS
-        <set>
-            <if test="loginAccount != null">LOGIN_ACCOUNT = #{loginAccount},</if>
-            <if test="password != null">PASSWORD          = #{password},</if>
-            <if test="username != null">USERNAME          = #{username},</if>
-            <if test="dateOfBirth != null">DATE_OF_BIRTH  = #{dateOfBirth},</if>
-            <if test="email != null">EMAIL               = #{email},</if>
-            <if test="roleId != null">ROLE_ID             = #{roleId},</if>
-            <if test="updatedTime != null">UPDATED_TIME   = #{updatedTime},</if>
-            <if test="visibleFlg != null">VISIBLE_FLG     = #{visibleFlg},</if>
-        </set>
-        WHERE ID = #{id}
-    </update>
+	<!-- 奉仕者を1件更新 -->
+	<update id="update">
+		UPDATE STUDENTS
+		<set>
+			<if test="loginAccount != null">LOGIN_ACCOUNT = #{loginAccount},</if>
+			<if test="password != null">PASSWORD = #{password},</if>
+			<if test="username != null">USERNAME = #{username},</if>
+			<if test="dateOfBirth != null">DATE_OF_BIRTH = #{dateOfBirth},</if>
+			<if test="email != null">EMAIL = #{email},</if>
+			<if test="roleId != null">ROLE_ID = #{roleId},</if>
+			<if test="updatedTime != null">UPDATED_TIME = #{updatedTime},</if>
+			<if test="visibleFlg != null">VISIBLE_FLG = #{visibleFlg},</if>
+		</set>
+		WHERE ID = #{id}
+	</update>
 
-    <!-- 奉仕者を論理削除 -->
-    <update id="deleteLogically">
-        UPDATE STUDENTS
-        <set>
-            VISIBLE_FLG = 'false'
-        </set>
-        WHERE ID = #{id}
-    </update>
+	<!-- 奉仕者を論理削除 -->
+	<update id="deleteLogically">
+		UPDATE STUDENTS
+		<set>
+			VISIBLE_FLG = 'false'
+		</set>
+		WHERE ID = #{id}
+	</update>
 
 </mapper>
