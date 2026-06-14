@@ -600,7 +600,7 @@ public class HymnServiceImpl implements IHymnService {
 	@Transactional
 	@Override
 	public CoResult<String, DataAccessException> infoUpdate(final @NotNull HymnDto hymnDto) {
-		final LocalDateTime updateTime = LocalDateTime.now();
+		final var updateTime = LocalDateTime.now();
 		try {
 			final var targetId = Long.valueOf(hymnDto.id());
 			// 既存の最新データをDBから直接取得（jOOQのセーブポイント比較に準拠）
