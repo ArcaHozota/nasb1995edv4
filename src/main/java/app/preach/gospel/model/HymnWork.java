@@ -1,9 +1,14 @@
 package app.preach.gospel.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
 /**
  * 賛美歌楽譜テーブル
  *
  * @author ArkamaHozota
  */
-public record HymnWork(Long id, Long workId, byte[] score) {
+@Table("HYMNS_WORK")
+public record HymnWork(@Id @Column("ID") Long id, @Column("WORK_ID") Long workId, @Column("SCORE") byte[] score) {
 }

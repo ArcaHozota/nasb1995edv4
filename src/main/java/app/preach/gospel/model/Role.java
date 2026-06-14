@@ -1,16 +1,31 @@
 package app.preach.gospel.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
+import org.springframework.data.relational.core.mapping.Table;
+
 /**
  * 役割テーブル
  *
- * <p>MyBatis移行により以下を変更:</p>
- * <ul>
- *   <li>Spring Data JDBC固有アノテーション(@Table/@Column/@MappedCollection)を除去</li>
- *   <li>Set&lt;AuthorityRef&gt;を除去 → ROLE_AUTHへのアクセスはRoleMapperで管理</li>
- *   <li>withAddedAuthority()を除去 → 権限追加処理はService層でMapperを呼び出す形に移行</li>
- * </ul>
- *
  * @author ArkamaHozota
  */
-public record Role(Long id, String name, String visibleFlg) {
+@Table("ROLES")
+public record Role(@Id @Column("ID") Long id, @Column("NAME") String name, @Column("VISIBLE_FLG") String visibleFlg,
+		// Spring Data JDBCが自動的に中間テーブル(ROLE_AUTH)と紐付けます
+		// ROLE_AUTHテーブル側の外部キーカラム名を明示的に指定する
+		@MappedCollection(idColumn = "ROLE_ID") Set<AuthorityRef> authorities) {
+
+	/**
+	 * イミュータブルなrecord型で、権限を追加するための便利メソッド（Witherパターン）
+	 */
+	public Role withAddedAuthority(final Long authId) {
+		final var newAuths = new HashSet<AuthorityRef>(this.authorities);
+		newAuths.add(new AuthorityRef(authId));
+		return new Role(this.id, this.name, this.visibleFlg, java.util.Collections.unmodifiableSet(newAuths));
+	}
+
 }
