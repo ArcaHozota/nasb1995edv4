@@ -58,7 +58,8 @@
 		<where>
 			ST.VISIBLE_FLG = 'true'
 			<if test="username != null and username != ''">
-				AND (ST.LOGIN_ACCOUNT = #{username} OR ST.EMAIL = #{username})
+				AND (ST.LOGIN_ACCOUNT = #{username} OR ST.EMAIL =
+				#{username})
 			</if>
 		</where>
 	</select>
@@ -96,10 +97,13 @@
 	<!-- 奉仕者を1件登録 -->
 	<insert id="insert">
 		INSERT INTO STUDENTS (
-		ID, LOGIN_ACCOUNT, PASSWORD, USERNAME, DATE_OF_BIRTH,
+		ID, LOGIN_ACCOUNT, PASSWORD,
+		USERNAME, DATE_OF_BIRTH,
 		EMAIL, ROLE_ID, UPDATED_TIME, VISIBLE_FLG
-		) VALUES (
-		#{id}, #{loginAccount}, #{password}, #{username}, #{dateOfBirth},
+		)
+		VALUES (
+		#{id}, #{loginAccount}, #{password}, #{username},
+		#{dateOfBirth},
 		#{email}, #{roleId}, #{updatedTime}, #{visibleFlg}
 		)
 	</insert>

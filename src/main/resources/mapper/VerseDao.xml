@@ -4,63 +4,68 @@
 
 <mapper namespace="app.preach.gospel.dao.VerseDao">
 
-    <resultMap id="verseResultMap" type="app.preach.gospel.model.Verse">
-        <constructor>
-            <idArg column="ID"          javaType="Long"    />
-            <arg   column="NAME"        javaType="String"  />
-            <arg   column="TEXT_EN"     javaType="String"  />
-            <arg   column="TEXT_JP"     javaType="String"  />
-            <arg   column="CHAPTER_ID"  javaType="Integer" />
-            <arg   column="CHANGE_LINE" javaType="String"  />
-        </constructor>
-    </resultMap>
+	<resultMap id="verseResultMap"
+		type="app.preach.gospel.model.Verse">
+		<constructor>
+			<idArg column="ID" javaType="Long" />
+			<arg column="NAME" javaType="String" />
+			<arg column="TEXT_EN" javaType="String" />
+			<arg column="TEXT_JP" javaType="String" />
+			<arg column="CHAPTER_ID" javaType="Integer" />
+			<arg column="CHANGE_LINE" javaType="String" />
+		</constructor>
+	</resultMap>
 
-    <!-- 全節を取得 -->
-    <select id="selectAll" resultMap="verseResultMap">
-        SELECT VA.ID, VA.NAME, VA.TEXT_EN, VA.TEXT_JP, VA.CHAPTER_ID, VA.CHANGE_LINE
-        FROM VERSES VA
-        ORDER BY VA.ID ASC
-    </select>
+	<!-- 全節を取得 -->
+	<select id="selectAll" resultMap="verseResultMap">
+		SELECT VA.ID, VA.NAME, VA.TEXT_EN, VA.TEXT_JP, VA.CHAPTER_ID, VA.CHANGE_LINE
+		FROM VERSES VA
+		ORDER BY VA.ID ASC
+	</select>
 
-    <!-- IDで1件取得 -->
-    <select id="selectById" resultMap="verseResultMap">
-        SELECT VA.ID, VA.NAME, VA.TEXT_EN, VA.TEXT_JP, VA.CHAPTER_ID, VA.CHANGE_LINE
-        FROM VERSES VA
-        <where>
-            <if test="id != null">
-                VA.ID = #{id}
-            </if>
-        </where>
-    </select>
+	<!-- IDで1件取得 -->
+	<select id="selectById" resultMap="verseResultMap">
+		SELECT VA.ID, VA.NAME, VA.TEXT_EN, VA.TEXT_JP, VA.CHAPTER_ID,
+		VA.CHANGE_LINE
+		FROM VERSES VA
+		<where>
+			<if test="id != null">
+				VA.ID = #{id}
+			</if>
+		</where>
+	</select>
 
-    <!-- chapterId指定でID昇順に取得 -->
-    <select id="selectByChapterIdOrderByIdAsc" resultMap="verseResultMap">
-        SELECT VA.ID, VA.NAME, VA.TEXT_EN, VA.TEXT_JP, VA.CHAPTER_ID, VA.CHANGE_LINE
-        FROM VERSES VA
-        <where>
-            <if test="chapterId != null">
-                VA.CHAPTER_ID = #{chapterId}
-            </if>
-        </where>
-        ORDER BY VA.ID ASC
-    </select>
+	<!-- chapterId指定でID昇順に取得 -->
+	<select id="selectByChapterIdOrderByIdAsc"
+		resultMap="verseResultMap">
+		SELECT VA.ID, VA.NAME, VA.TEXT_EN, VA.TEXT_JP, VA.CHAPTER_ID,
+		VA.CHANGE_LINE
+		FROM VERSES VA
+		<where>
+			<if test="chapterId != null">
+				VA.CHAPTER_ID = #{chapterId}
+			</if>
+		</where>
+		ORDER BY VA.ID ASC
+	</select>
 
-    <!-- 聖書節を1件登録 -->
-    <insert id="insert">
-        INSERT INTO VERSES (ID, NAME, TEXT_EN, TEXT_JP, CHAPTER_ID, CHANGE_LINE)
-        VALUES (#{id}, #{name}, #{textEn}, #{textJp}, #{chapterId}, #{changeLine})
-    </insert>
+	<!-- 聖書節を1件登録 -->
+	<insert id="insert">
+		INSERT INTO VERSES (ID, NAME, TEXT_EN, TEXT_JP, CHAPTER_ID, CHANGE_LINE)
+		VALUES (#{id}, #{name}, #{textEn}, #{textJp}, #{chapterId},
+		#{changeLine})
+	</insert>
 
-    <!-- 聖書節を1件更新 -->
-    <update id="update">
-        UPDATE VERSES
-        <set>
-            <if test="name != null">NAME            = #{name},</if>
-            <if test="textEn != null">TEXT_EN        = #{textEn},</if>
-            <if test="textJp != null">TEXT_JP        = #{textJp},</if>
-            <if test="changeLine != null">CHANGE_LINE = #{changeLine},</if>
-        </set>
-        WHERE ID = #{id}
-    </update>
+	<!-- 聖書節を1件更新 -->
+	<update id="update">
+		UPDATE VERSES
+		<set>
+			<if test="name != null">NAME = #{name},</if>
+			<if test="textEn != null">TEXT_EN = #{textEn},</if>
+			<if test="textJp != null">TEXT_JP = #{textJp},</if>
+			<if test="changeLine != null">CHANGE_LINE = #{changeLine},</if>
+		</set>
+		WHERE ID = #{id}
+	</update>
 
 </mapper>

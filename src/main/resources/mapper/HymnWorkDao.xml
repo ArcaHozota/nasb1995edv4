@@ -17,7 +17,8 @@
 	<!-- 楽譜テーブルの全レコード数カウント -->
 	<select id="countAllRecords" resultType="int">
 		SELECT COUNT(1)
-		FROM HYMNS_WORK
+		FROM
+		HYMNS_WORK
 	</select>
 
 	<!-- WORK_IDで楽譜を1件取得 -->
@@ -45,7 +46,8 @@
 	<!-- 楽譜を1件登録 -->
 	<insert id="insert">
 		INSERT INTO HYMNS_WORK (ID, WORK_ID, SCORE)
-		VALUES (#{id}, #{workId}, #{score, jdbcType=BLOB})
+		VALUES
+		(#{id}, #{workId}, #{score, jdbcType=BLOB})
 	</insert>
 
 	<!-- 楽譜を1件更新 -->
