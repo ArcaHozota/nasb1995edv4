@@ -623,15 +623,15 @@ public class HymnServiceImpl implements IHymnService {
 				return CoResult.ok(ProjectConstants.MESSAGE_STRING_NO_CHANGE);
 			}
 			// 変動があった場合のみ永続化
-			final HymnWork existingWork = this.hymnWorkDao.selectByWorkId(targetId)
-					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_HYMNSWORK_NOT_FOUND) {
-					});
+//			final HymnWork existingWork = this.hymnWorkDao.selectByWorkId(targetId)
+//					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_HYMNSWORK_NOT_FOUND) {
+//					});
 			// 更新用インスタンスの作成（時間・ユーザーIDの上書き）
 			final var finalUpdatedHymn = new Hymn(targetId, hymnDto.nameJp(), hymnDto.nameKr(), hymnDto.link(),
 					updateTime, Long.valueOf(hymnDto.updatedUser()), trimmedSerif, Boolean.TRUE.toString(),
 					existingHymn.classical());
-			final var finalUpdatedWork = new HymnWork(existingWork.id(), existingWork.workId(), existingWork.score());
-			this.hymnWorkDao.update(finalUpdatedWork);
+//			final var finalUpdatedWork = new HymnWork(existingWork.id(), existingWork.workId(), existingWork.score());
+//			this.hymnWorkDao.update(finalUpdatedWork);
 			this.hymnDao.update(finalUpdatedHymn);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 		} catch (final DataAccessException e) {
