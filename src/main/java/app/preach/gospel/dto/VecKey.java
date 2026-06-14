@@ -1,4 +1,4 @@
-package app.preach.gospel.dto.dtokey;
+package app.preach.gospel.dto;
 
 /**
  * ベクターキー

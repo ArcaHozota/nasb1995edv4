@@ -41,10 +41,10 @@ import org.springframework.util.CollectionUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.dto.dtokey.DocKey;
-import app.preach.gospel.dto.dtokey.IdfKey;
-import app.preach.gospel.dto.dtokey.TokKey;
-import app.preach.gospel.dto.dtokey.VecKey;
+import app.preach.gospel.dto.DocKey;
+import app.preach.gospel.dto.IdfKey;
+import app.preach.gospel.dto.TokKey;
+import app.preach.gospel.dto.VecKey;
 import app.preach.gospel.mapper.HymnMapper;
 import app.preach.gospel.model.Hymn;
 import app.preach.gospel.model.HymnWork;
