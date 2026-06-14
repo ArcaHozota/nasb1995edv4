@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import app.preach.gospel.dto.StudentDto;
+import app.preach.gospel.pojo.StudentDto;
 
 /**
  * User拡張クラス(SpringSecurity関連)

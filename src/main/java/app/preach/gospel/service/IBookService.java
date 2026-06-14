@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 
-import app.preach.gospel.dto.BookDto;
-import app.preach.gospel.dto.ChapterDto;
-import app.preach.gospel.dto.VerseDto;
+import app.preach.gospel.pojo.BookDto;
+import app.preach.gospel.pojo.ChapterDto;
+import app.preach.gospel.pojo.VerseDto;
 import app.preach.gospel.utils.CoResult;
 
 /**

@@ -12,9 +12,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.dto.StudentDto;
 import app.preach.gospel.model.Authority;
 import app.preach.gospel.model.AuthorityRef;
+import app.preach.gospel.pojo.StudentDto;
 import app.preach.gospel.repository.AuthorityRepository;
 import app.preach.gospel.repository.RoleRepository;
 import app.preach.gospel.repository.StudentRepository;

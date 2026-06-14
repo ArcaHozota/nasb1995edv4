@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.dto.StudentDto;
 import app.preach.gospel.model.Student;
+import app.preach.gospel.pojo.StudentDto;
 import app.preach.gospel.repository.StudentRepository;
 import app.preach.gospel.service.IStudentService;
 import app.preach.gospel.utils.CoResult;

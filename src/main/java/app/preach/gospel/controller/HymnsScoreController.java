@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.dto.HymnDto;
+import app.preach.gospel.pojo.HymnDto;
 import app.preach.gospel.service.IHymnService;
 import app.preach.gospel.utils.CoResult;
 import io.swagger.v3.oas.annotations.Operation;

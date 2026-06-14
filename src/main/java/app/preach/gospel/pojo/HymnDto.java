@@ -1,4 +1,4 @@
-package app.preach.gospel.dto;
+package app.preach.gospel.pojo;
 
 import app.preach.gospel.utils.LineNumber;
 import io.swagger.v3.oas.annotations.media.Schema;

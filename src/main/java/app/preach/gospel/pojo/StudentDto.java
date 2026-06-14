@@ -1,4 +1,4 @@
-package app.preach.gospel.dto;
+package app.preach.gospel.pojo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;

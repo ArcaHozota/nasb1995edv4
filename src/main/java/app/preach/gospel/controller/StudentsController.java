@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.dto.StudentDto;
+import app.preach.gospel.pojo.StudentDto;
 import app.preach.gospel.service.IStudentService;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.CoStringUtils;

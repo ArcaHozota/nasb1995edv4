@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 
-import app.preach.gospel.dto.HymnDto;
+import app.preach.gospel.pojo.HymnDto;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.Pagination;
 

@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.dto.BookDto;
-import app.preach.gospel.dto.ChapterDto;
-import app.preach.gospel.dto.VerseDto;
 import app.preach.gospel.model.Verse;
+import app.preach.gospel.pojo.BookDto;
+import app.preach.gospel.pojo.ChapterDto;
+import app.preach.gospel.pojo.VerseDto;
 import app.preach.gospel.repository.BookRepository;
 import app.preach.gospel.repository.ChapterRepository;
 import app.preach.gospel.repository.VerseRepository;

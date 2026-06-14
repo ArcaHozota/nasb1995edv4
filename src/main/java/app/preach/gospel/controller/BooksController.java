@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import app.preach.gospel.dto.BookDto;
-import app.preach.gospel.dto.ChapterDto;
-import app.preach.gospel.dto.VerseDto;
+import app.preach.gospel.pojo.BookDto;
+import app.preach.gospel.pojo.ChapterDto;
+import app.preach.gospel.pojo.VerseDto;
 import app.preach.gospel.service.IBookService;
 import app.preach.gospel.utils.CoResult;
 import io.swagger.v3.oas.annotations.Operation;
