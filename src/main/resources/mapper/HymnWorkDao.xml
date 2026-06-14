@@ -4,46 +4,56 @@
 
 <mapper namespace="app.preach.gospel.dao.HymnWorkDao">
 
-	<resultMap id="hymnWorkResultMap"
-		type="app.preach.gospel.model.HymnWork">
-		<constructor>
-			<idArg column="ID" javaType="Long" />
-			<arg column="WORK_ID" javaType="Long" />
-			<arg column="SCORE" javaType="[B" />
-		</constructor>
-	</resultMap>
+    <resultMap id="hymnWorkResultMap" type="app.preach.gospel.model.HymnWork">
+        <constructor>
+            <idArg column="ID"      javaType="Long" />
+            <arg   column="WORK_ID" javaType="Long" />
+            <arg   column="SCORE"   javaType="[B"   />
+        </constructor>
+    </resultMap>
 
-	<!-- 楽譜テーブルの全レコード数カウント -->
-	<select id="countAllRecords" resultType="int">
-		SELECT COUNT(1)
-		FROM HYMNS_WORK
-	</select>
+    <!-- 楽譜テーブルの全レコード数カウント -->
+    <select id="countAllRecords" resultType="int">
+        SELECT COUNT(1)
+        FROM HYMNS_WORK
+    </select>
 
-	<!-- WORK_IDで楽譜を1件取得 -->
-	<select id="selectByWorkId" resultMap="hymnWorkResultMap">
-		SELECT HMK.ID, HMK.WORK_ID, HMK.SCORE
-		FROM HYMNS_WORK HMK
-		WHERE WORK_ID = #{workId}
-	</select>
+    <!-- WORK_IDで楽譜を1件取得 -->
+    <select id="selectByWorkId" resultMap="hymnWorkResultMap">
+        SELECT HMK.ID, HMK.WORK_ID, HMK.SCORE
+        FROM HYMNS_WORK HMK
+        <where>
+            <if test="workId != null">
+                HMK.WORK_ID = #{workId}
+            </if>
+        </where>
+    </select>
 
-	<!-- IDで1件取得 -->
-	<select id="selectById" resultMap="hymnWorkResultMap">
-		SELECT HMK.ID, HMK.WORK_ID, HMK.SCORE
-		FROM HYMNS_WORK HMK
-		WHERE HMK.ID = #{id}
-	</select>
+    <!-- IDで1件取得 -->
+    <select id="selectById" resultMap="hymnWorkResultMap">
+        SELECT HMK.ID, HMK.WORK_ID, HMK.SCORE
+        FROM HYMNS_WORK HMK
+        <where>
+            <if test="id != null">
+                HMK.ID = #{id}
+            </if>
+        </where>
+    </select>
 
-	<!-- 楽譜を1件登録 -->
-	<insert id="insert">
-		INSERT INTO HYMNS_WORK (ID, WORK_ID, SCORE)
-		VALUES (#{id}, #{workId}, #{score})
-	</insert>
+    <!-- 楽譜を1件登録 -->
+    <insert id="insert">
+        INSERT INTO HYMNS_WORK (ID, WORK_ID, SCORE)
+        VALUES (#{id}, #{workId}, #{score})
+    </insert>
 
-	<!-- 楽譜を1件更新 -->
-	<update id="update">
-		UPDATE HYMNS_WORK
-		SET SCORE = #{score}
-		WHERE ID = #{id} AND WORK_ID = #{workId}
-	</update>
+    <!-- 楽譜を1件更新 -->
+    <update id="update">
+        UPDATE HYMNS_WORK
+        <set>
+            <if test="score != null">SCORE = #{score}</if>
+        </set>
+        WHERE ID = #{id}
+          AND WORK_ID = #{workId}
+    </update>
 
 </mapper>

@@ -4,182 +4,198 @@
 
 <mapper namespace="app.preach.gospel.dao.HymnDao">
 
-	<resultMap id="hymnResultMap"
-		type="app.preach.gospel.model.Hymn">
-		<constructor>
-			<idArg column="ID" javaType="Long" />
-			<arg column="NAME_JP" javaType="String" />
-			<arg column="NAME_KR" javaType="String" />
-			<arg column="LINK" javaType="String" />
-			<arg column="UPDATED_TIME" javaType="java.time.LocalDateTime" />
-			<arg column="UPDATED_USER" javaType="Long" />
-			<arg column="LYRIC" javaType="String" />
-			<arg column="VISIBLE_FLG" javaType="String" />
-			<arg column="CLASSICAL" javaType="String" />
-		</constructor>
-	</resultMap>
+    <resultMap id="hymnResultMap" type="app.preach.gospel.model.Hymn">
+        <constructor>
+            <idArg column="ID"           javaType="Long"                    />
+            <arg   column="NAME_JP"      javaType="String"                  />
+            <arg   column="NAME_KR"      javaType="String"                  />
+            <arg   column="LINK"         javaType="String"                  />
+            <arg   column="UPDATED_TIME" javaType="java.time.LocalDateTime" />
+            <arg   column="UPDATED_USER" javaType="Long"                    />
+            <arg   column="LYRIC"        javaType="String"                  />
+            <arg   column="VISIBLE_FLG"  javaType="String"                  />
+            <arg   column="CLASSICAL"    javaType="String"                  />
+        </constructor>
+    </resultMap>
 
-	<!-- 有効な賛美歌の全件数を取得 -->
-	<select id="countByVisibleFlgTrue" resultType="long">
-		SELECT COUNT(1)
-		FROM HYMNS HM
-		WHERE HM.VISIBLE_FLG = 'true'
-	</select>
+    <!-- 有効な賛美歌の全件数を取得 -->
+    <select id="countByVisibleFlgTrue" resultType="long">
+        SELECT COUNT(1)
+        FROM HYMNS HM
+        <where>
+            HM.VISIBLE_FLG = 'true'
+        </where>
+    </select>
 
-	<!-- 有効かつ名前(JP)に一致する件数を取得 -->
-	<select id="countByVisibleFlgTrueAndNameJp" resultType="int">
-		SELECT
-		COUNT(1)
-		FROM HYMNS HM
-		WHERE HM.VISIBLE_FLG = 'true'
-		AND HM.NAME_JP =
-		#{nameJp}
-	</select>
+    <!-- 有効かつ名前(JP)に一致する件数を取得 -->
+    <select id="countByVisibleFlgTrueAndNameJp" resultType="int">
+        SELECT COUNT(1)
+        FROM HYMNS HM
+        <where>
+            HM.VISIBLE_FLG = 'true'
+            <if test="nameJp != null and nameJp != ''">
+                AND HM.NAME_JP = #{nameJp}
+            </if>
+        </where>
+    </select>
 
-	<!-- 有効かつ名前(JP)に一致し、指定IDを除く件数を取得（重複チェック用） -->
-	<select id="countByVisibleFlgTrueAndNameJpAndIdNot"
-		resultType="int">
-		SELECT COUNT(1)
-		FROM HYMNS HM
-		WHERE HM.VISIBLE_FLG = 'true'
-		AND HM.NAME_JP = #{nameJp}
-		AND HM.ID &lt;&gt; #{id}
-	</select>
+    <!-- 有効かつ名前(JP)に一致し、指定IDを除く件数を取得（重複チェック用） -->
+    <select id="countByVisibleFlgTrueAndNameJpAndIdNot" resultType="int">
+        SELECT COUNT(1)
+        FROM HYMNS HM
+        <where>
+            HM.VISIBLE_FLG = 'true'
+            <if test="nameJp != null and nameJp != ''">
+                AND HM.NAME_JP = #{nameJp}
+            </if>
+            <if test="id != null">
+                AND HM.ID &lt;&gt; #{id}
+            </if>
+        </where>
+    </select>
 
-	<!-- 有効かつ名前(KR)に一致する件数を取得 -->
-	<select id="countByVisibleFlgTrueAndNameKr" resultType="int">
-		SELECT
-		COUNT(1)
-		FROM HYMNS HM
-		WHERE HM.VISIBLE_FLG = 'true'
-		AND HM.NAME_KR =
-		#{nameKr}
-	</select>
+    <!-- 有効かつ名前(KR)に一致する件数を取得 -->
+    <select id="countByVisibleFlgTrueAndNameKr" resultType="int">
+        SELECT COUNT(1)
+        FROM HYMNS HM
+        <where>
+            HM.VISIBLE_FLG = 'true'
+            <if test="nameKr != null and nameKr != ''">
+                AND HM.NAME_KR = #{nameKr}
+            </if>
+        </where>
+    </select>
 
-	<!-- 有効かつ名前(KR)に一致し、指定IDを除く件数を取得（重複チェック用） -->
-	<select id="countByVisibleFlgTrueAndNameKrAndIdNot"
-		resultType="int">
-		SELECT COUNT(1)
-		FROM HYMNS HM
-		WHERE HM.VISIBLE_FLG = 'true'
-		AND HM.NAME_KR = #{nameKr}
-		AND HM.ID &lt;&gt; #{id}
-	</select>
+    <!-- 有効かつ名前(KR)に一致し、指定IDを除く件数を取得（重複チェック用） -->
+    <select id="countByVisibleFlgTrueAndNameKrAndIdNot" resultType="int">
+        SELECT COUNT(1)
+        FROM HYMNS HM
+        <where>
+            HM.VISIBLE_FLG = 'true'
+            <if test="nameKr != null and nameKr != ''">
+                AND HM.NAME_KR = #{nameKr}
+            </if>
+            <if test="id != null">
+                AND HM.ID &lt;&gt; #{id}
+            </if>
+        </where>
+    </select>
 
-	<!-- 有効な賛美歌をNAME_KRでLIKE検索、ID昇順 -->
-	<select id="selectActiveByNameKrLike" resultMap="hymnResultMap">
-		SELECT HM.ID,
-		HM.NAME_JP, HM.NAME_KR, HM.LINK,
-		HM.UPDATED_TIME, HM.UPDATED_USER,
-		HM.LYRIC,
-		HM.VISIBLE_FLG,
-		HM.CLASSICAL
-		FROM HYMNS HM
-		WHERE HM.VISIBLE_FLG
-		= 'true'
-		AND
-		HM.NAME_KR LIKE #{keyword}
-		ORDER BY HM.ID ASC
-	</select>
+    <!-- 有効な賛美歌をNAME_KRでLIKE検索、ID昇順 -->
+    <select id="selectActiveByNameKrLike" resultMap="hymnResultMap">
+        SELECT HM.ID, HM.NAME_JP, HM.NAME_KR, HM.LINK,
+               HM.UPDATED_TIME, HM.UPDATED_USER,
+               HM.LYRIC, HM.VISIBLE_FLG, HM.CLASSICAL
+        FROM HYMNS HM
+        <where>
+            HM.VISIBLE_FLG = 'true'
+            <if test="keyword != null and keyword != ''">
+                AND HM.NAME_KR LIKE #{keyword}
+            </if>
+        </where>
+        ORDER BY HM.ID ASC
+    </select>
 
-	<!-- 有効かつクラシックではない賛美歌をNAME_KRでLIKE検索、ID昇順 -->
-	<select id="selectActiveByNameKrLikeAndClassicalFalse"
-		resultMap="hymnResultMap">
-		SELECT HM.ID, HM.NAME_JP, HM.NAME_KR, HM.LINK,
-		HM.UPDATED_TIME, HM.UPDATED_USER, HM.LYRIC,
-		HM.VISIBLE_FLG,
-		HM.CLASSICAL
-		FROM HYMNS HM
-		WHERE HM.VISIBLE_FLG = 'true' AND
-		HM.CLASSICAL = 'false'
-		AND
-		HM.NAME_KR LIKE #{keyword}
-		ORDER BY HM.ID ASC
-	</select>
+    <!-- 有効かつクラシックではない賛美歌をNAME_KRでLIKE検索、ID昇順 -->
+    <select id="selectActiveByNameKrLikeAndClassicalFalse" resultMap="hymnResultMap">
+        SELECT HM.ID, HM.NAME_JP, HM.NAME_KR, HM.LINK,
+               HM.UPDATED_TIME, HM.UPDATED_USER,
+               HM.LYRIC, HM.VISIBLE_FLG, HM.CLASSICAL
+        FROM HYMNS HM
+        <where>
+            HM.VISIBLE_FLG = 'true'
+            AND HM.CLASSICAL = 'false'
+            <if test="keyword != null and keyword != ''">
+                AND HM.NAME_KR LIKE #{keyword}
+            </if>
+        </where>
+        ORDER BY HM.ID ASC
+    </select>
 
-	<!-- IDで有効な賛美歌を1件取得 -->
-	<select id="selectByIdAndVisibleFlgTrue"
-		resultMap="hymnResultMap">
-		SELECT HM.ID, HM.NAME_JP, HM.NAME_KR, HM.LINK,
-		HM.UPDATED_TIME, HM.UPDATED_USER, HM.LYRIC,
-		HM.VISIBLE_FLG,
-		HM.CLASSICAL
-		FROM HYMNS HM
-		WHERE HM.ID =
-		#{id}
-		AND HM.VISIBLE_FLG = 'true'
-	</select>
+    <!-- IDで有効な賛美歌を1件取得 -->
+    <select id="selectByIdAndVisibleFlgTrue" resultMap="hymnResultMap">
+        SELECT HM.ID, HM.NAME_JP, HM.NAME_KR, HM.LINK,
+               HM.UPDATED_TIME, HM.UPDATED_USER,
+               HM.LYRIC, HM.VISIBLE_FLG, HM.CLASSICAL
+        FROM HYMNS HM
+        <where>
+            <if test="id != null">
+                HM.ID = #{id}
+            </if>
+            AND HM.VISIBLE_FLG = 'true'
+        </where>
+    </select>
 
-	<!-- 有効かつクラシックではない賛美歌をID昇順で全件取得 -->
-	<select id="selectByVisibleFlgTrueAndClassicalFalseOrderByIdAsc"
-		resultMap="hymnResultMap">
-		SELECT HM.ID, HM.NAME_JP, HM.NAME_KR, HM.LINK,
-		HM.UPDATED_TIME, HM.UPDATED_USER, HM.LYRIC,
-		HM.VISIBLE_FLG,
-		HM.CLASSICAL
-		FROM HYMNS HM
-		WHERE
-		HM.VISIBLE_FLG = 'true'
-		AND HM.CLASSICAL
-		= 'false'
-		ORDER BY HM.ID ASC
-	</select>
+    <!-- 有効かつクラシックではない賛美歌をID昇順で全件取得 -->
+    <select id="selectByVisibleFlgTrueAndClassicalFalseOrderByIdAsc" resultMap="hymnResultMap">
+        SELECT HM.ID, HM.NAME_JP, HM.NAME_KR, HM.LINK,
+               HM.UPDATED_TIME, HM.UPDATED_USER,
+               HM.LYRIC, HM.VISIBLE_FLG, HM.CLASSICAL
+        FROM HYMNS HM
+        <where>
+            HM.VISIBLE_FLG = 'true'
+            AND HM.CLASSICAL = 'false'
+        </where>
+        ORDER BY HM.ID ASC
+    </select>
 
-	<!-- 有効な賛美歌をID昇順で全件取得 -->
-	<select id="selectByVisibleFlgTrueOrderByIdAsc"
-		resultMap="hymnResultMap">
-		SELECT HM.ID, HM.NAME_JP, HM.NAME_KR, HM.LINK,
-		HM.UPDATED_TIME, HM.UPDATED_USER, HM.LYRIC,
-		HM.VISIBLE_FLG,
-		HM.CLASSICAL
-		FROM HYMNS HM
-		WHERE HM.VISIBLE_FLG = 'true'
-		ORDER BY HM.ID
-		ASC
-	</select>
+    <!-- 有効な賛美歌をID昇順で全件取得 -->
+    <select id="selectByVisibleFlgTrueOrderByIdAsc" resultMap="hymnResultMap">
+        SELECT HM.ID, HM.NAME_JP, HM.NAME_KR, HM.LINK,
+               HM.UPDATED_TIME, HM.UPDATED_USER,
+               HM.LYRIC, HM.VISIBLE_FLG, HM.CLASSICAL
+        FROM HYMNS HM
+        <where>
+            HM.VISIBLE_FLG = 'true'
+        </where>
+        ORDER BY HM.ID ASC
+    </select>
 
-	<!-- 有効な賛美歌の最新更新時間を取得 -->
-	<select id="selectMaxUpdatedTime"
-		resultType="java.time.LocalDateTime">
-		SELECT MAX(HM.UPDATED_TIME)
-		FROM HYMNS HM
-		WHERE
-		HM.VISIBLE_FLG = 'true'
-	</select>
+    <!-- 有効な賛美歌の最新更新時間を取得 -->
+    <select id="selectMaxUpdatedTime" resultType="java.time.LocalDateTime">
+        SELECT MAX(HM.UPDATED_TIME)
+        FROM HYMNS HM
+        <where>
+            HM.VISIBLE_FLG = 'true'
+        </where>
+    </select>
 
-	<!-- 賛美歌を1件登録 -->
-	<insert id="insert">
-		INSERT INTO HYMNS (ID, NAME_JP, NAME_KR, LINK,
-		UPDATED_TIME, UPDATED_USER,
-		LYRIC, VISIBLE_FLG, CLASSICAL)
-		VALUES
-		(#{id}, #{nameJp}, #{nameKr}, #{link}, #{updatedTime},
-		#{updatedUser},
-		#{lyric}, #{visibleFlg}, #{classical})
-	</insert>
+    <!-- 賛美歌を1件登録 -->
+    <insert id="insert">
+        INSERT INTO HYMNS (
+            ID, NAME_JP, NAME_KR, LINK,
+            UPDATED_TIME, UPDATED_USER,
+            LYRIC, VISIBLE_FLG, CLASSICAL
+        ) VALUES (
+            #{id}, #{nameJp}, #{nameKr}, #{link},
+            #{updatedTime}, #{updatedUser},
+            #{lyric}, #{visibleFlg}, #{classical}
+        )
+    </insert>
 
-	<!-- 賛美歌を1件更新 -->
-	<update id="update">
-		UPDATE HYMNS
-		SET NAME_JP = #{nameJp},
-		NAME_KR =
-		#{nameKr},
-		LINK = #{link},
-		UPDATED_TIME = #{updatedTime},
-		UPDATED_USER =
-		#{updatedUser},
-		LYRIC = #{lyric},
-		VISIBLE_FLG = #{visibleFlg},
-		CLASSICAL
-		= #{classical}
-		WHERE ID = #{id}
-	</update>
+    <!-- 賛美歌を1件更新 -->
+    <update id="update">
+        UPDATE HYMNS
+        <set>
+            <if test="nameJp != null">NAME_JP      = #{nameJp},</if>
+            <if test="nameKr != null">NAME_KR      = #{nameKr},</if>
+            <if test="link != null">LINK           = #{link},</if>
+            <if test="updatedTime != null">UPDATED_TIME = #{updatedTime},</if>
+            <if test="updatedUser != null">UPDATED_USER = #{updatedUser},</if>
+            <if test="lyric != null">LYRIC          = #{lyric},</if>
+            <if test="visibleFlg != null">VISIBLE_FLG  = #{visibleFlg},</if>
+            <if test="classical != null">CLASSICAL    = #{classical},</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
 
-	<!-- 賛美歌を論理削除 -->
-	<update id="deleteLogically">
-		UPDATE HYMNS
-		SET VISIBLE_FLG = 'false'
-		WHERE ID = #{id}
-	</update>
+    <!-- 賛美歌を論理削除 -->
+    <update id="deleteLogically">
+        UPDATE HYMNS
+        <set>
+            VISIBLE_FLG = 'false'
+        </set>
+        WHERE ID = #{id}
+    </update>
 
 </mapper>
