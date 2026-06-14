@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.dao.StudentDao;
 import app.preach.gospel.dto.StudentDto;
 import app.preach.gospel.model.Student;
+import app.preach.gospel.repository.StudentRepository;
 import app.preach.gospel.service.IStudentService;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.CoStringUtils;
@@ -43,15 +43,15 @@ public class StudentServiceImpl implements IStudentService {
 	/**
 	 * 奉仕者リポ
 	 */
-	private final StudentDao studentDao;
+	private final StudentRepository studentRepository;
 
 	/**
 	 * コンストラクタ
 	 *
-	 * @param studentDao
+	 * @param studentRepository
 	 */
-	protected StudentServiceImpl(final StudentDao studentDao) {
-		this.studentDao = studentDao;
+	protected StudentServiceImpl(final StudentRepository studentRepository) {
+		this.studentRepository = studentRepository;
 	}
 
 	@Transactional(readOnly = true)
@@ -60,9 +60,10 @@ public class StudentServiceImpl implements IStudentService {
 		try {
 			int count;
 			if (CoStringUtils.isDigital(id)) {
-				count = this.studentDao.countByLoginAccountAndVisibleFlgTrueAndIdNot(Long.parseLong(id), loginAccount);
+				count = this.studentRepository.countByLoginAccountAndVisibleFlgTrueAndIdNot(Long.parseLong(id),
+						loginAccount);
 			} else {
-				count = this.studentDao.countByLoginAccountAndVisibleFlgTrue(loginAccount);
+				count = this.studentRepository.countByLoginAccountAndVisibleFlgTrue(loginAccount);
 			}
 			return CoResult.ok(count);
 		} catch (final DataAccessException e) {
@@ -74,7 +75,7 @@ public class StudentServiceImpl implements IStudentService {
 	@Override
 	public CoResult<StudentDto, DataAccessException> getStudentInfoById(final Long id) {
 		try {
-			final Student student = this.studentDao.selectByIdAndVisibleFlgTrue(id)
+			final Student student = this.studentRepository.findByIdAndVisibleFlgTrue(id)
 					.orElseThrow(() -> new DataAccessException(ProjectConstants.MESSAGE_STUDENT_NOT_FOUND) {
 					}); // または適切な例外
 			final var dto = new StudentDto(student.id(), student.loginAccount(), student.username(), student.password(),
@@ -90,7 +91,7 @@ public class StudentServiceImpl implements IStudentService {
 	public CoResult<String, DataAccessException> infoUpdation(final @NotNull StudentDto studentDto) {
 		try {
 			// 1. 既存データの取得
-			final Student existing = this.studentDao.selectByIdAndVisibleFlgTrue(Long.valueOf(studentDto.id()))
+			final Student existing = this.studentRepository.findByIdAndVisibleFlgTrue(Long.valueOf(studentDto.id()))
 					.orElseThrow(() -> new DataAccessException("User not found") {
 					});
 			// 2. パスワードの判定
@@ -108,7 +109,7 @@ public class StudentServiceImpl implements IStudentService {
 					existing.roleId(), // 必要に応じて変更
 					existing.updatedTime(), // タイムスタンプ維持
 					Boolean.TRUE.toString());
-			this.studentDao.update(updated);
+			this.studentRepository.save(updated);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
@@ -125,12 +126,12 @@ public class StudentServiceImpl implements IStudentService {
 	@Override
 	public CoResult<String, Object> preLoginUpdate(final String loginAccount) {
 		try {
-			return this.studentDao.selectByVisibleFlgTrueAndLoginAccount(loginAccount).map(student -> {
+			return this.studentRepository.findByVisibleFlgTrueAndLoginAccount(loginAccount).map(student -> {
 				// 不変レコードのコピーを作成して更新時間をセット
 				final var updated = new Student(student.id(), student.loginAccount(), student.password(),
 						student.username(), student.dateOfBirth(), student.email(), student.roleId(),
 						LocalDateTime.now(), student.visibleFlg());
-				this.studentDao.update(updated);
+				this.studentRepository.save(updated);
 				return CoResult.ok(ProjectConstants.MESSAGE_STRING_LOGIN_SUCCESS);
 			}).orElse(CoResult
 					.err(new DataRetrievalFailureException(ProjectConstants.MESSAGE_SPRINGSECURITY_LOGINERROR1)));

@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import app.preach.gospel.common.ProjectConstants;
-import app.preach.gospel.dao.BookDao;
-import app.preach.gospel.dao.ChapterDao;
-import app.preach.gospel.dao.VerseDao;
 import app.preach.gospel.dto.BookDto;
 import app.preach.gospel.dto.ChapterDto;
 import app.preach.gospel.dto.VerseDto;
 import app.preach.gospel.model.Verse;
+import app.preach.gospel.repository.BookRepository;
+import app.preach.gospel.repository.ChapterRepository;
+import app.preach.gospel.repository.VerseRepository;
 import app.preach.gospel.service.IBookService;
 import app.preach.gospel.utils.CoResult;
 import app.preach.gospel.utils.CoStringUtils;
@@ -29,28 +29,29 @@ import app.preach.gospel.utils.CoStringUtils;
 public class BookServiceImpl implements IBookService {
 
 	/* DAOs */
-	private final BookDao bookDao;
-	private final ChapterDao chapterDao;
-	private final VerseDao verseDao;
+	private final BookRepository bookRepository;
+	private final ChapterRepository chapterRepository;
+	private final VerseRepository verseRepository;
 
 	/**
 	 * コンストラクタ
 	 *
-	 * @param bookDao
-	 * @param chapterDao
-	 * @param verseDao
+	 * @param bookRepository
+	 * @param chapterRepository
+	 * @param verseRepository
 	 */
-	protected BookServiceImpl(final BookDao bookDao, final ChapterDao chapterDao, final VerseDao verseDao) {
-		this.bookDao = bookDao;
-		this.chapterDao = chapterDao;
-		this.verseDao = verseDao;
+	protected BookServiceImpl(final BookRepository bookRepository, final ChapterRepository chapterRepository,
+			final VerseRepository verseRepository) {
+		this.bookRepository = bookRepository;
+		this.chapterRepository = chapterRepository;
+		this.verseRepository = verseRepository;
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public CoResult<List<BookDto>, DataAccessException> getBooks() {
 		try {
-			final var bookDtos = this.bookDao.selectAllOrderByIdAsc().stream()
+			final var bookDtos = this.bookRepository.findAllByOrderByIdAsc().stream()
 					.map(r -> new BookDto(r.id(), r.name(), r.nameJp())).toList();
 			return CoResult.ok(bookDtos);
 		} catch (final DataAccessException e) {
@@ -66,7 +67,7 @@ public class BookServiceImpl implements IBookService {
 		try {
 			// 短絡評価のためにIntegerへラップ
 			final var bookId = (id != null) ? Integer.valueOf(id) : Integer.valueOf(1);
-			final var chapterDtos = this.chapterDao.selectByBookIdOrderByIdAsc(bookId).stream()
+			final var chapterDtos = this.chapterRepository.findByBookIdOrderByIdAsc(bookId).stream()
 					.map(r -> new ChapterDto(r.id(), r.name(), r.nameJp(), r.bookId().toString())).toList();
 			return CoResult.ok(chapterDtos);
 		} catch (final DataAccessException e) {
@@ -85,7 +86,7 @@ public class BookServiceImpl implements IBookService {
 		final long targetPhraseId = (chapterId * 1000) + id;
 		try {
 			// 1. 章節情報の取得
-			final var chaptersRecord = this.chapterDao.selectById(chapterId)
+			final var chaptersRecord = this.chapterRepository.findById(chapterId)
 					.orElseThrow(() -> new DataAccessException("Chapter not found: " + chapterId) {
 					});
 			// 2. 節名称（例: "創世記:1" のようなフォーマット）の組み立て
@@ -102,21 +103,22 @@ public class BookServiceImpl implements IBookService {
 				changeLine = Boolean.FALSE.toString();
 			}
 			// 4. 既存レコードの確認（UPSERTロジックの判定）
-			final var existingPhrase = this.verseDao.selectById(targetPhraseId);
+			final var existingPhrase = this.verseRepository.findById(targetPhraseId);
 			if (existingPhrase.isPresent()) {
 				// 更新用インスタンスを生成
 				final var updatedPhrase = new Verse(targetPhraseId, phraseName, textEn, phraseDto.textJp(), chapterId,
 						changeLine);
-				this.verseDao.update(updatedPhrase);
+				this.verseRepository.save(updatedPhrase);
 				return CoResult.ok(ProjectConstants.MESSAGE_STRING_UPDATED);
 			}
 			// 新規登録用インスタンスを生成
-			final var verse = new Verse(targetPhraseId, phraseName, textEn, phraseDto.textJp(), chapterId, changeLine);
+//			final var verse = new Verse(targetPhraseId, phraseName, textEn, phraseDto.textJp(), chapterId, changeLine);
 			// Spring Data JDBCは、@Idに値（targetPhraseId）が既にセットされている場合、
 			// デフォルトで「UPDATE」を試みようとします（新しく払い出されたIDではないと認識するため）。
 			// しかし、既存確認をして存在しないことが保証されているため、ここではsave()メソッドを呼び出すことで、
 			// Spring Data JDBC内部のメカニズムによって新規インサート、または必要に応じた永続化処理が正しく行われます。
-			this.verseDao.insert(verse);
+			this.verseRepository.insertOne(targetPhraseId, phraseName, textEn, phraseDto.textJp(), chapterId,
+					changeLine);
 			return CoResult.ok(ProjectConstants.MESSAGE_STRING_INSERTED);
 		} catch (final DataAccessException e) {
 			return CoResult.err(e);
